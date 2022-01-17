@@ -176,10 +176,15 @@ if __name__ == "__main__":
     callables = [ (state, tx_to_fun(scriptf, state)) for state in trimmed_states]
     # execute all callables and check their status
     for (tx_no, (state, fun)) in enumerate(callables):
-        no_fail = fun()
-        if no_fail == state["lastTx"]["fail"]:
-            print(f"Transaction {tx_no} has failed", file=sys.stderr)
-            sys.exit(1)
+        is_ok = fun()
+        expected_ok = not state["lastTx"]["fail"]
+        def status(ok):
+            return "OK" if ok else "FAIL"
+
+        print("Expected transaction {n} to {e}, got {a}". \
+                format(n=tx_no, e=status(expected_ok), a=status(is_ok)), \
+              file=sys.stderr)
+        # do not quit immediately, even if the result is unexpected
     else:
         print("Executed {n} transactions".format(n = len(trimmed_states)))
 
