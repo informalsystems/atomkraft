@@ -33,7 +33,7 @@ import time
 from web3 import Web3
 from web3.exceptions import ContractLogicError
 
-from connector import Connector
+from atomkraft.connector import Connector
 
 class EthConnector(Connector):
     """Ethereum connector communicates

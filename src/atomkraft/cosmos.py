@@ -21,7 +21,7 @@ import shlex
 import subprocess
 import sys
 
-from connector import Connector
+from atomkraft.connector import Connector
 
 ### A generic CLI Cosmos command
 

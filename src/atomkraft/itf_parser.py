@@ -29,7 +29,7 @@ class ItfError(Exception):
         self.message = message
     
 
-def trace_from_itf_json(filename):
+def trace_from_itf_file(filename):
     """Parse a trace from a file in the Informal Trace Format"""
 
     with open(filename, "r") as f:
