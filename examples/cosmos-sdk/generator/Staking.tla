@@ -84,6 +84,7 @@ Delegate(sender, amount) ==
         \/ amount < 0
         \/ amount + GAS_PER_TX > balanceOf[sender]
     IN
+    /\ amount > 0 \* force it, otherwise, the CLI command fails
     /\ lastTx' = [ id |-> nextTxId, tag |-> "delegate", fail |-> fail,
                    sender |-> sender, toAddr |-> Validator, value |-> amount ]
     /\ nextTxId' = nextTxId + 1
@@ -107,6 +108,7 @@ Unbond(sender, amount) ==
         \/ sender = Validator
         \/ amount > delegated[sender]
     IN
+    /\ amount > 0   \* force it, otherwise, the CLI command fails
     /\ lastTx' = [ id |-> nextTxId, tag |-> "unbond", fail |-> fail,
                    sender |-> sender, toAddr |-> Validator, value |-> amount ]
     /\ nextTxId' = nextTxId + 1
@@ -128,6 +130,7 @@ Transfer(sender, receiver, amount) ==
         \/ sender = receiver
         \/ amount > balanceOf[sender] - GAS_PER_TX
     IN
+    /\ amount > 0   \* force it, otherwise, the CLI command fails
     /\ lastTx' = [ id |-> nextTxId, tag |-> "transfer-cosmos", fail |-> fail,
                    sender |-> sender, toAddr |-> receiver, value |-> amount ]
     /\ nextTxId' = nextTxId + 1

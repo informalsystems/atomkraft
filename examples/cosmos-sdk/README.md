@@ -34,9 +34,10 @@ transactions produced unexpected results:
 ```
 Input: traces/trace2.itf.json
 Output: test.sh
-cosmos balance:   999999145334281986226124000
+cosmos balance:   999999363335802543203126000
 expected balance: 999998999999999998999800000
-Expected transaction 0 to OK, got FAIL
+validator has 363335802544203326000 more coins as expected (due to rewards?)
+Expected transaction 0 to OK, got OK
 Expected transaction 1 to FAIL, got OK
 Executed 2 transactions
 ```

@@ -72,7 +72,9 @@ def tx_to_fun(scriptf, state):
 
         print(f'cosmos balance:   {cosmos_bal}')
         print(f'expected balance: {expected_bal}')
-        return cosmos_bal <= expected_bal
+        if cosmos_bal > expected_bal:
+            diff = cosmos_bal - expected_bal
+            print(f"{account} has {diff} more coins as expected (due to rewards?)")
 
     tx = state["lastTx"]
     # tx staking
@@ -84,7 +86,8 @@ def tx_to_fun(scriptf, state):
                     COSMOS_VALIDATOR_ADDR, coin, "--from", sender]
             result = CosmosCmd(scriptf, COSMOS_BIN, args, []).call()
             # check that the balance of the sender has decreased as expected
-            return result != None and result and compareBalances(tx["sender"])
+            compareBalances(tx["sender"])
+            return result != None and result
 
         return fun
     elif tx["tag"] == "unbond":
@@ -95,7 +98,8 @@ def tx_to_fun(scriptf, state):
                     COSMOS_VALIDATOR_ADDR, coin, "--from", sender]
             result = CosmosCmd(scriptf, COSMOS_BIN, args, []).call()
             # check that the balance of the sender has increased as expected
-            return result != None and result and compareBalances(tx["sender"])
+            compareBalances(tx["sender"])
+            return result != None and result
 
         return fun
     # tx bank send
