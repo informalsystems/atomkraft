@@ -106,12 +106,6 @@ NoUnbondAndTransfer(trace) ==
     IN
     ~Example
 
-\* A counterexample to this invariant causes panic in the processing logic.
-\* NoDelegatePanic == "NO DISCLOSURE YET"
-
-\* A counterexample to this invariant halts consensus.
-\* NoDelegateHalt == "NO DISCLOSURE YET"
-
 \* a transaction view that allows us to produce a variety of examples
 TxView ==
     <<lastTx.tag, lastTx.sender, lastTx.toAddr,
