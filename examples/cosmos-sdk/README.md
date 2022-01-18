@@ -67,6 +67,8 @@ The above trace does not expose any bug in Cosmos SDK. Interestingly, it shows
 that our expectations in the test deviate from the implementation.  In fact,
 this trace reproduces the behavior that once was reported as a bug.
 
+Check more traces in [traces](./traces).
+
 ## How to write my own traces?
 
 Start with the exiting example, e.g.,
