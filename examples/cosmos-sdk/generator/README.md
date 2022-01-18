@@ -1,0 +1,3 @@
+# Generating Informal traces
+
+TODO
