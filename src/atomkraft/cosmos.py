@@ -55,9 +55,13 @@ class CosmosCmd(Connector):
                 # if code is 0, then the command was executed successfully
                 self.shlog(f"# return code: {proc.returncode}")
                 if proc.returncode > 0:
-                    for e in errs.split('\n'):
-                        self.shlog('# ' + e)
-                    return False
+                    if errs != None:
+                        for e in errs.split('\n'):
+                            self.shlog('# ' + e)
+                        return False
+                    else:
+                        self.shlog('# Transaction command was not valid. Execution was aborted on CLI.')
+                        return False
                 else:
                     for o in outs.split('\n'):
                         self.shlog('# ' + o)
