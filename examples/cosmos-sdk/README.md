@@ -20,7 +20,7 @@ traces against a single-node instance of Cosmos SDK with atomkraft.
  1. Execute a trace against the dockerized blockchain:
 
     ```sh
-    $ ./exec-trace.sh --script test.sh traces/trace2.itf.json
+    $ ./exec-trace.py --script test.sh traces/trace2.itf.json
     ```
 
 ## What happened?
@@ -57,11 +57,12 @@ You can see the CLI commands that were executed in the generated file
   --from cosmos1uquty6wqc03pqpmz0t5fzh4fd5npfpd23wgr7l  
 ```
 
-From what we can see here, it is unexpected for the `bank transfer` to go
-through, as the delegator's balance was expected to have fewer coins than is
-required in the transfer. However, the command `staking delegate` has
-transferred delegation rewards on the delegator's account, and the transfer
-succeeded.
+From what we can see here, it is unexpected for the `bank send` transaction to
+succeed, as the delegator's balance was expected to have fewer coins than is
+required in the send. However, because the delegator was already staked (in the genesis),
+the command `staking delegate` auto-claimed the delegation rewards that had already accrued,
+transferring them to the delegator's account. It therefore did have enough tokens for the
+send transaction to succeed.
 
 The above trace does not expose any bug in Cosmos SDK. Interestingly, it shows
 that our expectations in the test deviate from the implementation.  In fact,
