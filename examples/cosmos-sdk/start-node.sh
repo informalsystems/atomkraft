@@ -10,7 +10,7 @@ MONIKER="localtestnet"
 docker run --rm --name "cosmos-container" \
     -p 0.0.0.0:1317:1317 \
     -i cosmos-image \
-    /usr/bin/simd start \
+    /usr/bin/simd start --mode validator\
     --pruning=nothing \
     --trace \
     --minimum-gas-prices=0.0001stake \
