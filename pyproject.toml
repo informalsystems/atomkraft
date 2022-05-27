@@ -1,9 +1,22 @@
+[tool.poetry]
+name = "atomkraft"
+version = "0.1.0"
+description = ""
+authors = ["Ranadeep Biswas <mail@rnbguy.at>"]
+license = "Apache"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+frozendict = "^2.3.2"
+json-rpc = "^1.13.0"
+requests = "^2.27.1"
+web3 = "^5.29.1"
+modelator = {git = "git@github.com:informalsystems/modelator", rev = "rano/pytest"}
+
+[tool.poetry.dev-dependencies]
+pytest = "^7.1.2"
+prospector = {extras = ["with_mypy", "with_bandit"], version = "^1.7.7"}
+
 [build-system]
-requires = [
-  "setuptools>=42",
-  "frozendict",
-  "json-rpc",
-  "requests",
-  "web3"
-]
-build-backend = "setuptools.build_meta"
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
