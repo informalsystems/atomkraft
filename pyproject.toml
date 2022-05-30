@@ -12,6 +12,8 @@ json-rpc = "^1.13.0"
 requests = "^2.27.1"
 web3 = "^5.29.1"
 modelator = {git = "git@github.com:informalsystems/modelator", rev = "rano/pytest"}
+cosmos-net = {git = "git@github.com:informalsystems/cosmos.net", rev = "main"}
+terra-sdk = {git = "git@github.com:informalsystems/cosmos.py", rev = "rano/cosmos_sdk"}
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.2"
