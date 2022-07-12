@@ -24,7 +24,7 @@ An example workflow with customization points:
    - For the test traces that they find interesting, or that are failing on the blockchain, the user tells the tool to store them as regression tests. The regression Python script is generated, which can be executed independently.
 4. The user asks the tool to generate a report for the failed tests, using `atomkraft report ...`. The user sends the report to the developers.
    - The developers fix the bugs, and ask the user to recheck the regression test on them. The user runs `atomkraft regression ...`, which automatically reruns previously stored regression tests.
-5. The blockchain developers are happy about the interaction, and ask the auditor to provide them the regression tests. The auditor sends them the Python regression test, generated was generated in step 4. 
+5. The blockchain developers are happy about the interaction, and ask the auditor to provide them the regression tests. The auditor sends them the Python regression test generated in step 4. 
 
 
 ## Launch a testnet
