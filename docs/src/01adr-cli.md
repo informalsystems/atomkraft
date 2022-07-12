@@ -10,10 +10,12 @@ Below we specify only the outcomes for successful command execution. Upon unsucc
 
 ## Launch a testnet
 
-A user wants to set up a Cosmos-SDK testnet, using a specific binary of their choice, so that the testnet can later be used either for exploration or testing.  Upon successful command execution, the testnet should be in operational step, and keep running; the testnet mnemonic is returned to the user. The proposed command format:
+A user wants to set up a Cosmos-SDK testnet, using a specific binary of their choice, so that the testnet can later be used either for exploration or testing.  
+
+Upon successful command execution, the testnet should be in operational step, and keep running; the testnet mnemonic is returned to the user. The proposed command format:
 
 ```
-atomkraft launch <binary> <genesis-config> <node-config>
+atomkraft testnet <binary> <genesis-config> <node-config>
 ```
 where: 
     
@@ -28,10 +30,12 @@ It should be possible to terminate one or all of the previously launched testnet
 
 ## Explore a testnet
 
-A user wants to explore the running testnet visually (e.g. validators or transactions), so that they see the transactions live as they are executed. Upon successful command execution, a browser window is opened with the blockchain explorer for the specified testnet. The proposed command format:
+A user wants to explore the running testnet visually (e.g. validators or transactions), so that they see the transactions live as they are executed. 
+
+Upon successful command execution, a browser window is opened with the blockchain explorer for the specified testnet. The proposed command format:
 
 ```
-atomkraft explore [<address>]
+atomkraft explorer [<address>]
 ```
 
 where `<address>` is the optional address for the blockchain explorer to connect to. If omitted, the explorer should connect to the testnet launched last.
@@ -39,10 +43,12 @@ where `<address>` is the optional address for the blockchain explorer to connect
 
 ## Generate test trace
 
-A user has written a TLA+ model, and wants to generate some traces for test assertions from the model, so that they can understand the model behavior, and use some of the generated test traces later for executing on a testnet. Upon successful command execution, the generated test trace should be saved to disk. The proposed command format:
+A user has written a TLA+ model, and wants to generate some traces for test assertions from the model, so that they can understand the model behavior, and use some of the generated test traces later for executing on a testnet. 
+
+Upon successful command execution, the generated test trace in the ITF format should be saved to disk. The proposed command format:
 
 ```
-atomkraft generate <model> <model-config> <test-assertion>
+atomkraft trace <model> <model-config> <test-assertion>
 ```
 where: 
 - `<model>` is the (path to) TLA+ model;
@@ -50,12 +56,33 @@ where:
 - `<test-assertion>` is the name of the model operator describing the desired test trace.
 
 
-## Generate test stub
+## Generate reactor stub
+
+A user has either a TLA+ model, or a test trace, and wants to write a reactor that transforms trace steps into transactions, so that they can be executed on a testnet. For that purpose, Atomkraft generates a reactor stub, which user only needs to fill with concrete actions.
+
+Upon successful command execution, a Python file should be generated, which contains Python function stubs for all relevant model actions.
+
+```
+atomkraft reactor <model-or-trace> <reactor-stub-file>
+```
+where: 
+- `<model-or-trace>` is the (path to) TLA+ model, or to ITF trace;
+- `<reactor-stub-file>` is the (path to) Python reactor stub to be generated.
 
 
 
+## Run a trace against the testnet
 
+WIP name: **Thrust a trace**
 
-## Execute a trace on the blockchain
+```
+atomkraft run <trace> 
+```
 
+## Test the blockchain
 
+WIP name: **Blast the testnet**
+
+```
+atomkraft test <model> <test-assertion>
+```
