@@ -102,9 +102,6 @@ Upon successful command execution, the testnet should be in operational step, an
 atomkraft testnet <binary> <genesis-config> <node-config>
 ```
 
-```
-atomkraft basic-test
-```
 where: 
     
 - `<binary>` is the name or path to a Cosmos-SDK based blockchain binary (e.g. `gaiad`);
