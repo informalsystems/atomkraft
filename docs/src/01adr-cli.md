@@ -8,6 +8,25 @@ This ADR describes the command-line interface of Atomkraft, and how it is suppos
 
 Below we specify only the outcomes for successful command execution. Upon unsuccessful command execution, the error should be reported to the user, and no remnants (e.g. zombie processes, or additional files beyond requested) should remain.
 
+## General principles
+
+The tool CLI commands represent top-level user workflows, where each workflow is able to bring value to a user. Our primary user for the CLI is the auditor, who comes to a new Cosmos-SDK based project, and wants to test it in a limited amount of time.
+
+Each CLI command produces a certain artifact (e.g. a blockchain configuration, or a Python reactor stub). Those intermediate artifacts can be customized, and then seamlessly integrated back in the workflows that depend on them.
+
+An example workflow with customization points:
+
+1. A user comes to the new blockchain. They want to check that Atomkraft is able to interact with it, so they run `atomkraft testnet ...`
+   - The produced configuration and a Python script that sets up a blockchain using the configuration is independently runnable. The user can customize the script; it will be picked up at later stages.
+2. The user writes a TLA+ spec, and wants to connect it to the blockchain they set up in step 1. They run `atomkraft reactor ...`; the reactor stub is generated.
+   - The user customizes the stub, and fills the gaps. The stub, together with the previous script for blockchain setup is runnable independently, but are also picked up automatically at later stages.
+3. The user wants to test the blockchain set up in step 1, using the model and the reactor developed in step 2. They run `atomkraft test ...`. They experiment with different test assertions.
+   - For the test traces that they find interesting, or that are failing on the blockchain, the user tells the tool to store them as regression tests. The regression Python script is generated, which can be executed independently.
+4. The user asks the tool to generate a report for the failed tests, using `atomkraft report ...`. The user sends the report to the developers.
+   - The developers fix the bugs, and ask the user to recheck the regression test on them. The user runs `atomkraft regression ...`, which automatically reruns previously stored regression tests.
+5. The blockchain developers are happy about the interaction, and ask the auditor to provide them the regression tests. The auditor sends them the Python regression test, generated was generated in step 4. 
+
+
 ## Launch a testnet
 
 A user wants to set up a Cosmos-SDK testnet, using a specific binary of their choice, so that the testnet can later be used either for exploration or testing.  
