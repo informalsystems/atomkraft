@@ -39,17 +39,43 @@ Below we outline one possible workflow between auditor, developer, and the Atomk
 
 We don't want to reinvent the wheel wrt. such things as test execution or reporting. Instead, we want to plug in Atomkraft into [Pytest](https://pytest.org/), an established testing framework.
 
+### Clean and transparent project structure
+
+We aim to provide a valuable service to our users, and not to hide everything behind the wall of obscurity. Thus we want to give user the possibility to fully understand at least how our artifacts are structured, and to intervene/customize this structure if necessary. To that end, upon setting up an Atomkraft project, we will have the top-level project structure containing the folders:
+- `chain`
+- `models`
+- `traces`
+- `reactors`
+- `tests`
+- `reports`
+
+We want to exactly explain to our users what each high-level Atomkraft command does, so that it is clear to them how to interface with the tool if needed, either manually or automated.
+
 ### Independently reusable artifacts
 
-We don't want to force our tool on developers, if they don't want it. We want to provide a CLI for users who are not comfortable programming in Python, or for those who prefer CLI tools to writing their own scripts. But at every stage of Atomkraft project evolution, we produce artifacts which a user can pick up and employ independently of Atomkraft. Those artifacts will be either in the form of human-readable data (e.g. test traces in JSON), or in the form of independently runnable Python scripts.
+We don't want to force our tool on developers, if they don't want it. We want to provide a CLI for users who are not comfortable programming in Python, or for those who prefer CLI tools to writing their own scripts. But at every stage of Atomkraft project evolution, we produce artifacts which a user can pick up and employ independently of Atomkraft. Those artifacts should be either in the form of human-readable data (e.g. test traces in JSON), or in the form of independently executable Python scripts (e.g. setup scripts,  or generated tests).
 
 ### Reproducibility
 
+Whenever a test is executed on the testnet and fails, we want to store
+ - all artifacts necessary to reproduce the failure (model, test assertion, and/or test trace, chain setup, reactor)
+ - all information relevant to the failure upon test execution (transactions, logs, error messages)
+
+Wrt. the failed tests, it should be possible:
+ - to generate reports with different degree of verbosity;
+ - to export test suites containing reproducible tests.
 
 ### Configuration flexibility with sensible defaults
 
+In general, Atomkraft commands will depend on a lot of parameters. In order to simplify user's life, we want to use default parameters whenever possible:
+ - use default testnet configuration, that needs to be modified only rarely. At the same time provide the possibility to tweak any parameter;
+ - save preconditions for the subsequent Atomkraft commands upon execution of the former ones.
+   - E.g., when a TLA+ model is configured using `atomkraft model <file>`, subsequent invocation of `atomkraft trace` should implicitly assume the model provided previously, but also provide the possibility to specify an alternative one using `--model <file>` option.
+   - Similarly, `atomkraft reactor` should store the name of generated reactor in the configuration, and this name should be later picked up automatically by `atomkraft run`, but with the possibility for an alternative reactor via `--reactor` option.
 
-## CLI
+## Everything below is WIP 
+
+## Command-line interface
 
 Below we specify only the outcomes for successful command execution. Upon unsuccessful command execution, the error should be reported to the user, and no remnants (e.g. zombie processes, or additional files beyond requested) should remain.
 
