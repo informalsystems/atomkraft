@@ -15,9 +15,9 @@ Below we specify only the outcomes for successful command execution. Upon unsucc
 
 ## Workflow with users
 
-Initially we plan to target two main user categories: security auditors and cosmos developers. They both share to correctness concern for a particular codebase (a Cosmos project), but from slightly different perspectives:
+Initially we plan to target two main user categories: security auditors and cosmos developers. They both share the correctness concern for a particular codebase (a Cosmos project), but from slightly different perspectives:
 - a security auditor has a limited time frame to look at the project, and wants to uncover as many bugs as possible in that period;
-- a Cosmos developer wants to uncover as many bugs as possible e.g. before the next release (hence the auditor engagement), without diverging much from their main activity (feature development), but also wants to ensure that correctness is maintained long-term after the release.
+- a Cosmos developer wants to uncover as many bugs as possible e.g. before the next release (hence the auditor engagement), without diverging much from their main activity (feature development), but also wants to ensure that code correctness is maintained long-term after the release.
 
 Below we outline one possible workflow between auditor, developer, and the Atomkraft tool, which provides a preview of possible tool usage.
 
