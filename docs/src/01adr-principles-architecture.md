@@ -1,10 +1,10 @@
-# ADR-01: Atomkraft CLI
+# ADR-01: Atomkraft principles and architecture
 
 | authors           | revision | revision date  |
 | ----------------- | --------:| --------------:|
-| Andrey Kuprianov  |        1 | July 12, 2022  |
+| Andrey Kuprianov  |        1 | July 14, 2022  |
 
-This ADR describes Atomkraft general organizational principles, and how it is supposed to be used by the users, which artifacts it produces, and how it is decomposed into main components. Concrete functionality of those components is delegated to subsequent ADRs.
+This ADR describes Atomkraft general organizational principles, how it is supposed to be used by the users, which artifacts it produces, and how it is decomposed into main components. Concrete functionality of those components is delegated to subsequent ADRs.
 
 
 ![Atomkraft high-level architecture](atomkraft-high-level-arch.svg)
@@ -12,6 +12,30 @@ This ADR describes Atomkraft general organizational principles, and how it is su
 
 
 Below we specify only the outcomes for successful command execution. Upon unsuccessful command execution, the error should be reported to the user, and no remnants (e.g. zombie processes, or additional files beyond requested) should remain.
+
+## Workflow with users
+
+Initially we plan to target two main user categories: security auditors and cosmos developers. They both share to correctness concern for a particular codebase (a Cosmos project), but from slightly different perspectives:
+- a security auditor has a limited time frame to look at the project, and wants to uncover as many bugs as possible in that period;
+- a Cosmos developer wants to uncover as many bugs as possible e.g. before the next release (hence the auditor engagement), without diverging much from their main activity (feature development), but also wants to ensure that correctness is maintained long-term after the release.
+
+Below we outline one possible workflow between auditor, developer, and the Atomkraft tool, which provides a preview of possible tool usage.
+
+1. Auditor comes to the new Cosmos project, represented by a blockchain binary (e.g. `gaiad`). They want to check that Atomkraft is able to interact with it, so they run `atomkraft init ...`, which:
+   - creates new Atomkraft project with all necessary file structure
+   - produces blockchain configuration and a Python script that sets up a testnet using the configuration. The user can customize the both the configuration and the script; it will be picked up at later stages.
+   - spins the testnet, and performs basic blockchain checks;
+2. Auditor can check that the updated configuration is still functional via `atomkraft chain ...`, which spins or shuts down the testnet.
+3. Auditor examines the Cosmos project, and writes one or multiple TLA+ models, each exercising a particularly critical aspect of project functionality. Some basic checks can be performed on the model using `atomkraft model ...`
+4. Auditor wants generate some example test scenarios, for which purpose they use `atomkraft trace ...`. 
+5. Auditor wants to connect TLA+ models to the testnet that is set up in step 1. They run `atomkraft reactor ...`, which generates the reactor stub: the set of Python handlers that map abstract model actions to concrete blockchain transactions. As project expertise is required to implement the handlers correctly, auditor contacts developer for the help implementing the handlers correctly.
+   - The reactor can be combined with the blockchain setup script stub, and some manual tests can be written utiilizing it. The reactor will be picked automatically at later stages.
+6. Now auditor has all components to connect TLA+ models to the testnet. They execute `atomkraft run ...` to run a single test trace against the testnet, or `atomkraft mbt` to perform the complete MBT workflow, starting from a TLA+ model and a test assertion, down to executing the generated traces on the testnet. Auditor tweaks the model, its parameters, and experiments with different test assertions, trying to uncover possible bugs.
+   - Test traces that are failing on the testnet, are stored together with all artifacts that were used to produce them, as well as with all information obtained from the blockchain, thus forming the regression test suite.
+7. Auditor asks the tool to generate a report for the failed tests, using `atomkraft report ...`, and submits the report to the developer.
+8. Developer fixes the bugs, and asks auditor to recheck the them. Auditor runs `atomkraft test ...`, which automatically reruns previously stored regression tests.
+9. Developer is happy about the interaction, and ask the auditor to provide them the regression tests. Auditor sends them the regression test suite generated in step 6.
+
 
 ## General principles
 
