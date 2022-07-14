@@ -9,10 +9,6 @@ This ADR describes Atomkraft general organizational principles, how it is suppos
 
 ![Atomkraft high-level architecture](atomkraft-high-level-arch.svg)
 
-
-
-Below we specify only the outcomes for successful command execution. Upon unsuccessful command execution, the error should be reported to the user, and no remnants (e.g. zombie processes, or additional files beyond requested) should remain.
-
 ## Workflow with users
 
 Initially we plan to target two main user categories: security auditors and cosmos developers. They both share the correctness concern for a particular codebase (a Cosmos project), but from slightly different perspectives:
@@ -34,10 +30,29 @@ Below we outline one possible workflow between auditor, developer, and the Atomk
    - Test traces that are failing on the testnet, are stored together with all artifacts that were used to produce them, as well as with all information obtained from the blockchain, thus forming the regression test suite.
 7. Auditor asks the tool to generate a report for the failed tests, using `atomkraft report ...`, and submits the report to the developer.
 8. Developer fixes the bugs, and asks auditor to recheck the them. Auditor runs `atomkraft test ...`, which automatically reruns previously stored regression tests.
-9. Developer is happy about the interaction, and ask the auditor to provide them the regression tests. Auditor sends them the regression test suite generated in step 6.
+9. Developer is happy about the interaction, and asks the auditor to provide them the regression tests. Auditor sends them the regression test suite generated in step 6.
 
 
 ## General principles
+
+### Pytest integration
+
+We don't want to reinvent the wheel wrt. such things as test execution or reporting. Instead, we want to plug in Atomkraft into [Pytest](https://pytest.org/), an established testing framework.
+
+### Independently reusable artifacts
+
+We don't want to force our tool on developers, if they don't want it. We want to provide a CLI for users who are not comfortable programming in Python, or for those who prefer CLI tools to writing their own scripts. But at every stage of Atomkraft project evolution, we produce artifacts which a user can pick up and employ independently of Atomkraft. Those artifacts will be either in the form of human-readable data (e.g. test traces in JSON), or in the form of independently runnable Python scripts.
+
+### Reproducibility
+
+
+### Configuration flexibility with sensible defaults
+
+
+## CLI
+
+Below we specify only the outcomes for successful command execution. Upon unsuccessful command execution, the error should be reported to the user, and no remnants (e.g. zombie processes, or additional files beyond requested) should remain.
+
 
 The tool CLI commands represent top-level user workflows, where each workflow is able to bring value to a user. Our primary user for the CLI is the auditor, who comes to a new Cosmos-SDK based project, and wants to test it in a limited amount of time.
 
