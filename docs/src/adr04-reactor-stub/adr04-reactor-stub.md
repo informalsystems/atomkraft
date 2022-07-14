@@ -42,7 +42,8 @@ Furthermore, it assumes imported `Testnet` from `cosmos_net.pytest`.
 
  The stub should include:
 
- - a stub for the testnet initialization function
+ - a stub for the testnet initialization function, based on the value of the `binary` that was put into `.atomkraft` by the command `atomkraft init`.
+ 
   ```python
 @pytest.fixture(scope="session")
 def chain_testnet():
