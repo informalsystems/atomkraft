@@ -4,7 +4,12 @@
 | ----------------- | --------:| --------------:|
 | Andrey Kuprianov  |        1 | July 12, 2022  |
 
-This ADR describes the command-line interface of Atomkraft, and how it is supposed to be used by the users as a standalone tool. It *does not* describe other possible usage scenarios, e.g. integration with testing frameworks (such as Pytest). We structure the description around the tool use cases.
+This ADR describes Atomkraft general organizational principles, and how it is supposed to be used by the users, which artifacts it produces, and how it is decomposed into main components. Concrete functionality of those components is delegated to subsequent ADRs.
+
+
+![Atomkraft high-level architecture](atomkraft-high-level-arch.svg)
+
+
 
 Below we specify only the outcomes for successful command execution. Upon unsuccessful command execution, the error should be reported to the user, and no remnants (e.g. zombie processes, or additional files beyond requested) should remain.
 
