@@ -1,4 +1,4 @@
-# ADR-03: Atomkraft init subcommand
+# ADR-02: Atomkraft init subcommand
 
 | authors         | revision | revision date |
 | --------------- | -------: | ------------: |
