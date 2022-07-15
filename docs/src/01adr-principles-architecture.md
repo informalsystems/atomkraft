@@ -1,8 +1,8 @@
 # ADR-01: Atomkraft principles and architecture
 
-| authors           | revision | revision date  |
-| ----------------- | --------:| --------------:|
-| Andrey Kuprianov  |        1 | July 14, 2022  |
+| authors                                                          | revision | revision date  |
+| ---------------------------------------------------------------- | --------:| --------------:|
+| Andrey Kuprianov, Hernán Vanzetto, Ivan Gavran, Ranadeep Biswas  |        1 | July 15, 2022  |
 
 This ADR describes Atomkraft general organizational principles, how it is supposed to be used by the users, which artifacts it produces, and how it is decomposed into main components. Concrete functionality of those components is delegated to subsequent ADRs.
 
@@ -72,6 +72,11 @@ In general, Atomkraft commands will depend on a lot of parameters. In order to s
  - save preconditions for the subsequent Atomkraft commands upon execution of the former ones.
    - E.g., when a TLA+ model is configured using `atomkraft model <file>`, subsequent invocation of `atomkraft trace` should implicitly assume the model provided previously, but also provide the possibility to specify an alternative one using `--model <file>` option.
    - Similarly, `atomkraft reactor` should store the name of generated reactor in the configuration, and this name should be later picked up automatically by `atomkraft run`, but with the possibility for an alternative reactor via `--reactor` option.
+
+
+## Interaction between components
+
+![Atomkraft component interaction](atomkraft-component-interaction.svg)
 
 ## Everything below is WIP 
 
