@@ -29,12 +29,13 @@ where
 
  The `ReactorRoom` class implements the desired behavior.
  Its member functions are:
-  - `generate_reactor(actions_list, variables_list, stub_file_path=None)`:
+  - `generate_reactor(actions_list, variables_list, stub_file_path=None) -> Path`:
   generates the stub, containing one `@step` function for each action from the `action_list`,
   and each of these functions takes variables from the `variables_list` as arguments.
   The reactor stub is created at `stub_file_path` name location
   (if it is `None`, a default location is used).
-  - `check_reactor(trace, keypath, reactor=None)`: it checks if the `reactor` (default reactor if `None`) is compatible with the `trace`. A reactor is compatible with a trace if each action appearing in `trace` is matched with a function in `reactor`. The `keypath` argument defines which field of the ITF trace contains the action.
+  The function returns the path to the generated reactor stub.
+  - `check_reactor(trace, keypath, reactor=None) -> Path | Exception`: it checks if the `reactor` (default reactor if `None`) is compatible with the `trace`. A reactor is compatible with a trace if each action appearing in `trace` is matched with a function in `reactor`. The `keypath` argument defines which field of the ITF trace contains the action. The function returns the path to reactor, if the check is successful. If the check is unsuccessful, it raises a (custom) `ReactorIncompatible` exception.
 
 
 ### Stub content
