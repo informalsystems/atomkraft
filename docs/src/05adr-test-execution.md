@@ -26,20 +26,20 @@ Test execution CLI provides two main entry points:
 ### Setup
 
 From `Setup` component it needs three functions provided via an agreed upon entry point:
-    - `setup()` sets up the chain with the default configured parameters;
-      - **TODO**: agree upon the way to provide initialization parameters (e.g. the set of users and their wallets)from the trace into the chain genesis.
-    - `client()` provides the configured `LCDClient` ready to be used with the chain;
-    - `teardown()` destroys the previously set up chain.
+- `setup()` sets up the chain with the default configured parameters;
+  - **TODO**: agree upon the way to provide initialization parameters (e.g. the set of users and their wallets)from the trace into the chain genesis.
+- `client()` provides the configured `LCDClient` ready to be used with the chain;
+- `teardown()` destroys the previously set up chain.
 
 ## Model
 
 From `Model` component it needs two functions provided via an agreed upon entry point:
-    - `get_trace(trace_file = None)` retrieves the ITF trace, either the default one, or from the provided location;
-    - `get_model_trace(model = None, config = None, sample = None)` provides a trace from the model, using either default, or the provided parameters.
+- `get_trace(trace_file = None)` retrieves the ITF trace, either the default one, or from the provided location;
+- `get_model_trace(model = None, config = None, sample = None)` provides a trace from the model, using either default, or the provided parameters.
 
 ## React (Generate)
 
 From `React` component it needs one function provided via an agreed upon entry point:
-    - `get_trace_reactor(trace, reactor = None)` provides the reactor for the given trace, and checks that they match each other.
+- `get_trace_reactor(trace, reactor = None)` provides the reactor for the given trace, and checks that they match each other.
 
 In the current version, `Execute` doesn't provide any programmatic service to other components.
