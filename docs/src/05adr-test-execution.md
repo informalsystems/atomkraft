@@ -43,7 +43,7 @@ From `Model` component it needs two functions provided via an agreed upon entry 
 - `get_model_trace(model = None, config = None, sample = None)` provides a trace from the model, using either default, or the provided parameters.
 
 From `React` component it needs one function provided via an agreed upon entry point:
-- `get_trace_reactor(trace, reactor = None)` provides the reactor for the given trace, and checks that they match each other.
+- `get_trace_reactor(trace, reactor = None)` takes the optional path to the reactor as argument, and returns the path to the reactor file if it matches the provided trace, or raises an exception if it doesn't. If `reactor` argument is omitted, the default reactor should be used.
 
 In the current version, `Execute` doesn't provide any programmatic service to other components.
 
