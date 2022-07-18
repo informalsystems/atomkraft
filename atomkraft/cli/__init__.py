@@ -3,6 +3,8 @@ from typing import List, Optional
 import typer
 from copier import run_auto
 
+from .. import chain
+
 app = typer.Typer(name="atomkraft", no_args_is_help=True)
 
 
@@ -12,17 +14,9 @@ def init(binary: str, include: Optional[List[str]] = typer.Argument(None)):
     run_auto("gh:informalsystems/atomkraft", ".", vcs_ref="rano/prototype")
 
 
-chain = typer.Typer()
+app.add_typer(chain.app, name="chain")
 
 
-@chain.command()
-def config(key: str, value: Optional[str] = typer.Argument(None)):
-    print(key, value)
-
-
-@chain.command()
+@app.command()
 def test_drive():
     print()
-
-
-app.add_typer(chain, name="chain")
