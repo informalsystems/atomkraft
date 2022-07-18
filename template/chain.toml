@@ -1,0 +1,20 @@
+name = "cosmoshub"
+prefix = "cosmos"
+denom = "uatom"
+coin = 118
+
+[app]
+"api.enable" = true
+"api.swagger" = true
+"api.enabled-unsafe-cors" = true
+"minimum-gas-prices" = "0.10uatom"
+"rosetta.enable" = false
+
+[config]
+"instrumentation.prometheus" = false
+"p2p.addr_book_strict" = false
+"p2p.allow_duplicate_ip" = true
+
+[genesis]
+"app_state.gov.voting_params.voting_period" = "600s"
+"app_state.mint.minter.inflation" = "0.300000000000000000"
