@@ -6,6 +6,12 @@
 
 The present ADR describes the external interfaces of the `Execute` component that deals with test execution, either from a given abstract trace, or from (a set of) traces generated from a TLA+ model.
 
+`Execute` component is the main integration point between other component. It doesn't do much work on its own; most of it is delegated, or should be already done at previous stages. The essence of what its doing can be described in a simple sentence:
+> Collect all pieces together, generate a test file, and call Pytest on it.
+
+All test files from all invocations are collected in the `tests` folder. So, the user can at any point in time run `pytest`, and all tests will be reproduced.
+
+**NB**: The current version provides only rudimentary reproducibility by preserving abstract traces. All other artifacts (chain configuration, reactor) are not preserved; so if a user modifies them, the tests may cease to become reproducible.
 
 ## Command line interface
 
@@ -61,4 +67,4 @@ In the current version, `Execute` doesn't provide any programmatic service to ot
 - `Setup`-mediated: blockchain binary
 - `Model`-mediated: model checker (Apalache)
 
-By itself, `Execute` runs `Pytest`, by supplying it the name of the generated test file.
+By itself, `Execute` runs `Pytest`, by supplying it the name of the generated test file. In the current version, the output of Pytest is passed unmodified to the user.
