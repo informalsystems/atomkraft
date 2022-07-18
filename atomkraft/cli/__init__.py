@@ -1,5 +1,6 @@
 from typing import List, Optional
 
+import pytest
 import typer
 from copier import run_auto
 
@@ -18,5 +19,5 @@ app.add_typer(chain.app, name="chain")
 
 
 @app.command()
-def test_drive():
-    print()
+def smoke_test():
+    pytest.main([".atomkraft/smoke_tests"])
