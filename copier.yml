@@ -1,0 +1,13 @@
+project_name:
+  type: str
+  placeholder: my_atomkraft
+
+_subdirectory: template
+
+_exclude:
+  - ".gitkeep"
+
+_tasks:
+  - poetry init
+  - poetry add git+https://github.com/informalsystems/atomkraft#rano/prototype
+  - poetry run python -m pytest .atomkraft/smoke_tests || true
