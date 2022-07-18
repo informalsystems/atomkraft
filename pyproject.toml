@@ -1,9 +1,0 @@
-[build-system]
-requires = [
-  "setuptools>=42",
-  "frozendict",
-  "json-rpc",
-  "requests",
-  "web3"
-]
-build-backend = "setuptools.build_meta"
