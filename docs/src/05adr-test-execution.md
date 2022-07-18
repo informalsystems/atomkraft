@@ -19,6 +19,9 @@ Test execution CLI provides two main entry points:
   - `--config <config-file>` specifies the model configuration file.
   - `--sample <sample-operator>` gives the name of the sample operator describing the test traces.
 
+**TODO**: add configuration capabilities, e.g.:
+- `test set timeout <TIMEOUT>` allows to specify the timeout (in seconds) for execution of a single test.
+
 ## Programmatic dependencies
 
 `Execute` component depends on all three upstream components:
@@ -43,3 +46,25 @@ From `React` component it needs one function provided via an agreed upon entry p
 - `get_trace_reactor(trace, reactor = None)` provides the reactor for the given trace, and checks that they match each other.
 
 In the current version, `Execute` doesn't provide any programmatic service to other components.
+
+## Environment interaction
+
+### File read
+
+`Execute` doesn't read any files by itself, all read access is mediated programmatically via other components. A non-exhaustive list of possible read dependencies:
+- `Setup`-mediated: chain configuration
+- `React`-mediated: reactor file (either default or from provided location)
+- `Model`-mediated: model, config & trace files (either default or from provided locations)
+
+### File write
+
+`Execute` writes into the following locations:
+- `tests` folder: writes the generated Pytest-based test file, that links together the setup, the reactor, and the execution of the ITF trace
+
+### Processes
+
+`Execute` runs the following (non-exhaustive) list of processes, mediated by other components:
+- `Setup`-mediated: blockchain binary
+- `Model`-mediated: model checker (Apalache)
+
+By itself, `Execute` runs `Pytest`, by supplying it the name of the generated test file.
