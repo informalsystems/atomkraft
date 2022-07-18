@@ -7,7 +7,7 @@ This ADR describes one component of Atomkraft, as decribed in [ADR-01](01adr-pri
 This is an early version of the ADR, meant for the first prototype.
 Major changes to the scope are very likely.
 
-## Reactor
+## Reactor Stub
 
 Once the user has a trace (either written by hand, or obtained from the system model),  they need to write a *reactor*.
 A reactor is a set of Python functions connecting the actions of the trace to executions of the code.
@@ -15,7 +15,7 @@ A reactor is a set of Python functions connecting the actions of the trace to ex
 In this ADR we describe a command `atomkraft reactor ...` which creates a stub of the reactor, 
 auto-generating all the boilerplate, and leaving it to the user to only fill in the application-specific parts.
 
-## Task
+## Command Line Interface
 
 The interface of the command looks like this: 
 `atomkraft reactor <actions_list> <variables_list> [<reactor-stub-file>]`
@@ -28,9 +28,13 @@ where
 ## Implementation
  
  The `ReactorRoom` class implements the desired behavior.
- Its member function are:
-  - `generate_reactor(actions_list, variables_list, stub_file_path=None)`: generates the stub
-  - `check_reactor(trace, reactor=None)`: it checks if the `reactor` (default reactor if `None`) is compatible with the `trace`. A reactor is compatible with a trace if each action appearing in `trace` is matched with a function in `reactor`. (TODO: in order to know what is *an action in trace*, I need to get a `keypath` argument from `Execute` (or some place else))
+ Its member functions are:
+  - `generate_reactor(actions_list, variables_list, stub_file_path=None)`: 
+  generates the stub, containing one `@step` function for each action from the `action_list`, 
+  and each of these functions takes variables from the `variables_list` as arguments. 
+  The reactor stub is created at `stub_file_path` name location 
+  (if it is `None`, a default location is used).
+  - `check_reactor(trace, keypath, reactor=None)`: it checks if the `reactor` (default reactor if `None`) is compatible with the `trace`. A reactor is compatible with a trace if each action appearing in `trace` is matched with a function in `reactor`. The `keypath` argument defines which field of the ITF trace contains the action.
 
 
  ### Config updates
