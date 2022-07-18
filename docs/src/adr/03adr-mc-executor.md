@@ -11,16 +11,15 @@ Proposed
 ## Summary
 
 This document describes the architecture of the Model-Checker (MC) Executor,
-consisting of two modules, one for models and one for traces. See a high-level
-overview in Atomkraft's architecture diagram: ![Atomkraft architecture
-diagram](images/architecture-diagram.png).
-
-The underlying functionality of both modules is mostly provided by Modelator.
+consisting of a module for loading models and generating traces. See a
+high-level overview in Atomkraft's architecture diagram: ![Atomkraft
+architecture diagram](images/architecture-diagram.png). The underlying
+functionality is mostly provided by Modelator.
 
 ## Model module
 
-This module deals with loading, parsing, and setting of models, as an interface
-to the Modelator's `Model` class.
+This module deals with loading, parsing, setting of models, and generation of
+traces. It is essentially an interface to Modelator's `Model` class.
 
 ### CLI commands
 
@@ -42,54 +41,30 @@ atomkraft model monitor add html <monitor-file.html>
 Additionally, `model` has the following sub-commands that require some extra
 logic not directly provided by Modelator:
 ```
+atomkraft trace [--model=<model>] <config-path> <test-assertion>
 atomkraft model info # will display filename(s), init, next, constants, invariants, ... 
 atomkraft model monitor remove-all # will remove all initialized monitors
 ```
 
-Apalache does not require a `cfg` file with the model, so we do not included in
-the first prototype:
-```
-atomkraft model config load <model-config-file> # will call the `ModelConfig` class in Modelator
-```
-
-### Artifacts and programmatic interface
-
-This module can load a model in memory that can be used by other modules.
-
-This module does not expect any connection to other components.
-
-## Trace module
-
-This module deals with generation of execution traces from a model.
-
-### CLI commands
-
-The `atomkraft trace` command generates ITF traces. If no model is given as
-parameter, it will use a model already loaded in memory with the `atomkraft
-model` command. Its format is:
-```
-atomkraft trace [--model=<model>] <config-path> <test-assertion> [<traces-path>]
-```
-where:
-- `<config-path>` is the (path to) TOML file with the model and model checker
+The `atomkraft model trace` command generates ITF traces. If no model is given
+as parameter, it will use a model already loaded in memory. Its parameters are:
+- `<config-path>`, the path to a TOML file with the model and model checker
   configuration (see below)
-- `<test-assertion>` is the name of the model operator describing the desired
-  test trace
-- `<traces-path>` is a custom location for the trace files
+- `<test-assertion>`, the name of the TLA+ operator describing the desired test
+  trace
 
 Upon successful command execution, the generated test trace should be persisted
-to disk in ITF format. The files will be located in a directory defined by the
-Setup/Config module.
+to disk in ITF format. The files will be located in the `traces` directory.
 
-Under the hood, the `atomkraft trace` command will call the following Modelator
-Shell commands:
+Under the hood, `atomkraft model trace` calls the following Modelator Shell
+commands:
 ```
 model = ModelShell.parse_file(<model-path>)
 model.typecheck()
 config = ModelConfig.parse_file(<config-path>)
 model.check(config, <test-assertion>, <traces-path>)
 ```
-where `ModelConfig` would be a new class in Modelator, used as a common data
+where `ModelConfig` will be a new class in Modelator, used as a common data
 structure for Apalache and TLC configurations.
 
 ### Model config file
@@ -103,6 +78,7 @@ init = "Init"
 next = "Next"
 spec = "Spec"
 invariants = ["Inv1", "Inv2", ...]
+samples = ["Ex1", "Ex2", ...]
 tlc_config_file = "path/to/ModuleName.cfg"
 
 [Constants]
@@ -112,22 +88,25 @@ constant_name_n = "tla_constant_value_n"
 
 [Config]
 check_deadlock = FALSE
-length=10 # called depth in TLC
+length = 10 # called 'depth' in TLC
+
+[Monitors]
+md = "path/to/monitor.md"
+html = "path/to/monitor.html"
 ```
 
-#### Related commands:
-```
-atomkraft config traces-dir <traces-path> # sets the location for the generated trace files
-atomkraft config traces-dir # displays the current directory for the trace files
-```
-#### Artifacts
+### Artifacts and programmatic interface
 
-This command generates ITF traces in the directory `default_traces_dir` provided
-by the Setup module.
+This module can load a model in memory that can be used by other modules. The
+`trace` sub-command generates ITF trace files.
+
+This module does not expect any connection to other components.
 
 #### Relation to other modules
 
-- Read the value of `default_traces_dir` provided by the Setup module.
+This module provides the following functions that can be called by other modules.
+- `get_all_traces()` will return a list with all the trace files in the default directory for traces.
+- `get_trace(trace_file_path)` will return the content of the file `trace_file_path`.
 
 ## Decision
 
