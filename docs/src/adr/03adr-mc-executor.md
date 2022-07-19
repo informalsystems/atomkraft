@@ -6,25 +6,23 @@
 
 ## Status
 
-Proposed
+Proposed first architecture for a prototype
 
 ## Summary
 
 This document describes the architecture of the Model-Checker (MC) Executor,
-consisting of a module for loading models and generating traces. See a
-high-level overview in Atomkraft's architecture diagram: ![Atomkraft
-architecture diagram](images/architecture-diagram.png). The underlying
-functionality is mostly provided by Modelator.
+consisting of a module for loading models and generating traces. Modelator
+provides most of its underlying functionality.
 
-## Model module
+## Description
 
-This module deals with loading, parsing, setting of models, and generation of
-traces. It is essentially an interface to Modelator's `Model` class.
+The MC Executor module deals with loading, parsing, and setting of models, and
+also with the generation of traces.
 
 ### CLI commands
 
-The command `atomkraft model` is essentially a wrapper around Modelator's
-`Model`, where each of its sub-commands would map almost one-to-one to the
+The CLI command `atomkraft model` is essentially a wrapper around Modelator's
+`Model` class, where each of its sub-commands would map almost one-to-one to the
 methods of `Model`:
 ```
 atomkraft model load <model-path> # in Model it's the parse_file method
@@ -47,7 +45,7 @@ atomkraft model monitor remove-all # will remove all initialized monitors
 ```
 
 The `atomkraft model trace` command generates ITF traces. If no model is given
-as parameter, it will use a model already loaded in memory. Its parameters are:
+as parameter, it will use an already loaded model. Its parameters are:
 - `<config-path>`, the path to a TOML file with the model and model checker
   configuration (see below)
 - `<test-assertion>`, the name of the TLA+ operator describing the desired test
@@ -97,14 +95,12 @@ html = "path/to/monitor.html"
 
 ### Artifacts and programmatic interface
 
-This module can load a model in memory that can be used by other modules. The
-`trace` sub-command generates ITF trace files.
-
-This module does not expect any connection to other components.
+The MC Executor module can load a file with a TLA+ model that can be used by other modules.
+The `trace` sub-command generates ITF trace files.
 
 #### Relation to other modules
 
-This module provides the following functions that can be called by other modules.
+MC Executor provides the following functions that can be called by other modules.
 - `get_all_traces()` will return a list with all the trace files in the default directory for traces.
 - `get_trace(trace_file_path)` will return the content of the file `trace_file_path`.
 
