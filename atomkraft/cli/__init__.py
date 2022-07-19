@@ -12,7 +12,7 @@ app = typer.Typer(name="atomkraft", no_args_is_help=True)
 @app.command()
 def init(binary: str, include: Optional[List[str]] = typer.Argument(None)):
     print(f"Binary {binary}, include {include}")
-    run_auto("gh:informalsystems/atomkraft", ".", vcs_ref="rano/prototype")
+    run_auto("gh:informalsystems/atomkraft", ".", vcs_ref="dev")
 
 
 app.add_typer(chain.app, name="chain")

@@ -9,5 +9,5 @@ _exclude:
 
 _tasks:
   - poetry init
-  - poetry add git+https://github.com/informalsystems/atomkraft#rano/prototype
+  - poetry add git+https://github.com/informalsystems/atomkraft#dev
   - poetry run python -m pytest .atomkraft/smoke_tests || true
