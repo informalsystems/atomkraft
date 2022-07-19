@@ -21,3 +21,8 @@ app.add_typer(chain.app, name="chain")
 @app.command()
 def smoke_test():
     pytest.main([".atomkraft/smoke_tests"])
+
+
+@app.command()
+def reactor():
+    print("Generating a reactor...")
