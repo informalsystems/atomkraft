@@ -1,9 +1,35 @@
+[tool.poetry]
+name = "atomkraft"
+version = "0.1.0"
+description = "Testing for Cosmos Blockchains"
+authors = ["Ranadeep Biswas <mail@rnbguy.at>"]
+license = "Apache"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pytest = "^7.1.2"
+copier = "^6.1.0"
+typer = {extras = ["all"], version = "^0.6.1"}
+terra-sdk = {git = "https://github.com/informalsystems/terra.py", rev = "rano/cosmos"}
+modelator = {git = "https://github.com/informalsystems/modelator", rev = "rano/unstable"}
+numpy = "^1.22.4"
+hdwallet = "^2.1.1"
+bip-utils = "^2.3.0"
+tabulate = "^0.8.9"
+jsonrpcclient = "^4.0.2"
+websockets = "^10.3"
+toml = "^0.10.2"
+
 [build-system]
-requires = [
-  "setuptools>=42",
-  "frozendict",
-  "json-rpc",
-  "requests",
-  "web3"
-]
-build-backend = "setuptools.build_meta"
+requires = ["poetry-core>=1.0.0", "setuptools>=42"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+atomkraft = "atomkraft.cli:app"
+
+[tool.poetry.plugins]
+pytest11 = { atomkraft-chain = "atomkraft.chain.pytest" }
+
+[tool.isort]
+profile = "black"
+src_paths = ["atomkraft", "test"]

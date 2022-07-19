@@ -1,0 +1,26 @@
+name: Build docker image for pingpub explorer
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/pingpub.yml
+      - explorer/**
+
+jobs:
+  docker-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Docker build
+        uses: docker/build-push-action@v3
+        with:
+          context: explorer
+          load: true
