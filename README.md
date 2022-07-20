@@ -5,13 +5,17 @@ Testing for Cosmos Blockchains
 ### Using `pip` (inside a system or virtual env)
 
 ```
-pip install git+https://github.com/informalsystems/atomkraft@dev
+pip install atomkraft
 atomkraft --help
+# or
+python -m atomkraft --help
 ```
 
 ### Using `poetry` (inside a project)
 
 ```
-poetry add git+https://github.com/informalsystems/atomkraft#dev
-poerty run atomkraft
+poetry add atomkraft
+poerty run atomkraft --help
+# or
+poetry run python -m atomkraft --help
 ```
