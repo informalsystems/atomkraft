@@ -6,7 +6,7 @@ import os
 from copier import run_auto
 
 from .. import chain
-from atomkraft import Reactor
+from .. import Reactor
 
 app = typer.Typer(name="atomkraft", no_args_is_help=True)
 
@@ -33,11 +33,11 @@ def smoke_test():
 
 @app.command()
 def reactor(
-    variables_list: Optional[str] = typer.Option(
-        None, help="A list of state variables to include into reactors as parameters"
+    variables_list: str = typer.Option(
+        ..., help="A list of state variables to include into reactors as parameters"
     ),
     actions_list: Optional[str] = typer.Option(
-        None, help="A list of actions for which to create reactor stubs."
+        ..., help="A list of actions for which to create reactor stubs."
     ),
     reactor_stub_file: str = typer.Option(
         os.path.abspath("atomkraft/reactors/reactor.py"),
