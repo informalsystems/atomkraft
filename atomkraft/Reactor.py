@@ -1,8 +1,7 @@
 from asyncio import constants
 from os import PathLike
-import os
 from typing import List
-import tomli
+import tomli, tomli_w
 from . import constants
 
 
@@ -35,6 +34,14 @@ def generate_reactor(
         f.write(init_stub)
         f.write(state_stub)
         f.write(actions_stub)
+
+    atomkraft_internal_config = tomli.load(
+        open(constants.ATOMKRAFT_INTERNAL_CONFIG, "rb")
+    )
+    atomkraft_internal_config["reactor"] = stub_file_path
+
+    with open(constants.ATOMKRAFT_INTERNAL_CONFIG, "wb") as internal_config_f:
+        tomli_w.dump(atomkraft_internal_config, internal_config_f)
 
     return stub_file_path
 
