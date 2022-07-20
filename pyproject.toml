@@ -15,7 +15,6 @@ repository = "https://github.com/informalsystems/atomkraft"
 include = ["LICENSE"]
 classifiers = [
     "Topic :: Software Development :: Testing",
-    "License :: OSI Approved :: Apache Software License",
     "Programming Language :: Python :: 3 :: Only",
 ]
 
