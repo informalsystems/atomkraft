@@ -40,7 +40,7 @@ def reactor(
         ..., help="A list of actions for which to create reactor stubs."
     ),
     reactor_stub_file: str = typer.Option(
-        os.path.abspath("atomkraft/reactors/reactor.py"),
+        os.path.abspath("reactors/reactor.py"),
         help="A path where to create the reactors file.",
     ),
 ):
