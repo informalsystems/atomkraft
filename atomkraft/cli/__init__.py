@@ -6,7 +6,7 @@ from copier import run_auto
 
 from .. import chain, test
 
-app = typer.Typer(name="atomkraft", no_args_is_help=True)
+app = typer.Typer(rich_markup_mode="rich", add_completion=False, name="atomkraft", no_args_is_help=True)
 
 
 @app.command()
