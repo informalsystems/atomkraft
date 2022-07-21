@@ -6,7 +6,7 @@ import os
 from copier import run_auto
 
 from .. import chain
-from ..reactor_room import reactor_room
+from ..reactor_room import reactor
 
 app = typer.Typer(name="atomkraft", no_args_is_help=True)
 
@@ -46,4 +46,4 @@ def reactor(
 ):
     actions = [act.strip() for act in actions_list.split(",")]
     variables = [var.strip() for var in variables_list.split(",")]
-    reactor_room.generate_reactor(actions, variables, reactor_stub_file)
+    reactor.generate_reactor(actions, variables, reactor_stub_file)

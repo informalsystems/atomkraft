@@ -1,4 +1,5 @@
 import ast
+import logging
 from os import PathLike
 from typing import List
 import tomli, tomli_w
@@ -9,7 +10,7 @@ from .step_functions_visitor import StepFunctionsVisitor
 
 def check_reactor(trace: PathLike, keypath="action", reactor=None) -> bool:
     """
-    returns true if each action appearing in trace is matched with a function in reactor
+    returns true if each action appearing in `trace` is matched with a function in `reactor`
     """
     if reactor is None:
         reactor = get_reactor()
@@ -18,8 +19,6 @@ def check_reactor(trace: PathLike, keypath="action", reactor=None) -> bool:
         root_node = ast.parse(f_reactor.read())
     v = StepFunctionsVisitor()
     v.visit(root_node)
-
-    print(v.step_functions)
     all_trace_actions = utils.get_all_trace_actions(trace, keypath)
 
     if constants.ALL_ENCOMPASSING_STEP in v.step_functions:
@@ -29,6 +28,9 @@ def check_reactor(trace: PathLike, keypath="action", reactor=None) -> bool:
 
 
 def get_reactor() -> PathLike:
+    """
+    returns the path to the current reactor from the internal config
+    """
     with open(constants.ATOMKRAFT_INTERNAL_CONFIG, "rb") as config_f:
         config_data = tomli.load(config_f)
         return config_data[constants.REACTOR_CONFIG_KEY]
@@ -41,10 +43,19 @@ def generate_reactor(
     with open(stub_file_path, "w") as f:
         f.write("hi")
 
-    # TODO: what is the best way to hanlde potential exceptions here?
-    chain_config = tomli.load(open(constants.CHAIN_CONFIG, "rb"))
-    atomkraft_config = tomli.load(open(constants.ATOMKRAFT_CONFIG, "rb"))
-    print(chain_config)
+    try:
+        chain_config = tomli.load(open(constants.CHAIN_CONFIG, "rb"))
+    except Exception as e:
+        logging.error(
+            f"Failed to parse {constants.CHAIN_CONFIG} file.\n Exception: {e}"
+        )
+
+    try:
+        atomkraft_config = tomli.load(open(constants.ATOMKRAFT_CONFIG, "rb"))
+    except Exception as e:
+        logging.error(
+            f"Failed to parse {constants.ATOMKRAFT_CONFIG} file.\n Exception: {e}"
+        )
 
     imports_stub = _imports_stub()
 
