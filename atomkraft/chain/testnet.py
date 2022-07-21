@@ -5,6 +5,8 @@ from typing import Dict
 import click
 import numpy as np
 import tabulate
+import tomlkit
+from munch import munchify
 
 from .node import Account, Coin, ConfigPort, Node
 from .utils import get_free_ports, update_port
@@ -42,6 +44,23 @@ class Testnet:
         self.overwrite = overwrite
         self.keep = keep
         self._verbose = verbose
+
+    @staticmethod
+    def load_toml(path: str):
+        with open(path) as f:
+            data = munchify(tomlkit.load(f))
+
+        return Testnet(
+            data.chain_id,
+            data.n_validator,
+            data.n_account,
+            data.binary,
+            data.denom,
+            data.prefix,
+            data.coin_type,
+            data.config.genesis,
+            data.config.node,
+        )
 
     @staticmethod
     def ports() -> Dict[str, ConfigPort]:
@@ -115,7 +134,11 @@ class Testnet:
         for (i, node) in enumerate(self.validator_nodes):
             for (config_file, configs) in self.node_config.items():
                 for (k, v) in configs.items():
-                    node.set(config_file, v, k)
+                    if isinstance(v, str):
+                        # TODO: avoid tomlkit.items.str being a list
+                        node.set(f"config/{config_file}.toml", str(v), k)
+                    else:
+                        node.set(f"config/{config_file}.toml", v, k)
 
             if i > 0:
                 ports = all_ports[i - 1]
@@ -213,14 +236,14 @@ def testnet(
     }
 
     node_config = {
-        "config/app.toml": {
+        "app": {
             "api.enable": True,
             "api.swagger": True,
             "api.enabled-unsafe-cors": True,
             "minimum-gas-prices": f"0.10{denom}",
             "rosetta.enable": False,
         },
-        "config/config.toml": {
+        "config": {
             "instrumentation.prometheus": False,
             "p2p.addr_book_strict": False,
             "p2p.allow_duplicate_ip": True,

@@ -1,6 +1,10 @@
+import json
+import time
 from typing import Optional
 
+import tomlkit
 import typer
+from atomkraft.utils import project
 
 from .node import Account, Coin, ConfigPort, Node
 from .testnet import Testnet
@@ -12,61 +16,72 @@ app = typer.Typer()
 
 
 @app.command()
-def config(key: str, value: Optional[str] = typer.Argument(None)):
-    print(key, value)
+def config(property_path: str, value: Optional[str] = typer.Argument(None)):
+    if value is None:
+        with open(f"{project.project_root()}/chain.toml") as f:
+            data = tomlkit.load(f)
+            if property_path is not None:
+                keys = property_path.split(".")
+                for key in keys:
+                    match data:
+                        case dict():
+                            try:
+                                data = data[key]
+                            except KeyError:
+                                try:
+                                    data = data[key.replace("-", "_")]
+                                except KeyError:
+                                    data = data[key.replace("_", "-")]
+                                except Exception as e:
+                                    raise e
+                        case list():
+                            data = data[int(key)]
+            print(json.dumps({property_path: data}, indent=2))
+    else:
+        with open(f"{project.project_root()}/chain.toml") as f:
+            main_data = tomlkit.load(f)
+            if property_path is not None:
+                data = main_data
+                keys = property_path.split(".")
+                for key in keys[:-1]:
+                    match data:
+                        case dict():
+                            try:
+                                data = data[key]
+                            except KeyError:
+                                try:
+                                    data = data[key.replace("-", "_")]
+                                except KeyError:
+                                    data = data[key.replace("_", "-")]
+                                except Exception as e:
+                                    raise e
+                        case list():
+                            data = data[int(key)]
+                match data:
+                    case dict():
+                        key = keys[-1]
+                        try:
+                            data[key] = value
+                        except KeyError:
+                            try:
+                                data[key.replace("-", "_")] = value
+                            except KeyError:
+                                data[key.replace("_", "-")] = value
+                            except Exception as e:
+                                raise e
+                    case list():
+                        data[int(keys[-1])] = value
+            else:
+                main_data = value
+        with open(f"{project.project_root()}/chain.toml", "w") as f:
+            tomlkit.dump(main_data, f)
 
 
 @app.command()
-def testnet(
-    chain_id: str,
-    validator: int,
-    account: int,
-    binary: str,
-    denom: str,
-    prefix: str,
-    coin_type: int,
-    overwrite: bool,
-    keep: bool,
-):
-    coin_type = 118
+def testnet():
+    testnet = Testnet.load_toml(f"{project.project_root()}/chain.toml")
 
-    genesis_config = {
-        "app_state.gov.voting_params.voting_period": "600s",
-        "app_state.mint.minter.inflation": "0.300000000000000000",
-    }
-
-    node_config = {
-        "config/app.toml": {
-            "api.enable": True,
-            "api.swagger": True,
-            "api.enabled-unsafe-cors": True,
-            "minimum-gas-prices": f"0.10{denom}",
-            "rosetta.enable": False,
-        },
-        "config/config.toml": {
-            "instrumentation.prometheus": False,
-            "p2p.addr_book_strict": False,
-            "p2p.allow_duplicate_ip": True,
-        },
-    }
-
-    net = Testnet(
-        chain_id,
-        n_validator=validator,
-        n_account=account,
-        binary=binary,
-        denom=denom,
-        prefix=prefix,
-        coin_type=coin_type,
-        genesis_config=genesis_config,
-        node_config=node_config,
-        account_balance=10**26,
-        validator_balance=10**16,
-        overwrite=overwrite,
-        keep=keep,
-    )
-
-    net.oneshot()
+    testnet.oneshot()
     try:
         time.sleep(600)
     except KeyboardInterrupt:
