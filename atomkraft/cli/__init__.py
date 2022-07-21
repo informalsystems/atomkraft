@@ -1,5 +1,6 @@
-from typing import List, Optional
+from pathlib import Path
 
+import git
 import pytest
 import typer
 import os
@@ -10,11 +11,13 @@ from ..reactor_room import reactor
 
 app = typer.Typer(name="atomkraft", no_args_is_help=True)
 
+GH_TEMPLATE = "gh:informalsystems/atomkraft"
+
 
 @app.command()
-def init(binary: str, include: Optional[List[str]] = typer.Argument(None)):
-    print(f"Binary {binary}, include {include}")
-    run_auto("gh:informalsystems/atomkraft", ".", vcs_ref="dev")
+def init(path: Path):
+    git.Repo.init(path)
+    run_auto(GH_TEMPLATE, path, vcs_ref="rano/impl-adr02")
 
 
 app.add_typer(chain.app, name="chain")

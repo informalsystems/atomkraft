@@ -1,17 +1,29 @@
 [tool.poetry]
 name = "atomkraft"
-version = "0.1.0"
+version = "0.0.1"
 description = "Testing for Cosmos Blockchains"
-authors = ["Ranadeep Biswas <mail@rnbguy.at>"]
-license = "Apache"
+authors = [
+    "Andrey Kuprianov <andrey@informal.systems>",
+    "Hernán Vanzetto <hernan@informal.systems>",
+    "Ivan Gavran <ivan@informal.systems>",
+    "Ranadeep Biswas <mail@rnbguy.at>",
+]
+keywords = ["cosmos", "blockchain", "testing", "testnet"]
+readme = "README.md"
+license = "Apache-2.0"
+repository = "https://github.com/informalsystems/atomkraft"
+include = ["LICENSE"]
+classifiers = [
+    "Topic :: Software Development :: Testing",
+    "Programming Language :: Python :: 3 :: Only",
+]
 
 [tool.poetry.dependencies]
 python = "^3.10"
 pytest = "^7.1.2"
 copier = "^6.1.0"
 typer = {extras = ["all"], version = "^0.6.1"}
-terra-sdk = {git = "https://github.com/informalsystems/terra.py", rev = "rano/cosmos"}
-modelator = {git = "https://github.com/informalsystems/modelator", rev = "dev"}
+modelator = "^0.4.2"
 numpy = "^1.22.4"
 hdwallet = "^2.1.1"
 bip-utils = "^2.3.0"
@@ -19,6 +31,9 @@ tabulate = "^0.8.9"
 jsonrpcclient = "^4.0.2"
 websockets = "^10.3"
 toml = "^0.10.2"
+GitPython = "^3.1.27"
+tomlkit = "^0.11.1"
+munch = "^2.5.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0", "setuptools>=42"]
@@ -32,4 +47,5 @@ pytest11 = { atomkraft-chain = "atomkraft.chain.pytest" }
 
 [tool.isort]
 profile = "black"
-src_paths = ["atomkraft", "test"]
+known_third_party = ["atomkraft"]
+src_paths = ["atomkraft", "test", "examples"]
