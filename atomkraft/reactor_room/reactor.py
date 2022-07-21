@@ -1,8 +1,7 @@
 import ast
-import logging
 from os import PathLike
 from typing import List
-import tomli, tomli_w
+import tomlkit
 from . import constants
 from . import utils
 from .step_functions_visitor import StepFunctionsVisitor
@@ -31,8 +30,8 @@ def get_reactor() -> PathLike:
     """
     returns the path to the current reactor from the internal config
     """
-    with open(constants.ATOMKRAFT_INTERNAL_CONFIG, "rb") as config_f:
-        config_data = tomli.load(config_f)
+    with open(constants.ATOMKRAFT_INTERNAL_CONFIG) as config_f:
+        config_data = tomlkit.load(config_f)
         return config_data[constants.REACTOR_CONFIG_KEY]
 
 
@@ -43,25 +42,8 @@ def generate_reactor(
     with open(stub_file_path, "w") as f:
         f.write("hi")
 
-    try:
-        chain_config = tomli.load(open(constants.CHAIN_CONFIG, "rb"))
-    except Exception as e:
-        logging.error(
-            f"Failed to parse {constants.CHAIN_CONFIG} file.\n Exception: {e}"
-        )
-
-    try:
-        atomkraft_config = tomli.load(open(constants.ATOMKRAFT_CONFIG, "rb"))
-    except Exception as e:
-        logging.error(
-            f"Failed to parse {constants.ATOMKRAFT_CONFIG} file.\n Exception: {e}"
-        )
-
     imports_stub = _imports_stub()
 
-    init_stub = _testnet_init_stub(
-        chain_config=chain_config, atomkraft_config=atomkraft_config
-    )
     state_stub = _state_stub()
     actions_stub = "\n".join(
         [
@@ -71,27 +53,16 @@ def generate_reactor(
     )
     with open(stub_file_path, "w") as f:
         f.write(imports_stub)
-        f.write(init_stub)
         f.write(state_stub)
         f.write(actions_stub)
 
-    atomkraft_internal_config = tomli.load(
-        open(constants.ATOMKRAFT_INTERNAL_CONFIG, "rb")
-    )
+    atomkraft_internal_config = tomlkit.load(open(constants.ATOMKRAFT_INTERNAL_CONFIG))
     atomkraft_internal_config[constants.REACTOR_CONFIG_KEY] = stub_file_path
 
     with open(constants.ATOMKRAFT_INTERNAL_CONFIG, "wb") as internal_config_f:
-        tomli_w.dump(atomkraft_internal_config, internal_config_f)
+        tomlkit.dump(atomkraft_internal_config, internal_config_f)
 
     return stub_file_path
-
-
-def _random_func_stub():
-    stub = f"""
-def f():
-    pass
-    """
-    return stub
 
 
 def _action_stub(action_name: str, variables: List[str]):
@@ -122,52 +93,4 @@ from cosmos_net.pytest import Testnet
 from modelator.pytest.decorators import step
 
     """
-    return stub
-
-
-def _testnet_init_stub(
-    chain_config,
-    atomkraft_config,
-    default_num_validators=3,
-    default_num_accounts=3,
-    default_account_balance=1000,
-    default_validator_balance=1000,
-):
-    stub = f"""
-@pytest.fixture(scope="session")
-def chain_testnet(num_validators={default_num_validators}, num_accounts={default_num_accounts}, account_balance={default_account_balance}, validator_balance={default_validator_balance}):
-    chain_id = {repr(chain_config['name'])}
-    binary = {repr(atomkraft_config['chain']['binary'])}
-    denom = {repr(chain_config['denom'])}
-    prefix = {repr(chain_config['prefix'])}
-    coin_type = {chain_config['coin']}
-
-    genesis_config = {chain_config["genesis"]}
-
-    node_config = {{}}
-    node_config["config/app.toml"] = {chain_config["app"]}
-    node_config["config/config.toml"] = {chain_config["config"]}
-
-
-    testnet = Testnet(
-        chain_id,
-        n_validator=num_validators,
-        n_account=num_accounts,
-        binary=binary,
-        denom=denom,
-        prefix=prefix,
-        coin_type=coin_type,
-        genesis_config=genesis_config,
-        node_config=node_config,
-        account_balance=account_balance,
-        validator_balance=validator_balance,
-    )
-
-    testnet.oneshot()
-    time.sleep(10)
-    yield testnet
-    time.sleep(2)
-
-    """
-
     return stub
