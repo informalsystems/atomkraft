@@ -1,8 +1,37 @@
-from asyncio import constants
+import ast
 from os import PathLike
 from typing import List
 import tomli, tomli_w
 from . import constants
+from . import utils
+from .step_functions_visitor import StepFunctionsVisitor
+
+
+def check_reactor(trace: PathLike, keypath="action", reactor=None) -> bool:
+    """
+    returns true if each action appearing in trace is matched with a function in reactor
+    """
+    if reactor is None:
+        reactor = get_reactor()
+
+    with open(reactor) as f_reactor:
+        root_node = ast.parse(f_reactor.read())
+    v = StepFunctionsVisitor()
+    v.visit(root_node)
+
+    print(v.step_functions)
+    all_trace_actions = utils.get_all_trace_actions(trace, keypath)
+
+    if constants.ALL_ENCOMPASSING_STEP in v.step_functions:
+        return True
+    else:
+        return all_trace_actions.issubset(v.step_functions)
+
+
+def get_reactor() -> PathLike:
+    with open(constants.ATOMKRAFT_INTERNAL_CONFIG, "rb") as config_f:
+        config_data = tomli.load(config_f)
+        return config_data[constants.REACTOR_CONFIG_KEY]
 
 
 def generate_reactor(
@@ -38,12 +67,20 @@ def generate_reactor(
     atomkraft_internal_config = tomli.load(
         open(constants.ATOMKRAFT_INTERNAL_CONFIG, "rb")
     )
-    atomkraft_internal_config["reactor"] = stub_file_path
+    atomkraft_internal_config[constants.REACTOR_CONFIG_KEY] = stub_file_path
 
     with open(constants.ATOMKRAFT_INTERNAL_CONFIG, "wb") as internal_config_f:
         tomli_w.dump(atomkraft_internal_config, internal_config_f)
 
     return stub_file_path
+
+
+def _random_func_stub():
+    stub = f"""
+def f():
+    pass
+    """
+    return stub
 
 
 def _action_stub(action_name: str, variables: List[str]):
