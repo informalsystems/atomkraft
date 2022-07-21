@@ -5,6 +5,7 @@ import pytest
 import typer
 import os
 from copier import run_auto
+from typing import List, Optional
 
 from .. import chain
 from ..reactor_room import reactor

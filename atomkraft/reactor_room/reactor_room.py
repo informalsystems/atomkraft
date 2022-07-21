@@ -69,10 +69,10 @@ def generate_reactor(
         constants.ATOMKRAFT_INTERNAL_CONFIG,
     )
 
-    atomkraft_internal_config = tomlkit.load(internal_config_file_path)
+    atomkraft_internal_config = tomlkit.load(open(internal_config_file_path))
     atomkraft_internal_config[constants.REACTOR_CONFIG_KEY] = stub_file_path
 
-    with open(internal_config_file_path, "wb") as internal_config_f:
+    with open(internal_config_file_path, "w") as internal_config_f:
         tomlkit.dump(atomkraft_internal_config, internal_config_f)
 
     return stub_file_path
