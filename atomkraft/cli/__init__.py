@@ -7,10 +7,10 @@ import os
 from copier import run_auto
 from typing import List, Optional
 
-from .. import chain
+from .. import chain, test
 from ..reactor import reactor
 
-app = typer.Typer(name="atomkraft", no_args_is_help=True)
+app = typer.Typer(rich_markup_mode="rich", add_completion=False, name="atomkraft", no_args_is_help=True)
 
 GH_TEMPLATE = "gh:informalsystems/atomkraft"
 
@@ -22,6 +22,7 @@ def init(path: Path):
 
 
 app.add_typer(chain.app, name="chain")
+app.add_typer(test.app, name="test", short_help="Test the blockchain based on abstract traces, either explicitly given or produced from models")
 
 
 @app.command()
