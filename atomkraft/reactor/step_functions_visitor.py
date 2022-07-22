@@ -23,7 +23,6 @@ class StepFunctionsVisitor(ast.NodeVisitor):
 
         # only accepts decorators of the form @step(...)
         if isinstance(dec, ast.Call):
-            print(dec.func.id)
             if dec.func.id == "step":
                 return True
         return False

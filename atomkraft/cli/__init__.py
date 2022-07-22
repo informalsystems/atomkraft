@@ -51,4 +51,4 @@ def reactor_command(
 ):
     actions = [act.strip() for act in actions_list.split(",")]
     variables = [var.strip() for var in variables_list.split(",")]
-    reactor.generate_reactor(actions, variables, reactor_stub_file)
+    reactor.generate_reactor(actions, variables, stub_file_path=reactor_stub_file)
