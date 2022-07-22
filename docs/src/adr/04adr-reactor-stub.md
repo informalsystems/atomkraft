@@ -27,8 +27,8 @@ where
 
 ## Implementation
 
- The `Reactor` class implements the desired behavior.
- Its member functions are:
+ The following three functions implement the desired functionality:
+
   - `generate_reactor(actions_list, variables_list, keypath="action", stub_file_path=None) -> Path`:
   generates the stub, containing one `@step` function for each action from the `action_list`,
   and each of these functions takes variables from the `variables_list` as arguments,
