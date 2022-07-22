@@ -1,7 +1,7 @@
 import sys
 import py_compile
 
-from atomkraft.reactor_room import reactor_room
+from atomkraft.reactor import reactor
 
 # test if a correct reactor is generated for the arguments
 
@@ -13,7 +13,7 @@ def test_parsing():
     for actions in actions_list:
         for variables in variables_list:
             reactor_stub_file = f"tests/project/reactors/reactor.py"
-            reactor_room.generate_reactor(actions, variables, reactor_stub_file)
+            reactor.generate_reactor(actions, variables, reactor_stub_file)
             compiled_reactor = py_compile.compile(reactor_stub_file)
             assert compiled_reactor is not None
 
