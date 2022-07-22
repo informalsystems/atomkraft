@@ -1,0 +1,1 @@
+reactor = "tests/project/reactors/check_faulty_reactor.py"
