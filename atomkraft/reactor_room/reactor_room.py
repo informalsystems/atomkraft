@@ -32,8 +32,14 @@ def get_reactor() -> PathLike:
     """
     returns the path to the current reactor from the internal config
     """
+
+    if "PYTEST_CURRENT_TEST" in os.environ:
+        root = "tests/project"
+    else:
+        root = project_root()
+
     internal_config_file_path = os.path.join(
-        project_root(),
+        root,
         constants.ATOMKRAFT_INTERNAL_FOLDER,
         constants.ATOMKRAFT_INTERNAL_CONFIG,
     )
@@ -45,9 +51,6 @@ def get_reactor() -> PathLike:
 def generate_reactor(
     actions_list: List[str], variables_list: List[str], stub_file_path: PathLike = None
 ) -> PathLike:
-
-    with open(stub_file_path, "w") as f:
-        f.write("hi")
 
     imports_stub = _imports_stub()
 
@@ -63,8 +66,13 @@ def generate_reactor(
         f.write(state_stub)
         f.write(actions_stub)
 
+    if "PYTEST_CURRENT_TEST" in os.environ:
+        root = "tests/project"
+    else:
+        root = project_root()
+
     internal_config_file_path = os.path.join(
-        project_root(),
+        root,
         constants.ATOMKRAFT_INTERNAL_FOLDER,
         constants.ATOMKRAFT_INTERNAL_CONFIG,
     )
