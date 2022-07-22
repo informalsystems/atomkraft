@@ -10,7 +10,12 @@ from typing import List, Optional
 from .. import chain, test
 from ..reactor import reactor
 
-app = typer.Typer(rich_markup_mode="rich", add_completion=False, name="atomkraft", no_args_is_help=True)
+app = typer.Typer(
+    rich_markup_mode="rich",
+    add_completion=False,
+    name="atomkraft",
+    no_args_is_help=True,
+)
 
 GH_TEMPLATE = "gh:informalsystems/atomkraft"
 
@@ -22,7 +27,11 @@ def init(path: Path):
 
 
 app.add_typer(chain.app, name="chain")
-app.add_typer(test.app, name="test", short_help="Test the blockchain based on abstract traces, either explicitly given or produced from models")
+app.add_typer(
+    test.app,
+    name="test",
+    short_help="Test the blockchain based on abstract traces, either explicitly given or produced from models",
+)
 
 
 @app.command()
@@ -38,17 +47,24 @@ def smoke_test():
 
 @app.command("reactor")
 def reactor_command(
-    variables_list: str = typer.Option(
-        ..., help="A list of state variables to include into reactors as parameters"
+    actions: str = typer.Option(
+        ...,
+        help="trace actions for which to create reactor stub functions",
+        show_default=False,
     ),
-    actions_list: Optional[str] = typer.Option(
-        ..., help="A list of actions for which to create reactor stubs."
+    variables: str = typer.Option(
+        ...,
+        help="state variables to use as parameters for reactor stub functions.",
+        show_default=False,
     ),
-    reactor_stub_file: str = typer.Option(
+    path: typer.FileTextWrite = typer.Option(
         os.path.abspath("reactors/reactor.py"),
-        help="A path where to create the reactors file.",
+        help="path where to create the reactor stub",
     ),
 ):
-    actions = [act.strip() for act in actions_list.split(",")]
-    variables = [var.strip() for var in variables_list.split(",")]
-    reactor.generate_reactor(actions, variables, stub_file_path=reactor_stub_file)
+    """
+    Generate a reactor stub used to interpret test traces
+    """
+    actions = [act.strip() for act in actions.split(",")]
+    variables = [var.strip() for var in variables.split(",")]
+    reactor.generate_reactor(actions, variables, stub_file_path=path.name)
