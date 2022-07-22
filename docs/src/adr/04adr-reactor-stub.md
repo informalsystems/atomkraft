@@ -29,14 +29,15 @@ where
 
  The `Reactor` class implements the desired behavior.
  Its member functions are:
-  - `generate_reactor(actions_list, variables_list, stub_file_path=None) -> Path`:
+  - `generate_reactor(actions_list, variables_list, keypath="action", stub_file_path=None) -> Path`:
   generates the stub, containing one `@step` function for each action from the `action_list`,
-  and each of these functions takes variables from the `variables_list` as arguments.
+  and each of these functions takes variables from the `variables_list` as arguments,
+  as well as the assignment to the `keypath` value.
   The reactor stub is created at `stub_file_path` name location
   (if it is `None`, a default location is used).
   The function returns the path to the generated reactor stub and updates the value of `reactor` under `atomkraft.toml`.
 
-  - `check_reactor(trace, keypath="action", reactor=None) -> bool`: it checks if the `reactor` (default reactor if `None`) is compatible with the `trace`. A reactor is compatible with a trace if each action appearing in `trace` is matched with a function in `reactor`. The `keypath` argument defines which field of the ITF trace contains the action (if omitted, it takes the default value "action"). The function returns `True` if the check is successful, and `False` otherwise.
+  - `check_reactor(trace, reactor=None) -> bool`: it checks if the `reactor` (default reactor if `None`) is compatible with the `trace`. A reactor is compatible with a trace if each action appearing in `trace` (lookig under key defined by the variable `keypath` from `reactor`) is matched with a function in `reactor`. The function returns `True` if the check is successful, and `False` otherwise.
 
   - `get_reactor() -> Path`: returns the path to the reactor from `atomkraft.toml`
 
@@ -45,55 +46,9 @@ where
 
  The stub should include:
 
-
-  - a stub for the `chain_testnet` initialization function
+  - an assignment defining what is the keypath for the steps, e.g.
   ```python
-  @pytest.fixture(scope="session")
-  def chain_testnet(num_validators=3, num_accounts=3, account_balance=1000, validator_balance=100):
-    chain_id = "test-cw" # read from chain config
-    binary = "binary" # read from chain config
-    denom = "stake" # read from chain config
-    prefix = "juno" # read from chain config
-    coin_type = 118 # read from chain config
-
-    genesis_config = {
-        "app_state.gov.voting_params.voting_period": "600s",
-        "app_state.mint.minter.inflation": "0.300000000000000000",
-    }
-
-    node_config = {
-        "config/app.toml": {
-            "api.enable": True,
-            "api.swagger": True,
-            "api.enabled-unsafe-cors": True,
-            "minimum-gas-prices": f"0.10{denom}",
-            "rosetta.enable": False,
-        },
-        "config/config.toml": {
-            "instrumentation.prometheus": False,
-            "p2p.addr_book_strict": False,
-            "p2p.allow_duplicate_ip": True,
-        },
-    }
-
-    testnet = Testnet(
-        chain_id,
-        n_validator=num_validators,
-        n_account=num_accounts,
-        binary=binary,
-        denom=denom,
-        prefix=prefix,
-        coin_type=coin_type,
-        genesis_config=genesis_config,
-        node_config=node_config,
-        account_balance=account_balance
-        validator_balance=validator_balance,
-    )
-
-    testnet.oneshot()
-    time.sleep(10)
-    yield testnet
-    time.sleep(2)
+    keypath = 'action'
   ```
 
   - a stub for the state function. The `state` is meant to serve any additional state that the user wants to maintain besides the blockchain state.
@@ -108,16 +63,16 @@ where
 
   ```python
     @step("<act>")
-    def act_step(chain_testnet, state, var1, var2,..., vark):
+    def act_step(testnet, state, var1, var2,..., vark):
         print("Step: <act>")
   ```
   where `var1`, `var2`,...,`vark` are all the variables from the `variables_list`
   (and `state` is the state provided by the function `state`,
-  while `chain_testnet` is provided by the function `chain_testnet`).
+  while `testnet` is a fixture generated when calling `atomkraft init`).
 
 
 ### Programmatic dependencies
-Implicit dependency on `Init` to generate the `chain_testnet` variable.
+Implicit dependency on `Init` to generate the `testnet` variable.
 
  ### Environment Interaction
 This command updates the value of the `reactor` field in the config file `.atomkraft.toml`.
