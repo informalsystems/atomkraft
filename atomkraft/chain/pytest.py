@@ -8,7 +8,7 @@ from .testnet import Testnet
 
 @pytest.fixture
 def testnet():
-    testnet = Testnet.load_loml(f"{project_root()}/chain.toml")
+    testnet = Testnet.load_toml(f"{project_root()}/chain.toml")
 
     testnet.oneshot()
     time.sleep(10)
