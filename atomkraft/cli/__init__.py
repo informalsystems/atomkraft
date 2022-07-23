@@ -2,11 +2,11 @@ from pathlib import Path
 
 import git
 import pytest
+import modelator
 import typer
 import os
 from copier import run_auto
 from typing import List, Optional
-
 from .. import chain, test
 from ..reactor import reactor
 
@@ -22,10 +22,18 @@ GH_TEMPLATE = "gh:informalsystems/atomkraft"
 
 @app.command()
 def init(path: Path):
+    """
+    Initialize new Atomkraft project in the given directory
+    """
     git.Repo.init(path)
     run_auto(GH_TEMPLATE, path, vcs_ref="rano/impl-adr02")
 
 
+app.add_typer(
+    modelator.cli.app,
+    name="model",
+    short_help="Work with TLA+ models: load, typecheck, check invariants, or sample traces",
+)
 app.add_typer(chain.app, name="chain")
 app.add_typer(
     test.app,
