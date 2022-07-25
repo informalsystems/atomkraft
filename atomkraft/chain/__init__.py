@@ -50,6 +50,10 @@ def config(
                             data = data[int(key)]
             print(json.dumps({property_path: data}, indent=2))
     else:
+        try:
+            value = eval(value)
+        except:
+            pass
         with open(f"{project.project_root()}/chain.toml") as f:
             main_data = tomlkit.load(f)
             if property_path is not None:
