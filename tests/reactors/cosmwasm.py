@@ -22,7 +22,7 @@ def store_contract(testnet, last_msg, contract_data):
         )
     )
 
-    with open("contracts/counter.wasm", "rb") as f:
+    with open("tests/contracts/counter.wasm", "rb") as f:
         counter_cw_code = base64.b64encode(f.read()).decode("ascii")
 
     msg = MsgStoreCode(

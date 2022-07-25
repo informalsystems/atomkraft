@@ -4,13 +4,16 @@ import pytest
 from atomkraft.chain.pytest import Testnet
 from modelator.pytest.decorators import itf, mbt
 
-pytest_plugins = ["cosmwasm"]
+pytest_plugins = ["reactors.cosmwasm"]
+
+# add terra-sdk in pyproject.toml
+# terra-sdk = {git = "https://github.com/informalsystems/terra.py", rev = "rano/cosmos"}
 
 
 @pytest.fixture(scope="session")
 def testnet():
     chain_id = "test-cw"
-    binary = "juno"
+    binary = "junod"
     denom = "stake"
     prefix = "juno"
     coin_type = 118
@@ -21,14 +24,14 @@ def testnet():
     }
 
     node_config = {
-        "config/app.toml": {
+        "app": {
             "api.enable": True,
             "api.swagger": True,
             "api.enabled-unsafe-cors": True,
             "minimum-gas-prices": f"0.10{denom}",
             "rosetta.enable": False,
         },
-        "config/config.toml": {
+        "config": {
             "instrumentation.prometheus": False,
             "p2p.addr_book_strict": False,
             "p2p.allow_duplicate_ip": True,
