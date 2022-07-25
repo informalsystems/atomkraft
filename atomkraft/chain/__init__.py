@@ -16,7 +16,17 @@ app = typer.Typer()
 
 
 @app.command()
-def config(property_path: str, value: Optional[str] = typer.Argument(None)):
+def config(
+    property_path: str = typer.Argument(
+        ..., help="Nested keys of a config value, joined by `.`", show_default=False
+    ),
+    value: Optional[str] = typer.Argument(
+        None, help="Update old value with provided value"
+    ),
+):
+    """
+    Query or update chain configuration
+    """
     if value is None:
         with open(f"{project.project_root()}/chain.toml") as f:
             data = tomlkit.load(f)
@@ -78,11 +88,16 @@ def config(property_path: str, value: Optional[str] = typer.Argument(None)):
 
 
 @app.command()
-def testnet():
+def testnet(silent: bool = typer.Option(False, help="Silent mode. Print no output")):
+    """
+    Run a testnet in background
+    """
     testnet = Testnet.load_toml(f"{project.project_root()}/chain.toml")
+    testnet.verbose = not silent
 
     testnet.oneshot()
     try:
-        time.sleep(600)
+        while True:
+            time.sleep(1)
     except KeyboardInterrupt:
         print("\ntear-down!")
