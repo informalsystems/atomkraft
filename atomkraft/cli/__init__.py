@@ -22,7 +22,9 @@ GH_TEMPLATE = "gh:informalsystems/atomkraft"
 
 
 @app.command()
-def init(name: Path):
+def init(
+    name: Path = typer.Argument(..., help="Name of new directory", show_default=False)
+):
     """
     Initialize new Atomkraft project in the given directory
     """

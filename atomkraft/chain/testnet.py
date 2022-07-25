@@ -29,6 +29,7 @@ class Testnet:
         overwrite=False,
         keep=False,
         verbose=False,
+        data_dir=None,
     ):
         self.chain_id = chain_id
         self.n_validator = n_validator
@@ -43,7 +44,8 @@ class Testnet:
         self.validator_balance = validator_balance
         self.overwrite = overwrite
         self.keep = keep
-        self._verbose = verbose
+        self.verbose = verbose
+        self.data_dir = "." if data_dir is None else data_dir
 
     @staticmethod
     def load_toml(path: str):
@@ -93,7 +95,7 @@ class Testnet:
             Node(
                 f"node-{i}",
                 self.chain_id,
-                f"node-{i}",
+                f"{self.data_dir}/node-{i}",
                 overwrite=self.overwrite,
                 keep=self.keep,
                 binary=self.binary,
@@ -154,7 +156,7 @@ class Testnet:
                 port_data.append(node.get(e_port.config_file, e_port.property_path))
             all_port_data.append(port_data)
 
-        if self._verbose:
+        if self.verbose:
             print(
                 tabulate.tabulate(
                     all_port_data,
@@ -189,6 +191,7 @@ class Testnet:
                 gentx_file = glob.glob(f"{node.home_dir}/config/gentx/*json")[0].split(
                     "/", maxsplit=1
                 )[-1]
+                gentx_file = gentx_file.lstrip(node.home_dir)
                 node_p2p = node.get(p2p.config_file, p2p.property_path).rsplit(
                     ":", maxsplit=1
                 )[-1]
