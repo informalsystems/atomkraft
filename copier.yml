@@ -5,6 +5,6 @@ _exclude:
 
 _tasks:
   - poetry init -n
-  - poetry add git+https://github.com/informalsystems/atomkraft#dev
+  - poetry add atomkraft
   - poetry add git+https://github.com/informalsystems/terra.py#rano/cosmos
   - poetry run python -m pytest .atomkraft/smoke_tests || true
