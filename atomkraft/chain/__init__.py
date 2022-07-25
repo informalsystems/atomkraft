@@ -6,6 +6,8 @@ import tomlkit
 import typer
 from atomkraft.utils import project
 
+from pathlib import Path
+
 from .node import Account, Coin, ConfigPort, Node
 from .testnet import Testnet
 
@@ -88,12 +90,21 @@ def config(
 
 
 @app.command()
-def testnet(silent: bool = typer.Option(False, help="Silent mode. Print no output")):
+def testnet(
+    silent: bool = typer.Option(False, help="Silent mode. Print no output"),
+    config: Optional[Path] = typer.Option(None, help="Path to chain.toml"),
+):
     """
     Run a testnet in background
     """
-    testnet = Testnet.load_toml(f"{project.project_root()}/chain.toml")
+    if config is None:
+        testnet = Testnet.load_toml(f"{project.project_root()}/chain.toml")
+    else:
+        testnet = Testnet.load_toml(config)
     testnet.verbose = not silent
+    testnet.keep = True
+    testnet.overwrite = True
+    testnet.data_dir = ".atomkraft"
 
     testnet.oneshot()
     try:
