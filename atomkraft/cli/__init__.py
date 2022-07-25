@@ -9,6 +9,7 @@ from copier import run_auto
 from typing import List, Optional
 from .. import chain, test
 from ..reactor import reactor
+from ..utils.project import project_root
 
 app = typer.Typer(
     rich_markup_mode="rich",
@@ -27,8 +28,11 @@ def init(
     """
     Initialize new Atomkraft project in the given directory
     """
-    git.Repo.init(name)
-    run_auto(GH_TEMPLATE, name, vcs_ref="rano/impl-adr02")
+    try:
+        git.Repo(os.getcwd(), search_parent_directories=True)
+    except git.InvalidGitRepositoryError:
+        git.Repo.init(name)
+    run_auto(GH_TEMPLATE, name, vcs_ref="dev")
 
 
 app.add_typer(
