@@ -99,7 +99,7 @@ class Node:
         self._stderr = None
 
     def init(self):
-        if self.overwrite:
+        if self.overwrite and os.path.exists(self.home_dir):
             shutil.rmtree(self.home_dir)
         args = f"init {self.moniker} --chain-id {self.chain_id}".split()
         _, data = self._execute(args, stderr=PIPE)
