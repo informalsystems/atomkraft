@@ -1,11 +1,11 @@
 import os
-import git
+from pathlib import Path
 
 
 def project_root():
-    cwd = os.getcwd()
-    try:
-        git_repo = git.Repo(cwd, search_parent_directories=True)
-        return git_repo.git.rev_parse("--show-toplevel")
-    except git.InvalidGitRepositoryError:
-        return None
+    cwd = Path(os.getcwd())
+    while cwd != cwd.parent:
+        if (cwd / "pyproject.toml").exists():
+            return cwd
+        cwd = cwd.parent
+    return None

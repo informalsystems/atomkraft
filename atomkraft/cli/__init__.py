@@ -26,7 +26,9 @@ def init(name: Path):
     """
     Initialize new Atomkraft project in the given directory
     """
-    if project_root() is None:
+    try:
+        git.Repo(os.getcwd(), search_parent_directories=True)
+    except git.InvalidGitRepositoryError:
         git.Repo.init(name)
     run_auto(GH_TEMPLATE, name, vcs_ref="dev")
 
