@@ -21,12 +21,14 @@ GH_TEMPLATE = "gh:informalsystems/atomkraft"
 
 
 @app.command()
-def init(path: Path):
+def init(
+    name: Path = typer.Argument(..., help="Name of new directory", show_default=False)
+):
     """
     Initialize new Atomkraft project in the given directory
     """
-    git.Repo.init(path)
-    run_auto(GH_TEMPLATE, path, vcs_ref="rano/impl-adr02")
+    git.Repo.init(name)
+    run_auto(GH_TEMPLATE, name, vcs_ref="rano/impl-adr02")
 
 
 app.add_typer(
