@@ -43,7 +43,7 @@ class Testnet:
         self.validator_balance = validator_balance
         self.overwrite = overwrite
         self.keep = keep
-        self._verbose = verbose
+        self.verbose = verbose
 
     @staticmethod
     def load_toml(path: str):
@@ -154,7 +154,7 @@ class Testnet:
                 port_data.append(node.get(e_port.config_file, e_port.property_path))
             all_port_data.append(port_data)
 
-        if self._verbose:
+        if self.verbose:
             print(
                 tabulate.tabulate(
                     all_port_data,
