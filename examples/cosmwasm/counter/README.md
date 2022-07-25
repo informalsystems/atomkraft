@@ -1,5 +1,11 @@
 # Cosmwasm Counter: Atomkraft example project
 
+## Install/update `atomkraft` cli
+
+```
+pip install -U atomkraft
+```
+
 ## Initialize atomkraft project
 
 ```
@@ -16,22 +22,24 @@ git submodule add --force git@github.com:Ethernal-Tech/counter-example-contract
 ## Compile CosmWasm binary
 
 ```
+rustup target add wasm32-unknown-unknown
 RUSTFLAGS='-C link-arg=-s' cargo build --release --target wasm32-unknown-unknown --manifest-path counter-example-contract/Cargo.toml
 ls counter-example-contract/target/wasm32-unknown-unknown/release/counter.wasm # wasm binary
 ```
 
-## Create tests
-
-- Add TLA+ models in `models/`
-- Add ITF traces in `traces/`
-- Add tests in `tests/`
-
 ## Generate and update reactors
 
 ```
-atomkraft reactor --actions "store_cw_contract,instantiate,reset,increment,get_count" --variables "count,last_msg"
+atomkraft reactor --actions store_cw_contract,instantiate,reset,increment,get_count --variables count,last_msg
 # update the `reactors/reactor.py`
 ```
+
+## Create tests
+
+- Add ITF traces in `traces/`
+- Add TLA+ models in `models/`
+- Add tests in `tests/`
+  - Soon we will provide CLI commands to auto-generate test files from traces or models)
 
 ## Update chain config
 
