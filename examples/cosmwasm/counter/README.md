@@ -16,6 +16,7 @@ git submodule add --force git@github.com:Ethernal-Tech/counter-example-contract
 ## Compile CosmWasm binary
 
 ```
+rustup target add wasm32-unknown-unknown
 RUSTFLAGS='-C link-arg=-s' cargo build --release --target wasm32-unknown-unknown --manifest-path counter-example-contract/Cargo.toml
 ls counter-example-contract/target/wasm32-unknown-unknown/release/counter.wasm # wasm binary
 ```
