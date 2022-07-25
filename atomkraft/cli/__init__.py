@@ -9,6 +9,7 @@ from copier import run_auto
 from typing import List, Optional
 from .. import chain, test
 from ..reactor import reactor
+from ..utils.project import project_root
 
 app = typer.Typer(
     rich_markup_mode="rich",
@@ -21,12 +22,13 @@ GH_TEMPLATE = "gh:informalsystems/atomkraft"
 
 
 @app.command()
-def init(path: Path):
+def init(name: Path):
     """
     Initialize new Atomkraft project in the given directory
     """
-    git.Repo.init(path)
-    run_auto(GH_TEMPLATE, path, vcs_ref="rano/impl-adr02")
+    if project_root() is None:
+        git.Repo.init(name)
+    run_auto(GH_TEMPLATE, name, vcs_ref="dev")
 
 
 app.add_typer(
