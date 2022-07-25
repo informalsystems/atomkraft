@@ -1,0 +1,23 @@
+chain_id = "cosmoshub-4"
+n_validator = 3
+n_account = 2
+binary = "gaiad"
+prefix = "cosmos"
+denom = "stake"
+coin_type = 118
+
+[config.node.app]
+"api.enable" = true
+"api.swagger" = true
+"api.enabled-unsafe-cors" = true
+"minimum-gas-prices" = "0.10stake"
+"rosetta.enable" = false
+
+[config.node.config]
+"instrumentation.prometheus" = false
+"p2p.addr_book_strict" = false
+"p2p.allow_duplicate_ip" = true
+
+[config.genesis]
+"app_state.gov.voting_params.voting_period" = "600s"
+"app_state.mint.minter.inflation" = "0.300000000000000000"
