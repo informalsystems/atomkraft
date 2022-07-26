@@ -108,8 +108,8 @@ def _keypath_stub(keypath):
 
 def _action_stub(action_name: str, variables: List[str]):
     stub = f"""
-@step({repr(action_name)})
-def act_step(testnet, state, {", ".join(variables)}):
+@step({action_name})
+def {action_name}(testnet, state, {", ".join(variables)}):
     print("Step: {action_name}")
 """
     return stub
