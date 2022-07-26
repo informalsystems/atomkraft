@@ -1,11 +1,10 @@
-import pytest
-from typer.testing import CliRunner
-import os
-import py
 import json
+import os
 
-
+import py
+import pytest
 from atomkraft.cli import app
+from typer.testing import CliRunner
 
 
 @pytest.fixture(scope="session")
