@@ -1,8 +1,8 @@
-chain_id = "cosmoshub-4"
-n_validator = 3
-n_account = 2
-binary = "gaiad"
-prefix = "cosmos"
+chain_id = "test-cw"
+n_validator = 2
+n_account = 3
+binary = "junod"
+prefix = "juno"
 denom = "stake"
 coin_type = 118
 

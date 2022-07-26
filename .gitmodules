@@ -1,0 +1,3 @@
+[submodule "examples/cosmwasm/counter/counter-example-contract"]
+	path = examples/cosmwasm/counter/counter-example-contract
+	url = git@github.com:Ethernal-Tech/counter-example-contract
