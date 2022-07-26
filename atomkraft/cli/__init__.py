@@ -13,6 +13,7 @@ app = typer.Typer(
     add_completion=False,
     name="atomkraft",
     no_args_is_help=True,
+    rich_markup_mode="rich",
 )
 
 GH_TEMPLATE = "gh:informalsystems/atomkraft"
@@ -20,7 +21,6 @@ GH_TEMPLATE = "gh:informalsystems/atomkraft"
 
 @app.command(
     no_args_is_help=True,
-
 )
 def init(
     name: Path = typer.Argument(..., help="Name of new directory", show_default=False)
