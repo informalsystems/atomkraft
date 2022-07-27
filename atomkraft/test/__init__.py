@@ -9,7 +9,7 @@ def FileOption(help, default):
     return typer.Option(
         None,
         show_default=False,
-        help=f"{help} [grey30]\[default: set via [bold cyan]atomkraft {default}[/bold cyan]][/grey30]",
+        help=f"{help} [grey30][default: set via [bold cyan]atomkraft {default}[/bold cyan]][/grey30]",
     )
 
 

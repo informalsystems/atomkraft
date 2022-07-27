@@ -51,7 +51,7 @@ def config(
     else:
         try:
             value = eval(value)
-        except:
+        except (SyntaxError, NameError):
             pass
         with open(f"{project.project_root()}/chain.toml") as f:
             main_data = tomlkit.load(f)

@@ -25,7 +25,7 @@ def check_reactor(trace: PathLike, reactor=None) -> bool:
     keypath = utils.get_keypath(root_node)
     try:
         all_trace_actions = utils.get_all_trace_actions(trace, keypath)
-    except Exception as e:
+    except Exception:
         raise ValueError(
             f"Keypath {keypath}, which is set in {reactor} is not present in the trace {trace}"
         )
@@ -117,11 +117,11 @@ def act_step(testnet, state, {", ".join(variables)}):
 
 
 def _state_stub():
-    stub = f"""
+    stub = """
 
 @pytest.fixture
 def state():
-    return {{}}
+    return {}
 
 """
     return stub
