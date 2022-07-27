@@ -2,6 +2,8 @@ from os import PathLike
 from atomkraft.utils.project import project_root
 import os.path
 from datetime import datetime
+import pytest
+from ..reactor.reactor import get_reactor
 
 
 trace_test_stub = """
@@ -19,6 +21,9 @@ def test_trace(trace: PathLike, reactor: PathLike, keypath: str):
     """
     Test blockchain by running one trace
     """
+
+    if reactor is None:
+        reactor = get_reactor()
 
     root = project_root()
     if not root:
@@ -40,10 +45,13 @@ def test_trace(trace: PathLike, reactor: PathLike, keypath: str):
         .replace(":", "_")
         .replace("-", "_")
     )
-    test = os.path.join(tests, f"{test_name}.py")
-    with open(test, "w") as test:
+    test_path = os.path.join(tests, f"{test_name}.py")
+    with open(test_path, "w") as test:
+        print(f"Writing {test_name} ...")
         test.write(
             trace_test_stub.format(
                 str(reactor).replace("/", ".").replace(".py", ""), trace, keypath
             )
         )
+    print(f"Executing {test_name} ...")
+    pytest.main(["-s", test_path])

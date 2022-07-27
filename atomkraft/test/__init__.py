@@ -37,7 +37,7 @@ def trace(
     Test blockchain by running one trace
     """
 
-    test_trace(trace.name, reactor.name, keypath)
+    test_trace(trace.name, reactor if reactor is None else reactor.name, keypath)
 
 
 @app.command()
