@@ -1,12 +1,13 @@
 import ast
-from os import PathLike
 import os
+from os import PathLike
 from typing import List, Optional
+
 import tomlkit
-from . import constants
-from . import utils
-from .step_functions_visitor import StepFunctionsVisitor
 from atomkraft.utils.project import project_root
+
+from . import constants, utils
+from .step_functions_visitor import StepFunctionsVisitor
 
 
 def check_reactor(trace: PathLike, reactor=None) -> bool:

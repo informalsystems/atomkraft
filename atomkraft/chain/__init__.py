@@ -1,12 +1,11 @@
 import json
 import time
+from pathlib import Path
 from typing import Optional
 
 import tomlkit
 import typer
 from atomkraft.utils import project
-
-from pathlib import Path
 
 from .node import Account, Coin, ConfigPort, Node
 from .testnet import Testnet

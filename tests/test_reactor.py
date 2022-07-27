@@ -1,5 +1,5 @@
-import sys
 import py_compile
+import sys
 
 from atomkraft.reactor import reactor
 

@@ -1,7 +1,7 @@
 import base64
 import time
-import pytest
 
+import pytest
 from modelator.pytest.decorators import step
 from terra_sdk.client.lcd import LCDClient
 from terra_sdk.client.lcd.api.tx import CreateTxOptions
