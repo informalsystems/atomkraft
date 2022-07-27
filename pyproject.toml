@@ -51,6 +51,5 @@ known_third_party = ["atomkraft"]
 src_paths = ["atomkraft", "test", "examples"]
 
 [tool.pytest.ini_options]
-pythonpath = [
-  "."
-]
+pythonpath = "."
+norecursedirs = "examples/*"
