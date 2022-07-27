@@ -17,6 +17,7 @@ app = typer.Typer(
 )
 
 GH_TEMPLATE = "gh:informalsystems/atomkraft"
+GH_REVISION = "rano/60-improve-code-quality"
 
 
 @app.command(
@@ -32,7 +33,7 @@ def init(
         git.Repo(os.getcwd(), search_parent_directories=True)
     except git.InvalidGitRepositoryError:
         git.Repo.init(name)
-    run_auto(GH_TEMPLATE, name, vcs_ref="dev")
+    run_auto(GH_TEMPLATE, name, vcs_ref=GH_REVISION)
 
 
 app.add_typer(
