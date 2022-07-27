@@ -3,6 +3,7 @@ from os import PathLike
 import os
 from typing import List, Optional
 import tomlkit
+from caseconverter import snakecase
 from . import constants
 from . import utils
 from .step_functions_visitor import StepFunctionsVisitor
@@ -108,8 +109,8 @@ def _keypath_stub(keypath):
 
 def _action_stub(action_name: str, variables: List[str]):
     stub = f"""
-@step({action_name})
-def {action_name}(testnet, state, {", ".join(variables)}):
+@step({repr(action_name)})
+def {snakecase(action_name)}(testnet, state, {", ".join(variables)}):
     print("Step: {action_name}")
 """
     return stub
