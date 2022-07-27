@@ -19,3 +19,11 @@ poerty run atomkraft --help
 # or
 poetry run python -m atomkraft --help
 ```
+
+### Code Quality
+
+```
+pip install black pylama[all]
+black . --check
+pylama -l pyflakes,pycodestyle,isort
+```
