@@ -101,14 +101,16 @@ def generate_reactor(
 
 def _keypath_stub(keypath):
     stub = f"""
-{constants.KEYPATH_VAR} = {repr(keypath)}
 
+{constants.KEYPATH_VAR} = {repr(keypath)}
 """
     return stub
 
 
 def _action_stub(action_name: str, variables: List[str]):
     stub = f"""
+
+
 @step({repr(action_name)})
 def act_step(testnet, state, {", ".join(variables)}):
     print("Step: {action_name}")
@@ -119,20 +121,17 @@ def act_step(testnet, state, {", ".join(variables)}):
 def _state_stub():
     stub = """
 
+
 @pytest.fixture
 def state():
     return {}
-
 """
     return stub
 
 
 def _imports_stub():
     stub = """
-import time
 import pytest
-from cosmos_net.pytest import Testnet
 from modelator.pytest.decorators import step
-
-    """
+"""
     return stub
