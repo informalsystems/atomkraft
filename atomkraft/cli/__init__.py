@@ -20,7 +20,6 @@ GH_TEMPLATE = "gh:informalsystems/atomkraft"
 
 @app.command(
     no_args_is_help=True,
-
 )
 def init(
     name: Path = typer.Argument(..., help="Name of new directory", show_default=False)
