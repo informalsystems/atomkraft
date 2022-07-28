@@ -1,12 +1,11 @@
 import ast
 from os import PathLike
-import os
 from typing import List, Optional
-import tomlkit
+from atomkraft.config.atomkraft_config import AtomkraftConfig
+
 from . import constants
 from . import utils
 from .step_functions_visitor import StepFunctionsVisitor
-from atomkraft.utils.project import project_root
 
 
 def check_reactor(trace: PathLike, reactor=None) -> bool:
@@ -39,20 +38,8 @@ def get_reactor() -> PathLike:
     """
     returns the path to the current reactor from the internal config
     """
-
-    if "PYTEST_CURRENT_TEST" in os.environ:
-        root = "tests/project"
-    else:
-        root = project_root()
-
-    internal_config_file_path = os.path.join(
-        root,
-        constants.ATOMKRAFT_INTERNAL_FOLDER,
-        constants.ATOMKRAFT_INTERNAL_CONFIG,
-    )
-    with open(internal_config_file_path) as config_f:
-        config_data = tomlkit.load(config_f)
-        return config_data[constants.REACTOR_CONFIG_KEY]
+    with AtomkraftConfig() as config:
+        return config.get(constants.REACTOR_CONFIG_KEY)
 
 
 def generate_reactor(
@@ -78,22 +65,8 @@ def generate_reactor(
         f.write(state_stub)
         f.write(actions_stub)
 
-    if "PYTEST_CURRENT_TEST" in os.environ:
-        root = "tests/project"
-    else:
-        root = project_root()
-
-    internal_config_file_path = os.path.join(
-        root,
-        constants.ATOMKRAFT_INTERNAL_FOLDER,
-        constants.ATOMKRAFT_INTERNAL_CONFIG,
-    )
-
-    atomkraft_internal_config = tomlkit.load(open(internal_config_file_path))
-    atomkraft_internal_config[constants.REACTOR_CONFIG_KEY] = stub_file_path
-
-    with open(internal_config_file_path, "w") as internal_config_f:
-        tomlkit.dump(atomkraft_internal_config, internal_config_f)
+    with AtomkraftConfig() as config:
+        config.write(constants.REACTOR_CONFIG_KEY, stub_file_path)
 
     return stub_file_path
 
