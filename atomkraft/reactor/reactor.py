@@ -1,15 +1,12 @@
 import ast
 import os
-from os import PathLike
 import os.path
+from os import PathLike
 from typing import List, Optional
 
 import tomlkit
-from caseconverter import snakecase
-from . import constants
-from . import utils
-from .step_functions_visitor import StepFunctionsVisitor
 from atomkraft.utils.project import project_root
+from caseconverter import snakecase
 
 from . import constants, utils
 from .step_functions_visitor import StepFunctionsVisitor

@@ -1,10 +1,11 @@
-from os import PathLike
-from atomkraft.utils.project import project_root
 import os.path
 from datetime import datetime
-import pytest
-from ..reactor.reactor import get_reactor
+from os import PathLike
 
+import pytest
+from atomkraft.utils.project import project_root
+
+from ..reactor.reactor import get_reactor
 
 TRACE_TEST_STUB = """
 from modelator.pytest.decorators import itf

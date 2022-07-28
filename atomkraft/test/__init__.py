@@ -1,6 +1,7 @@
 from typing import List, Optional
 
 import typer
+
 from .trace import test_trace
 
 app = typer.Typer(rich_markup_mode="rich", add_completion=False)
