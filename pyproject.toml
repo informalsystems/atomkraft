@@ -34,6 +34,7 @@ toml = "^0.10.2"
 GitPython = "^3.1.27"
 tomlkit = "^0.11.1"
 munch = "^2.5.0"
+case-converter = "^1.1.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0", "setuptools>=42"]
