@@ -13,5 +13,5 @@ class ModelConfig(ConfigFile):
                 root = "tests/project"
             else:
                 root = project_root()
-            self.path = os.path.join(root, MODEL_CONFIG_PATH)
+            path = os.path.join(root, MODEL_CONFIG_PATH)
         super(path)
