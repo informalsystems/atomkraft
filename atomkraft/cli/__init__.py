@@ -18,7 +18,7 @@ app = typer.Typer(
 )
 
 GH_TEMPLATE = "gh:informalsystems/atomkraft"
-GH_REVISION = "rano/60-improve-code-quality"
+GH_REVISION = "dev"
 
 
 @app.command(
