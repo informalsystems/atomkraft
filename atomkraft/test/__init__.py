@@ -19,7 +19,7 @@ def RequiredFileOption(help, default):
     return typer.Option(
         ...,
         show_default=False,
-        help=f"{help} [grey30]\[default: set via [bold cyan]atomkraft {default}[/bold cyan]][/grey30]",
+        help=f"{help} [grey30][default: set via [bold cyan]atomkraft {default}[/bold cyan]][/grey30]",
     )
 
 
@@ -32,7 +32,7 @@ def trace(
     keypath: str = typer.Option(
         "action",
         show_default=True,
-        help=f"Path to key used as step name, extracted from ITF states",
+        help="Path to key used as step name, extracted from ITF states",
     ),
 ):
     """
