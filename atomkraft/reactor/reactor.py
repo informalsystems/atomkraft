@@ -1,6 +1,7 @@
 import ast
 from os import PathLike
 import os
+import os.path
 from typing import List, Optional
 import tomlkit
 from caseconverter import snakecase
@@ -41,18 +42,30 @@ def get_reactor() -> PathLike:
     returns the path to the current reactor from the internal config
     """
 
-    if "PYTEST_CURRENT_TEST" in os.environ:
-        root = "tests/project"
-    else:
-        root = project_root()
+    root = project_root()
+
+    if not root:
+        raise RuntimeError(
+            "could not find Atomkraft project: are you in the right directory?"
+        )
 
     internal_config_file_path = os.path.join(
         root,
         constants.ATOMKRAFT_INTERNAL_FOLDER,
         constants.ATOMKRAFT_INTERNAL_CONFIG,
     )
+
+    if not os.path.isfile(internal_config_file_path):
+        raise RuntimeError(
+            "Atomkraft configuration not found: have you executed `atomkraft init`?"
+        )
+
     with open(internal_config_file_path) as config_f:
         config_data = tomlkit.load(config_f)
+        if constants.REACTOR_CONFIG_KEY not in config_data:
+            raise RuntimeError(
+                "Could not find default reactor; have you ran `atomkraft reactor`?"
+            )
         return config_data[constants.REACTOR_CONFIG_KEY]
 
 
