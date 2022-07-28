@@ -1,5 +1,7 @@
 from typing import List, Optional
+
 import typer
+
 from .trace import test_trace
 
 app = typer.Typer(rich_markup_mode="rich", add_completion=False)
@@ -9,7 +11,7 @@ def FileOption(help, default):
     return typer.Option(
         None,
         show_default=False,
-        help=f"{help} [grey30]\[default: set via [bold cyan]atomkraft {default}[/bold cyan]][/grey30]",
+        help=f"{help} [grey30][default: set via [bold cyan]atomkraft {default}[/bold cyan]][/grey30]",
     )
 
 
@@ -17,7 +19,7 @@ def RequiredFileOption(help, default):
     return typer.Option(
         ...,
         show_default=False,
-        help=f"{help} [grey30]\[default: set via [bold cyan]atomkraft {default}[/bold cyan]][/grey30]",
+        help=f"{help} [grey30][default: set via [bold cyan]atomkraft {default}[/bold cyan]][/grey30]",
     )
 
 
@@ -30,7 +32,7 @@ def trace(
     keypath: str = typer.Option(
         "action",
         show_default=True,
-        help=f"Path to key used as step name, extracted from ITF states",
+        help="Path to key used as step name, extracted from ITF states",
     ),
 ):
     """

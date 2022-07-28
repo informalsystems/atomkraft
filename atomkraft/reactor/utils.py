@@ -1,8 +1,10 @@
-from modelator.pytest.decorators import dict_get_keypath
-from typing import Set
-from os import PathLike
-import json
 import ast
+import json
+from os import PathLike
+from typing import Set
+
+from modelator.pytest.decorators import dict_get_keypath
+
 from . import constants
 
 

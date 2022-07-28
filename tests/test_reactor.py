@@ -1,4 +1,3 @@
-import sys
 import py_compile
 
 from atomkraft.reactor import reactor
@@ -12,7 +11,7 @@ def test_parsing():
     variables_list = [["a", "b", "c", "d"], [], ["a"]]
     for actions in actions_list:
         for variables in variables_list:
-            reactor_stub_file = f"tests/project/reactors/reactor.py"
+            reactor_stub_file = "tests/project/reactors/reactor.py"
             reactor.generate_reactor(
                 actions, variables, stub_file_path=reactor_stub_file
             )
@@ -23,7 +22,7 @@ def test_parsing():
 def test_check():
     actions = ["store_cw_contract", "instantiate", "get_count", "increment", "reset"]
     variables = ["owner", "instantiated", "stepCount", "messages", "count", "last_msg"]
-    reactor_stub_file = f"tests/project/reactors/check_correct_reactor.py"
+    reactor_stub_file = "tests/project/reactors/check_correct_reactor.py"
     generated_reactor = reactor.generate_reactor(
         actions, variables, stub_file_path=reactor_stub_file, keypath="last_msg.name"
     )
@@ -33,7 +32,7 @@ def test_check():
     assert reactor_ok is True
 
     # test that the reactor with missing actions will be deemed incorrect
-    reactor_stub_file = f"tests/project/reactors/check_faulty_reactor.py"
+    reactor_stub_file = "tests/project/reactors/check_faulty_reactor.py"
     modified_actions = actions[:2]
     generated_reactor = reactor.generate_reactor(
         modified_actions,

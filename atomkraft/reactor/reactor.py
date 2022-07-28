@@ -1,14 +1,15 @@
 import ast
-from os import PathLike
 import os
 import os.path
+from os import PathLike
 from typing import List, Optional
+
 import tomlkit
-from caseconverter import snakecase
-from . import constants
-from . import utils
-from .step_functions_visitor import StepFunctionsVisitor
 from atomkraft.utils.project import project_root
+from caseconverter import snakecase
+
+from . import constants, utils
+from .step_functions_visitor import StepFunctionsVisitor
 
 
 def check_reactor(trace: PathLike, reactor=None) -> bool:
@@ -26,7 +27,7 @@ def check_reactor(trace: PathLike, reactor=None) -> bool:
     keypath = utils.get_keypath(root_node)
     try:
         all_trace_actions = utils.get_all_trace_actions(trace, keypath)
-    except Exception as e:
+    except Exception:
         raise ValueError(
             f"Keypath {keypath}, which is set in {reactor} is not present in the trace {trace}"
         )
@@ -114,14 +115,16 @@ def generate_reactor(
 
 def _keypath_stub(keypath):
     stub = f"""
-{constants.KEYPATH_VAR} = {repr(keypath)}
 
+{constants.KEYPATH_VAR} = {repr(keypath)}
 """
     return stub
 
 
 def _action_stub(action_name: str, variables: List[str]):
     stub = f"""
+
+
 @step({repr(action_name)})
 def {snakecase(action_name)}(testnet, state, {", ".join(variables)}):
     print("Step: {action_name}")
@@ -130,22 +133,19 @@ def {snakecase(action_name)}(testnet, state, {", ".join(variables)}):
 
 
 def _state_stub():
-    stub = f"""
+    stub = """
+
 
 @pytest.fixture
 def state():
-    return {{}}
-
+    return {}
 """
     return stub
 
 
 def _imports_stub():
     stub = """
-import time
 import pytest
-from cosmos_net.pytest import Testnet
 from modelator.pytest.decorators import step
-
-    """
+"""
     return stub

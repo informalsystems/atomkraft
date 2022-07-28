@@ -1,8 +1,5 @@
-import time
 import pytest
-from cosmos_net.pytest import Testnet
 from modelator.pytest.decorators import step
-
 
 keypath = "last_msg.name"
 
