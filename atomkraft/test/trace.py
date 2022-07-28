@@ -6,7 +6,7 @@ import pytest
 from ..reactor.reactor import get_reactor
 
 
-trace_test_stub = """
+TRACE_TEST_STUB = """
 from modelator.pytest.decorators import itf
 
 pytest_plugins = "{0}"
@@ -49,8 +49,8 @@ def test_trace(trace: PathLike, reactor: PathLike, keypath: str):
     with open(test_path, "w") as test:
         print(f"Writing {test_name} ...")
         test.write(
-            trace_test_stub.format(
-                str(reactor).replace("/", ".").replace(".py", ""), trace, keypath
+            TRACE_TEST_STUB.format(
+                str(reactor).replace("/", ".").removesuffix(".py"), trace, keypath
             )
         )
     print(f"Executing {test_name} ...")
