@@ -6,7 +6,6 @@ import click
 import numpy as np
 import tabulate
 import tomlkit
-from munch import munchify
 
 from .node import Account, Coin, ConfigPort, Node
 from .utils import get_free_ports, update_port
@@ -50,18 +49,18 @@ class Testnet:
     @staticmethod
     def load_toml(path: str):
         with open(path) as f:
-            data = munchify(tomlkit.load(f))
+            data = tomlkit.load(f)
 
         return Testnet(
-            data.chain_id,
-            data.n_validator,
-            data.n_account,
-            data.binary,
-            data.denom,
-            data.prefix,
-            data.coin_type,
-            data.config.genesis,
-            data.config.node,
+            data["chain_id"],
+            data["n_validator"],
+            data["n_account"],
+            data["binary"],
+            data["denom"],
+            data["prefix"],
+            data["coin_type"],
+            data["config"]["genesis"],
+            data["config"]["node"],
         )
 
     @staticmethod
@@ -188,9 +187,7 @@ class Testnet:
             if i > 0:
                 # because this
                 # https://github.com/cosmos/cosmos-sdk/blob/88ee7fb2e9303f43c52bd32410901841cad491fb/x/staking/client/cli/tx.go#L599
-                gentx_file = glob.glob(f"{node.home_dir}/config/gentx/*json")[0].split(
-                    "/", maxsplit=1
-                )[-1]
+                gentx_file = glob.glob(f"{node.home_dir}/config/gentx/*json")[0]
                 gentx_file = gentx_file.removeprefix(node.home_dir)
                 node_p2p = node.get(p2p.config_file, p2p.property_path).rsplit(
                     ":", maxsplit=1
