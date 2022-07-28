@@ -66,6 +66,14 @@ pynacl = ">=1.1,<2.0"
 six = ">=1.12.0"
 
 [[package]]
+name = "case-converter"
+version = "1.1.0"
+description = "A string case conversion package."
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "cffi"
 version = "1.15.1"
 description = "Foreign Function Interface for Python calling C code."
@@ -838,7 +846,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "ad7ede805b7b4d7a923d4b7cd4e65f0076d2d675dbba0140d00077c6b10ee544"
+content-hash = "2297534a8629e234da22f2f06cce366d09ff4ba21ab0e5957c23730d5dcbe9c8"
 
 [metadata.files]
 appdirs = [
@@ -862,6 +870,10 @@ base58 = [
 ]
 bip-utils = [
     {file = "bip_utils-2.5.1.tar.gz", hash = "sha256:eeb70f0401e08d381ad1f4cc2fc54caf4fafa4b50614797f3de1a5cdf158e1f8"},
+]
+case-converter = [
+    {file = "case-converter-1.1.0.tar.gz", hash = "sha256:2ed3fc6e3ffa8d601f9a31ffcbc8fbd19eaeb48671a79a8ef16394672824510e"},
+    {file = "case_converter-1.1.0-py3-none-any.whl", hash = "sha256:d0fbc665a4fd410e454630bcf5168dce62e147a98512647ed48b0a6b556986e3"},
 ]
 cffi = [
     {file = "cffi-1.15.1-cp27-cp27m-macosx_10_9_x86_64.whl", hash = "sha256:a66d3508133af6e8548451b25058d5812812ec3798c886bf38ed24a98216fab2"},
