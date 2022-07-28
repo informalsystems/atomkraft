@@ -14,6 +14,7 @@ app = typer.Typer(
     add_completion=False,
     name="atomkraft",
     no_args_is_help=True,
+    rich_markup_mode="rich",
 )
 
 GH_TEMPLATE = "gh:informalsystems/atomkraft"

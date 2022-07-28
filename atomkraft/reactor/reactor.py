@@ -1,9 +1,14 @@
 import ast
 import os
 from os import PathLike
+import os.path
 from typing import List, Optional
 
 import tomlkit
+from caseconverter import snakecase
+from . import constants
+from . import utils
+from .step_functions_visitor import StepFunctionsVisitor
 from atomkraft.utils.project import project_root
 
 from . import constants, utils
@@ -41,18 +46,30 @@ def get_reactor() -> PathLike:
     returns the path to the current reactor from the internal config
     """
 
-    if "PYTEST_CURRENT_TEST" in os.environ:
-        root = "tests/project"
-    else:
-        root = project_root()
+    root = project_root()
+
+    if not root:
+        raise RuntimeError(
+            "could not find Atomkraft project: are you in the right directory?"
+        )
 
     internal_config_file_path = os.path.join(
         root,
         constants.ATOMKRAFT_INTERNAL_FOLDER,
         constants.ATOMKRAFT_INTERNAL_CONFIG,
     )
+
+    if not os.path.isfile(internal_config_file_path):
+        raise RuntimeError(
+            "Atomkraft configuration not found: have you executed `atomkraft init`?"
+        )
+
     with open(internal_config_file_path) as config_f:
         config_data = tomlkit.load(config_f)
+        if constants.REACTOR_CONFIG_KEY not in config_data:
+            raise RuntimeError(
+                "Could not find default reactor; have you ran `atomkraft reactor`?"
+            )
         return config_data[constants.REACTOR_CONFIG_KEY]
 
 
@@ -112,7 +129,7 @@ def _action_stub(action_name: str, variables: List[str]):
 
 
 @step({repr(action_name)})
-def act_step(testnet, state, {", ".join(variables)}):
+def {snakecase(action_name)}(testnet, state, {", ".join(variables)}):
     print("Step: {action_name}")
 """
     return stub
