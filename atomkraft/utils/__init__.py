@@ -6,7 +6,7 @@ def query(
     data: Dict[Any, Any],
     property_path: str | None,
 ) -> Any:
-    if property_path is not None:
+    if property_path:
         keys = property_path.split(".")
         for key in keys:
             match data:
@@ -39,7 +39,7 @@ def merge(old: Any, new: Any):
 
 
 def update(data_root: Dict[Any, Any], property_path: str | None, value: Any) -> Any:
-    if property_path is not None:
+    if property_path:
         data = data_root
         keys = property_path.split(".")
         for key in keys[:-1]:
