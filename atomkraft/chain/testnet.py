@@ -26,8 +26,8 @@ class Testnet:
         node_config: Dict = {},
         account_balance: int = 10**27,
         validator_balance: int = 10**21,
-        overwrite=False,
-        keep=False,
+        overwrite=True,
+        keep=True,
         verbose=False,
         data_dir=None,
     ):
