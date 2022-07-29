@@ -58,7 +58,6 @@ def testnet(
     testnet.verbose = not silent
     testnet.keep = True
     testnet.overwrite = True
-    testnet.data_dir = ".atomkraft"
 
     testnet.oneshot()
     try:
