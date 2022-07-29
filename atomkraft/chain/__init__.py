@@ -56,9 +56,6 @@ def testnet(
     else:
         testnet = Testnet.load_toml(config)
     testnet.verbose = not silent
-    testnet.keep = True
-    testnet.overwrite = True
-    testnet.data_dir = ".atomkraft"
 
     testnet.oneshot()
     try:

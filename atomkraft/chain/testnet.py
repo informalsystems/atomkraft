@@ -1,5 +1,6 @@
 import glob
 import time
+from pathlib import Path
 from typing import Dict
 
 import click
@@ -25,8 +26,8 @@ class Testnet:
         node_config: Dict = {},
         account_balance: int = 10**27,
         validator_balance: int = 10**21,
-        overwrite=False,
-        keep=False,
+        overwrite=True,
+        keep=True,
         verbose=False,
         data_dir=None,
     ):
@@ -44,7 +45,7 @@ class Testnet:
         self.overwrite = overwrite
         self.keep = keep
         self.verbose = verbose
-        self.data_dir = "." if data_dir is None else data_dir
+        self.data_dir = Path(".atomkraft/nodes") if data_dir is None else data_dir
 
     @staticmethod
     def load_toml(path: str):
@@ -90,6 +91,7 @@ class Testnet:
         return self.validator_nodes[validator_id].get_port(self.ports()[port_type])
 
     def prepare(self):
+        self.data_dir.mkdir(parents=True, exist_ok=True)
         self.validator_nodes = [
             Node(
                 f"node-{i}",
@@ -227,6 +229,7 @@ def testnet(
     coin_type: int,
     overwrite: bool,
     keep: bool,
+    data_dir: Path,
 ):
     coin_type = 118
 
@@ -264,6 +267,7 @@ def testnet(
         validator_balance=10**16,
         overwrite=overwrite,
         keep=keep,
+        data_dir=data_dir,
     )
 
     net.oneshot()
