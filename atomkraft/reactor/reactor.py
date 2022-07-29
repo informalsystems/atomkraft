@@ -4,9 +4,9 @@ import os.path
 from os import PathLike
 from typing import List, Optional
 
+from atomkraft.config.atomkraft_config import AtomkraftConfig
 from atomkraft.utils.project import project_root
 from caseconverter import snakecase
-from atomkraft.config.atomkraft_config import AtomkraftConfig
 
 from . import constants, utils
 from .step_functions_visitor import StepFunctionsVisitor

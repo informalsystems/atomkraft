@@ -1,5 +1,6 @@
 import os
 from typing import Optional
+
 from atomkraft.config.config_file import ConfigFile
 from atomkraft.utils.project import project_root
 
