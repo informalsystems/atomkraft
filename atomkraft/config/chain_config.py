@@ -14,4 +14,4 @@ class ChainConfig(ConfigFile):
             else:
                 root = project_root()
             path = os.path.join(root, CHAIN_CONFIG_PATH)
-        super(path)
+        super().__init__(path)

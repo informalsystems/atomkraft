@@ -14,4 +14,4 @@ class ModelConfig(ConfigFile):
             else:
                 root = project_root()
             path = os.path.join(root, MODEL_CONFIG_PATH)
-        super(path)
+        super().__init__(path)

@@ -1,14 +1,14 @@
 import tomlkit
 
 
-class ConfigFile:
+class ConfigFile(object):
     def __init__(self, path: str):
         self.data = {}
         self.path = path
 
     def __enter__(self):
         self.fd = open(self.path, "w+")
-        self.data = tomlkit.load(self.fg)
+        self.data = tomlkit.load(self.fd)
         return self
 
     def __exit__(self, type, value, traceback):
