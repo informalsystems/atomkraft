@@ -1,8 +1,8 @@
 import time
 
 import pytest
-from atomkraft.utils.project import project_root
 
+from ..utils.project import project_root
 from .testnet import Testnet
 
 

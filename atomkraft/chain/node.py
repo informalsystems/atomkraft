@@ -8,8 +8,10 @@ from subprocess import PIPE, Popen
 import bip_utils
 import hdwallet
 import numpy as np
-import toml
+import tomlkit
 from hdwallet.symbols import ATOM
+
+from .. import utils
 
 
 @dataclass
@@ -146,26 +148,10 @@ class Node:
                 case ".json":
                     data = json.load(f)
                 case ".toml":
-                    data = toml.load(f)
+                    data = tomlkit.load(f)
                 case _:
                     raise RuntimeError(f"Unexpected file {path}")
-        if property_path is not None:
-            keys = property_path.split(".")
-            for key in keys:
-                match data:
-                    case dict():
-                        try:
-                            data = data[key]
-                        except KeyError:
-                            try:
-                                data = data[key.replace("-", "_")]
-                            except KeyError:
-                                data = data[key.replace("_", "-")]
-                            except Exception as e:
-                                raise e
-                    case list():
-                        data = data[int(key)]
-        return data
+        return utils.query(data, property_path)
 
     def get_port(self, port_config: ConfigPort):
         return self.get(
@@ -180,39 +166,10 @@ class Node:
                     case ".json":
                         main_data = json.load(f)
                     case ".toml":
-                        main_data = toml.load(f)
+                        main_data = tomlkit.load(f)
                     case _:
                         raise RuntimeError(f"Unexpected file {path}")
-            data = main_data
-            keys = property_path.split(".")
-            for key in keys[:-1]:
-                match data:
-                    case dict():
-                        try:
-                            data = data[key]
-                        except KeyError:
-                            try:
-                                data = data[key.replace("-", "_")]
-                            except KeyError:
-                                data = data[key.replace("_", "-")]
-                            except Exception as e:
-                                raise e
-                    case list():
-                        data = data[int(key)]
-            match data:
-                case dict():
-                    key = keys[-1]
-                    try:
-                        data[key] = value
-                    except KeyError:
-                        try:
-                            data[key.replace("-", "_")] = value
-                        except KeyError:
-                            data[key.replace("_", "-")] = value
-                        except Exception as e:
-                            raise e
-                case list():
-                    data[int(keys[-1])] = value
+            main_data = utils.update(main_data, property_path, value)
         else:
             main_data = value
         with open(f"{self.home_dir}/{path}", "w", encoding="utf-8") as f:
@@ -220,7 +177,7 @@ class Node:
                 case ".json":
                     json.dump(main_data, f)
                 case ".toml":
-                    toml.dump(main_data, f)
+                    tomlkit.dump(main_data, f)
                 case _:
                     raise RuntimeError(f"Unexpected file {path}")
 
