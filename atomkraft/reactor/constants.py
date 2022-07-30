@@ -1,8 +1,3 @@
-ATOMKRAFT_INTERNAL_FOLDER = ".atomkraft"
-
-# the file that contains internal configurations for atomkraft
-ATOMKRAFT_INTERNAL_CONFIG = "config.toml"
-
 # a key for the reactor path inside internal config
 REACTOR_CONFIG_KEY = "reactor"
 

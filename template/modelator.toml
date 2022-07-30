@@ -1,8 +1,0 @@
-[[models]]
-model = "path/to/module.tla"
-config = "path/to/module.cfg"
-constants = {"N": 3, "FOO": "bar" }
-invariants = ["Inv1", "Inv2"]
-samples = ["Ex1", "Ex2"]
-md_monitor = "path/to/monitor.md"
-html_monitor = "path/to/monitor.html"
