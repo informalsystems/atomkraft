@@ -4,7 +4,8 @@ _exclude:
   - ".gitkeep"
 
 _tasks:
-  - poetry init -n
-  - poetry add atomkraft
-  - poetry add git+https://github.com/informalsystems/terra.py#rano/cosmos
-  - poetry run python -m pytest .atomkraft/smoke_tests || true
+  - "{{ _copier_python }} -m poetry --version >/dev/null 2>&1 || {{ _copier_python }} -m pip install poetry"
+  - "{{ _copier_python }} -m poetry init -n"
+  - "{{ _copier_python }} -m poetry add atomkraft"
+  - "{{ _copier_python }} -m poetry add git+https://github.com/informalsystems/terra.py#rano/cosmos"
+  - "{{ _copier_python }} -m poetry run python -m pytest .atomkraft/smoke_tests || true"
