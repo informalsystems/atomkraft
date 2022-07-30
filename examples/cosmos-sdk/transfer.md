@@ -13,6 +13,20 @@
 - [`go`](https://go.dev/doc/install): Compile Cosmos-SDK chain binary
 - [`java`](https://www.java.com/download): For [Apalache](https://apalache.informal.systems) model checker
 
+#### `ubuntu`
+
+```
+apt update -y && apt upgrade -y
+apt install pip3 git golang curl default-jre -y
+pip install --upgrade poetry
+```
+
+#### `archlinux`
+
+```
+pacman -Syu python-pip python-poetry git make go jre-openjdk gcc --noconfirm --needed
+```
+
 ### Install Atomkraft
 
 ```
