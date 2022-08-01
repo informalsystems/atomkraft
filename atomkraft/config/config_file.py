@@ -14,11 +14,11 @@ class ConfigFile(object):
     def __exit__(self, type, value, traceback):
         self.fd.close()
 
-    def get(self, key) -> str:
+    def query(self, key) -> str:
         if key not in self.data:
             raise KeyError
         return self.data[key]
 
-    def write(self, key, value):
+    def store(self, key, value):
         self.data[key] = value
         tomlkit.dump(self.data, self.fd)

@@ -62,7 +62,7 @@ def get_reactor() -> PathLike:
 
     with AtomkraftConfig() as config:
         try:
-            return config.get(constants.REACTOR_CONFIG_KEY)
+            return config.query(constants.REACTOR_CONFIG_KEY)
         except KeyError:
             raise RuntimeError(
                 "Could not find default reactor; have you ran `atomkraft reactor`?"
@@ -93,7 +93,7 @@ def generate_reactor(
         f.write(actions_stub)
 
     with AtomkraftConfig() as config:
-        config.write(constants.REACTOR_CONFIG_KEY, stub_file_path)
+        config.store(constants.REACTOR_CONFIG_KEY, stub_file_path)
 
     return stub_file_path
 
