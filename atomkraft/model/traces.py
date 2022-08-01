@@ -47,7 +47,8 @@ def generate_traces(
     if not Path(model_path).is_file():
         raise FileNotFoundError(f"File with model not found: {model_path}")
 
-    return Model(model_path, init, next).sample(examples=sample_operators)
+    model = Model.parse_file(model_path, init, next)
+    return model.sample(examples=sample_operators)
 
 
 def last_modified_trace_path() -> str:
