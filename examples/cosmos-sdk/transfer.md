@@ -4,10 +4,12 @@
 
 ### Prerequisite
 
-- [`python`](https://www.python.org/downloads) 3.10: For Atomkraft
-- [`pip`](https://pip.pypa.io/en/stable/installation): To install Atomkraft executable
-  - Normally after installing Python, you may just want to execute `python -m ensurepip --upgrade` to have `pip` installed.
+- [`pip3.10`](https://pip.pypa.io/en/stable/installation) for `python3.10`: To install Atomkraft executable
+  - If `python3.10` is unavailable for your distribution, you can use `pyenv` to setup `python3.10`.
+    - `pyenv install 3.10.5; pyenv global 3.10.5`.
+    - When you're done, you can revert back by `pyenv global system`.
 - [`poetry`](https://python-poetry.org/docs/#installation): For Atomkraft project
+  - It will be auto-installed if not present.
 - [`git`](https://github.com/git-guides/install-git): To clone Atomkraft template and Cosmos-SDK chain repo
 - [`make`](https://www.gnu.org/software/make): Compile Cosmos-SDK chain binary
 - [`go`](https://go.dev/doc/install): Compile Cosmos-SDK chain binary
@@ -17,7 +19,7 @@
 
 ```
 apt update -y && apt upgrade -y
-apt install pip3 git golang curl default-jre -y
+apt install python3-pip git golang curl default-jre -y
 pip install --upgrade poetry
 ```
 
@@ -40,7 +42,10 @@ atomkraft init transfer
 cd transfer
 ```
 
-### Turn on Poetry shell
+`atomkraft init` creates a new directory and initializes a Poetry project in it.
+It also auto-installs Poetry if needed. It also adds required dependencies to the project.
+
+### Activate Poetry shell
 
 ```
 poetry shell
@@ -57,12 +62,12 @@ You can use the following code to _jump-start_ a new model at `models/transfer.t
 ```
 cat > models/transfer.tla << EOF
 ---- MODULE transfer ----
-EXTENDS Apalache, Variants, Integers, FiniteSets
+EXTENDS Apalache, Integers, FiniteSets
 
 VARIABLES
     \* @type: Int -> Int;
     balances,
-    \* @type: Init({n_wallet: Int}) | Transfer({sender: Int, receiver: Int, amount: Int});
+    \* @type: [tag: Str, value: [n_wallet: Int, sender: Int, receiver: Int, amount: Int]];
     action,
     \* @type: Int;
     step
@@ -71,7 +76,7 @@ WALLETS == 0..1
 
 Init ==
     /\ balances = [wallet \in WALLETS |-> 100]
-    /\ action = Variant("Init", [n_wallet |-> Cardinality(WALLETS)])
+    /\ action = [tag |-> "Init", value |-> [n_wallet |-> Cardinality(WALLETS)]]
     /\ step = 0
 
 Next ==
@@ -84,12 +89,12 @@ Next ==
             ![sender] = @ - amount,
             ![receiver] = @ + amount
             ]
-        /\ action' = Variant("Transfer", [sender |-> sender, receiver |-> receiver, amount |-> amount])
+        /\ action' = [tag |-> "Transfer", value |-> [sender |-> sender, receiver |-> receiver, amount |-> amount]]
     /\ step' = step + 1
 
 View ==
-    IF VariantTag(action) = "Transfer"
-    THEN VariantGetUnsafe("Transfer", action)
+    IF action.tag = "Transfer"
+    THEN action.value
     ELSE [sender |-> -1, receiver |-> -1, amount |-> 0]
 
 Inv == step < 10
@@ -100,9 +105,9 @@ EOF
 
 ### Generate traces
 
-#### Download Apalache
+We will use Apalache model checker to generate traces from our model.
 
-We will use Apalache to generate traces from our model.
+#### Download Apalache
 
 ```
 curl -Lo- https://github.com/informalsystems/apalache/releases/download/v0.26.0/apalache-0.26.0.tgz | tar -zxf-
@@ -113,8 +118,8 @@ The Apalache executable will be at `./apalache-0.26.0/bin/apalache-mc`.
 The following will generate traces at `traces/`.
 
 ```
-./apalache-0.26.0/bin/apalache-mc check --features=rows --init=Init --next=Next --inv=Inv --view=View --max-error=10 --run-dir=mc_traces models/transfer.tla
-ls -1I violation.itf.json mc_traces/violation*itf.json | xargs cp -t traces
+./apalache-0.26.0/bin/apalache-mc check --init=Init --next=Next --inv=Inv --view=View --max-error=10 --run-dir=mc_traces models/transfer.tla
+ls -1I violation.itf.json mc_traces/violation*itf.json | xargs -I _ cp _ traces
 rm -r mc_traces
 ```
 
