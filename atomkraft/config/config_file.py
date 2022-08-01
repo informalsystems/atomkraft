@@ -15,13 +15,9 @@ class ConfigFile(object):
         self.fd.close()
 
     def get(self, key) -> str:
-        if key in self.data:
-            return self.data[key]
-        if key.replace("-", "_") in self.data:
-            return self.data[key.replace("-", "_")]
-        if key.replace("_", "-") in self.data:
-            return self.data[key.replace("_", "-")]
-        raise KeyError
+        if key not in self.data:
+            raise KeyError
+        return self.data[key]
 
     def write(self, key, value):
         self.data[key] = value
