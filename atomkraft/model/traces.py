@@ -1,4 +1,3 @@
-import json
 from pathlib import Path
 from typing import List
 
@@ -76,5 +75,8 @@ def get_trace(trace_path=None) -> List["ITF"]:
     if not trace_path:
         trace_path = last_modified_trace_path()
 
-    trace_json = json.loads(trace_path)
-    return ITF.from_itf_json(trace_json)
+    if not Path(trace_path).is_file():
+        raise FileNotFoundError(f"Path {trace_path} is not a file")
+
+    print(f"Retrieving trace from: {trace_path}")
+    return ITF.from_itf_json(trace_path)
