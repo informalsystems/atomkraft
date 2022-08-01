@@ -16,7 +16,7 @@ class AtomkraftConfig(ConfigFile):
                 root = "tests/project"
             else:
                 root = project_root()
-            self.path = os.path.join(
+            path = os.path.join(
                 root,
                 ATOMKRAFT_INTERNAL_DIR,
                 ATOMKRAFT_INTERNAL_CONFIG,
