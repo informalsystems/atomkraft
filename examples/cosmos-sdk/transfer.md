@@ -31,15 +31,15 @@ pacman -Syu python-pip python-poetry git make go jre-openjdk gcc --noconfirm --n
 
 ### Install Atomkraft
 
-```
-pip install --upgrade atomkraft
+```sh
+$ pip install --upgrade atomkraft
 ```
 
 ### Initialize project
 
-```
-atomkraft init transfer
-cd transfer
+```sh
+$ atomkraft init transfer
+$ cd transfer
 ```
 
 `atomkraft init` creates a new directory and initializes a Poetry project in it.
@@ -59,8 +59,8 @@ At each step, Alice or Bob will send some amount of tokens to the other person.
 We will use TLA+ to specify this model.
 You can use the following code to _jump-start_ a new model at `models/transfer.tla`.
 
-```
-cat > models/transfer.tla << EOF
+```sh
+$ cat > models/transfer.tla << EOF
 ---- MODULE transfer ----
 EXTENDS Apalache, Integers, FiniteSets
 
@@ -109,18 +109,18 @@ We will use Apalache model checker to generate traces from our model.
 
 #### Download Apalache
 
-```
-curl -Lo- https://github.com/informalsystems/apalache/releases/download/v0.26.0/apalache-0.26.0.tgz | tar -zxf-
+```sh
+$ curl -Lo- https://github.com/informalsystems/apalache/releases/download/v0.26.0/apalache-0.26.0.tgz | tar -zxf-
 ```
 
 The Apalache executable will be at `./apalache-0.26.0/bin/apalache-mc`.
 
 The following will generate traces at `traces/`.
 
-```
-./apalache-0.26.0/bin/apalache-mc check --init=Init --next=Next --inv=Inv --view=View --max-error=10 --run-dir=mc_traces models/transfer.tla
-ls -1I violation.itf.json mc_traces/violation*itf.json | xargs -I _ cp _ traces
-rm -r mc_traces
+```sh
+$ ./apalache-0.26.0/bin/apalache-mc check --init=Init --next=Next --inv=Inv --view=View --max-error=10 --run-dir=mc_traces models/transfer.tla
+$ ls -1I violation.itf.json mc_traces/violation*itf.json | xargs -I _ cp _ traces
+$ rm -r mc_traces
 ```
 
 ### Generate reactors
@@ -129,8 +129,8 @@ Once we have some traces, we can generate reactor stubs for the traces.
 
 In our model, the `action` variable had two tags - `Init`, `Transfer`.
 
-```
-atomkraft reactor --actions "Init,Transfer" --variables "action"
+```sh
+$ atomkraft reactor --actions "Init,Transfer" --variables "action"
 ```
 
 ### Setting up chains
@@ -141,9 +141,9 @@ We will use `juno` chain binary. But any Cosmos-SDK derived chain should work.
 
 #### Binary
 
-```
-git clone --depth 1 --branch v9.0.0 https://github.com/CosmosContracts/juno
-(cd juno; make build)
+```sh
+$ git clone --depth 1 --branch v9.0.0 https://github.com/CosmosContracts/juno
+$ (cd juno; make build)
 ```
 
 The binary will be at `./juno/bin/junod`
@@ -152,18 +152,18 @@ The binary will be at `./juno/bin/junod`
 
 Now we can update the chain parameters.
 
-```
-atomkraft chain config chain_id test-cw
-atomkraft chain config binary ./juno/bin/junod
-atomkraft chain config prefix juno
+```sh
+$ atomkraft chain config chain_id test-cw
+$ atomkraft chain config binary ./juno/bin/junod
+$ atomkraft chain config prefix juno
 ```
 
 ### Executing tests
 
 We have some traces and a reactor stub ready. Now we can smoke-test the test.
 
-```
-atomkraft test trace --trace traces/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag
+```sh
+$ poetry run atomkraft test trace --trace traces/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag
 ```
 
 For now, this just prints the name of the action tag. Let's complete the reactor stub.
@@ -172,8 +172,8 @@ For now, this just prints the name of the action tag. Let's complete the reactor
 
 Update `reactors/reactor.py` with the following complete reactor code.
 
-```
-cat > reactors/reactor.py << EOF
+```sh
+$ cat > reactors/reactor.py << EOF
 import time
 
 from modelator.pytest.decorators import step
@@ -241,8 +241,8 @@ EOF
 
 Finally, you can run the complete test with the completed reactor and a trace.
 
-```
-atomkraft test trace --trace traces/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag
-atomkraft test trace --trace traces/violation2.itf.json --reactor reactors/reactor.py --keypath action.tag
-atomkraft test trace --trace traces/violation3.itf.json --reactor reactors/reactor.py --keypath action.tag
+```sh
+$ poetry run atomkraft test trace --trace traces/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag
+$ poetry run atomkraft test trace --trace traces/violation2.itf.json --reactor reactors/reactor.py --keypath action.tag
+$ poetry run atomkraft test trace --trace traces/violation3.itf.json --reactor reactors/reactor.py --keypath action.tag
 ```
