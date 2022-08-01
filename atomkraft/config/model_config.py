@@ -5,8 +5,8 @@ from atomkraft.utils.project import project_root
 
 MODEL_CONFIG_PATH = "model.toml"
 
-class ModelConfig(ConfigFile):
 
+class ModelConfig(ConfigFile):
     def __init__(self, path: Optional[str] = None):
         if not path:
             if "PYTEST_CURRENT_TEST" in os.environ:

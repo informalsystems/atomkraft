@@ -8,16 +8,16 @@ class ConfigFile:
         self.path = path
 
     def __enter__(self):
-        self.fd = open(self.path, 'w+')
+        self.fd = open(self.path, "w+")
         self.data = tomlkit.load(self.fg)
         return self
-    
+
     def __exit__(self, type, value, traceback):
         self.fd.close()
-    
+
     def get(self, key) -> Optional[str]:
         if key in self.data:
-            return self.data[key]        
+            return self.data[key]
         if key.replace("-", "_") in self.data:
             return self.data[key.replace("-", "_")]
         if key.replace("_", "-") in self.data:
