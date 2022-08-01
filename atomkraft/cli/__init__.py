@@ -1,11 +1,12 @@
+import os
 from pathlib import Path
 
 import git
-import pytest
 import modelator
+import pytest
 import typer
-import os
 from copier import run_auto
+
 from .. import chain, test
 from ..reactor.reactor import generate_reactor
 
@@ -20,7 +21,6 @@ GH_TEMPLATE = "gh:informalsystems/atomkraft"
 
 @app.command(
     no_args_is_help=True,
-
 )
 def init(
     name: Path = typer.Argument(..., help="Name of new directory", show_default=False)
