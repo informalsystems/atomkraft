@@ -33,12 +33,14 @@ pacman -Syu python-pip python-poetry git make go jre-openjdk gcc --noconfirm --n
 
 ```sh
 $ pip install --upgrade atomkraft
+...
 ```
 
 ### Initialize project
 
 ```sh
 $ atomkraft init transfer
+...
 $ cd transfer
 ```
 
@@ -59,8 +61,12 @@ At each step, Alice or Bob will send some amount of tokens to the other person.
 We will use TLA+ to specify this model.
 You can use the following code to _jump-start_ a new model at `models/transfer.tla`.
 
+<!-- $MDX dir=../transfer -->
+
 ```sh
-$ cat > models/transfer.tla << EOF
+$ curl -Lo models/transfer.tla https://raw.githubusercontent.com/informalsystems/atomkraft/rano/77-token-transfer-example/examples/cosmos-sdk/transfer/transfer.tla
+...
+$ cat models/transfer.tla
 ---- MODULE transfer ----
 EXTENDS Apalache, Integers, FiniteSets
 
@@ -100,7 +106,6 @@ View ==
 Inv == step < 10
 
 ====
-EOF
 ```
 
 ### Generate traces
@@ -109,16 +114,23 @@ We will use Apalache model checker to generate traces from our model.
 
 #### Download Apalache
 
+<!-- $MDX dir=../transfer -->
+
 ```sh
 $ curl -Lo- https://github.com/informalsystems/apalache/releases/download/v0.26.0/apalache-0.26.0.tgz | tar -zxf-
+...
 ```
 
 The Apalache executable will be at `./apalache-0.26.0/bin/apalache-mc`.
 
 The following will generate traces at `traces/`.
 
+<!-- $MDX dir=../transfer -->
+
 ```sh
 $ ./apalache-0.26.0/bin/apalache-mc check --init=Init --next=Next --inv=Inv --view=View --max-error=10 --run-dir=mc_traces models/transfer.tla
+...
+[12]
 $ ls -1I violation.itf.json mc_traces/violation*itf.json | xargs -I _ cp _ traces
 $ rm -r mc_traces
 ```
@@ -128,6 +140,8 @@ $ rm -r mc_traces
 Once we have some traces, we can generate reactor stubs for the traces.
 
 In our model, the `action` variable had two tags - `Init`, `Transfer`.
+
+<!-- $MDX dir=../transfer -->
 
 ```sh
 $ atomkraft reactor --actions "Init,Transfer" --variables "action"
@@ -141,9 +155,13 @@ We will use `juno` chain binary. But any Cosmos-SDK derived chain should work.
 
 #### Binary
 
+<!-- $MDX dir=../transfer -->
+
 ```sh
 $ git clone --depth 1 --branch v9.0.0 https://github.com/CosmosContracts/juno
+...
 $ (cd juno; make build)
+...
 ```
 
 The binary will be at `./juno/bin/junod`
@@ -151,6 +169,8 @@ The binary will be at `./juno/bin/junod`
 ### Chain parameters
 
 Now we can update the chain parameters.
+
+<!-- $MDX dir=../transfer -->
 
 ```sh
 $ atomkraft chain config chain_id test-cw
@@ -162,8 +182,11 @@ $ atomkraft chain config prefix juno
 
 We have some traces and a reactor stub ready. Now we can smoke-test the test.
 
+<!-- $MDX dir=../transfer -->
+
 ```sh
 $ poetry run atomkraft test trace --trace traces/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag
+...
 ```
 
 For now, this just prints the name of the action tag. Let's complete the reactor stub.
@@ -172,14 +195,18 @@ For now, this just prints the name of the action tag. Let's complete the reactor
 
 Update `reactors/reactor.py` with the following complete reactor code.
 
+<!-- $MDX dir=../transfer -->
+
 ```sh
-$ cat > reactors/reactor.py << EOF
+$ curl -Lo reactors/reactor.py https://raw.githubusercontent.com/informalsystems/atomkraft/rano/77-token-transfer-example/examples/cosmos-sdk/transfer/reactor.py
+...
+$ cat reactors/reactor.py
 import time
 
 from modelator.pytest.decorators import step
 from terra_sdk.client.lcd import LCDClient
 from terra_sdk.client.lcd.api.tx import CreateTxOptions
-from terra_sdk.core import Coins, Coin
+from terra_sdk.core import Coin, Coins
 from terra_sdk.core.bank import MsgSend
 from terra_sdk.core.fee import Fee
 from terra_sdk.key.mnemonic import MnemonicKey
@@ -193,7 +220,6 @@ def init(testnet, action):
 
     testnet.oneshot()
     time.sleep(10)
-
 
 
 @step("Transfer")
@@ -218,9 +244,7 @@ def transfer(testnet, action):
         )
     )
 
-    msg = MsgSend(
-        sender, receiver, Coins([Coin(testnet.denom, amount)])
-    )
+    msg = MsgSend(sender, receiver, Coins([Coin(testnet.denom, amount)]))
 
     tx = sender_wallet.create_and_sign_tx(
         CreateTxOptions(
@@ -234,15 +258,19 @@ def transfer(testnet, action):
     print("[RES]", result)
 
     time.sleep(2)
-EOF
 ```
 
 ### Re-executing tests with complete reactors
 
 Finally, you can run the complete test with the completed reactor and a trace.
 
+<!-- $MDX dir=../transfer -->
+
 ```sh
 $ poetry run atomkraft test trace --trace traces/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag
+...
 $ poetry run atomkraft test trace --trace traces/violation2.itf.json --reactor reactors/reactor.py --keypath action.tag
+...
 $ poetry run atomkraft test trace --trace traces/violation3.itf.json --reactor reactors/reactor.py --keypath action.tag
+...
 ```
