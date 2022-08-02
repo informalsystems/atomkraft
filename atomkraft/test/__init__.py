@@ -1,5 +1,8 @@
 from typing import List, Optional
+
 import typer
+
+from .trace import test_trace
 
 app = typer.Typer(rich_markup_mode="rich", add_completion=False)
 
@@ -8,24 +11,35 @@ def FileOption(help, default):
     return typer.Option(
         None,
         show_default=False,
-        help=f"{help} [grey30]\[default: set via [bold cyan]atomkraft {default}[/bold cyan]][/grey30]",
+        help=f"{help} [grey30][default: set via [bold cyan]atomkraft {default}[/bold cyan]][/grey30]",
+    )
+
+
+def RequiredFileOption(help, default):
+    return typer.Option(
+        ...,
+        show_default=False,
+        help=f"{help} [grey30][default: set via [bold cyan]atomkraft {default}[/bold cyan]][/grey30]",
     )
 
 
 @app.command()
 def trace(
-    trace: typer.FileText = FileOption("trace to execute", "model"),
+    # currently, require the trace to be present.
+    # later, there will be an option to pick up the last one from the model
+    trace: typer.FileText = RequiredFileOption("trace to execute", "model"),
     reactor: typer.FileText = FileOption("reactor to interpret the trace", "reactor"),
+    keypath: str = typer.Option(
+        "action",
+        show_default=True,
+        help="Path to key used as step name, extracted from ITF states",
+    ),
 ):
     """
     Test blockchain by running one trace
     """
-    print(
-        f"""
-    Trace: {trace}
-    Reactor: {reactor}
-    """
-    )
+
+    test_trace(trace.name, reactor if reactor is None else reactor.name, keypath)
 
 
 @app.command()

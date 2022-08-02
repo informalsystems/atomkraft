@@ -191,7 +191,7 @@ class Testnet:
                 gentx_file = glob.glob(f"{node.home_dir}/config/gentx/*json")[0].split(
                     "/", maxsplit=1
                 )[-1]
-                gentx_file = gentx_file.lstrip(node.home_dir)
+                gentx_file = gentx_file.removeprefix(node.home_dir)
                 node_p2p = node.get(p2p.config_file, p2p.property_path).rsplit(
                     ":", maxsplit=1
                 )[-1]

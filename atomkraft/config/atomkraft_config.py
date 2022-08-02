@@ -22,4 +22,4 @@ class AtomkraftConfig(ConfigFile):
                 ATOMKRAFT_INTERNAL_DIR,
                 ATOMKRAFT_INTERNAL_CONFIG,
             )
-        super(path)
+        super().__init__(path)

@@ -1,12 +1,11 @@
 import json
 import time
+from pathlib import Path
 from typing import Optional
 
 import tomlkit
 import typer
 from atomkraft.utils import project
-
-from pathlib import Path
 
 from .node import Account, Coin, ConfigPort, Node
 from .testnet import Testnet
@@ -52,7 +51,7 @@ def config(
     else:
         try:
             value = eval(value)
-        except:
+        except (SyntaxError, NameError):
             pass
         with open(f"{project.project_root()}/chain.toml") as f:
             main_data = tomlkit.load(f)
