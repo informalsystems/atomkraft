@@ -13,8 +13,8 @@ ATOMKRAFT_INTERNAL_CONFIG = "config.toml"
 class AtomkraftConfig(ConfigFile):
     def __init__(self, path: Optional[str] = None):
         if not path:
-            if "PYTEST_CURRENT_TEST" in os.environ:
-                root = "tests/project"
+            if "PROJECT_ROOT" in os.environ:
+                root = os.environ["PROJECT_ROOT"]
             else:
                 root = project_root()
             path = os.path.join(
