@@ -1,8 +1,8 @@
 # ADR-02: Model-Checker Executor
 
-| authors         | revision | revision date |
-| --------------- | -------: | ------------: |
-| Hernán Vanzetto |        1 | July 18, 2022 |
+| authors         | revision | revision date  |
+| --------------- | -------: | -------------: |
+| Hernán Vanzetto |        1 | August 4, 2022 |
 
 ## Status
 
@@ -11,59 +11,118 @@ Proposed first architecture for a prototype
 ## Summary
 
 This document describes the architecture of the Model-Checker (MC) Executor,
-consisting of a module for loading models and generating traces. Modelator
-provides most of its underlying functionality.
+which is a module for handling models and generating traces. Modelator provides
+most of its underlying functionality.
 
 ## Description
 
-The MC Executor module deals with loading, parsing, and setting of models, and
-also with the generation of traces.
+The MC Executor module deals with loading, parsing, instantiating, and running the
+models to produce execution trace files.
 
 ### CLI commands
 
 The CLI command `atomkraft model` is essentially a wrapper around Modelator's
 `Model` class, where each of its sub-commands would map almost one-to-one to the
 methods of `Model`:
+
+| Command     | Description |
+|-------------|-------------|
+| `load`      | Load a TLA+ model file and parses it. |
+| `reload`    | Reload current model, if any. |
+| `info`      | Display information on the loaded model, if available. |
+| `reset`     | Removes any loaded model. |
+| `typecheck` | Type check the loaded model, if available. |
+| `check`     | Check that the invariants hold in the model, or generate a trace for a counterexample. |
+| `sample`    | Generate execution traces that reach the state described by the `examples` properties. |
+
+### Load, reload, reset, info
+
+The `load` command parses the file in `model-path` and creates a `Model` object,
+which will be serialized with the standard `pickle` library and saved as
+`.model.pickle`.
 ```
-atomkraft model load <model-path> # in Model it's the parse_file method
+atomkraft model load <model-path>
+```
+
+Any other command that requires a model will try to load the `pickle` file if no
+other model is provided.
+
+The `reload` command will simply take the path to the model file from the
+`pickle` file (if it exists), parse it again, serialize the object model, and
+save it.
+```
+atomkraft model reload
+```
+
+The `info` command removes displays information about the model found in the object model file, such as model path, init and next predicates, constant definitions, files in the model, etc.
+```
+atomkraft model info
+```
+
+The `reset` command removes the object model file `.model.pickle` if it exists.
+```
+atomkraft model reset
+```
+#### Typecheck
+
+```
 atomkraft model typecheck
-atomkraft model instantiate <constant-name> <constant-value>
-atomkraft model check [<invariant-list>] [--constants=<name>:<value>,...] # for now, checker is Apalache, and checker params are the default values
-atomkraft model sample [<sample-list>] [--constants=<name>:<value>,...] 
-atomkraft model last-sample
-atomkraft model all-samples
-atomkraft model monitor add markdown <monitor-file.md>
-atomkraft model monitor add html <monitor-file.html>
+```
+runs Apalache's type-checker on the loaded model.
+
+#### Check and sample
+
+The following two commands run the model checker and generate traces. The only
+difference is in how they check model properties, that is, the invariants and
+examples.
+
+An invariant must hold in each state and, if is violated, the model checker will
+produce an execution trace as a counter-example of the violated property. 
+
+An example predicate is a state property that must be satisfied at some point in
+the state space exploration. When the example predicate holds, the model checker
+stops and provides the execution trace leading to the state satisfying the
+desired property. The example predicate may be a property of one state, two
+consecutive states, if it includes primed variables, or many states if it
+involves temporal logic operators.
+
+```
+atomkraft model check [--config-path=<config-path>] 
+    [--model-path=<model-path>] 
+    [--constants=<name>:<value>,...] 
+    [--invariants=<invariants-list>]
+    [--traces-dir=<traces-dir>]
+atomkraft model sample [--config-path=<config-path>] 
+    [--model-path=<model-path>] 
+    [--constants=<name>:<value>,...] 
+    [--examples=<examples-list>] 
+    [--traces-dir=<traces-dir>]
 ```
 
-Additionally, `model` has the following sub-commands that require some extra
-logic not directly provided by Modelator:
-```
-atomkraft trace [--model=<model>] <config-path> <test-assertion>
-atomkraft model info # will display filename(s), init, next, constants, invariants, ... 
-atomkraft model monitor remove-all # will remove all initialized monitors
-```
+If a path to a configuration file is provided, the command will load all
+available settings from that file. Subsequent options provided to the command
+will override those settings.
 
-The `atomkraft model trace` command generates ITF traces. If no model is given
-as parameter, it will use an already loaded model. Its parameters are:
+For now, checker is Apalache, and checker params are the default values
+
+If no model is given as parameter, it will use an already loaded model. Its
+parameters are:
 - `<config-path>`, the path to a TOML file with the model and model checker
   configuration (see below)
-- `<test-assertion>`, the name of the TLA+ operator describing the desired test
-  trace
 
 Upon successful command execution, the generated test trace should be persisted
 to disk in ITF format. The files will be located in the `traces` directory.
 
-Under the hood, `atomkraft model trace` calls the following Modelator Shell
-commands:
+#### Commands not implemented yet
+
 ```
-model = ModelShell.parse_file(<model-path>)
-model.typecheck()
-config = ModelConfig.parse_file(<config-path>)
-model.check(config, <test-assertion>, <traces-path>)
+atomkraft model instantiate <constant-name> <constant-value>
+atomkraft model last-sample
+atomkraft model all-samples
+atomkraft model monitor add markdown <monitor-file.md>
+atomkraft model monitor add html <monitor-file.html>
+atomkraft model monitor remove-all # will remove all initialized monitors
 ```
-where `ModelConfig` will be a new class in Modelator, used as a common data
-structure for Apalache and TLC configurations.
 
 ### Model config file
 
