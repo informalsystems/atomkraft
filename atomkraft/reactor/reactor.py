@@ -2,7 +2,7 @@ import ast
 import os
 import os.path
 from os import PathLike
-from typing import List, Optional
+from typing import List
 
 import tomlkit
 from atomkraft.utils.project import project_root
@@ -73,8 +73,8 @@ def get_reactor() -> PathLike:
 def generate_reactor(
     actions_list: List[str],
     variables_list: List[str],
+    stub_file_path: PathLike,
     keypath: str = "action",
-    stub_file_path: Optional[PathLike] = None,
 ) -> PathLike:
 
     imports_stub = _imports_stub()
