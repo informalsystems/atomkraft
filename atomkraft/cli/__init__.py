@@ -97,9 +97,11 @@ def reactor(
     """
     actions = [act.strip() for act in actions.split(",")]
     variables = [var.strip() for var in variables.split(",")]
-    
+
     if Path(path.name).is_file():
-        print(f"WARNING: Stub file already exists and it will be overwritten: {path.name}")
+        print(
+            f"WARNING: Stub file already exists and it will be overwritten: {path.name}"
+        )
         if input("Continue? [Y/n] ").lower() != "y":
             return
 
