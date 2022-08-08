@@ -97,4 +97,12 @@ def reactor(
     """
     actions = [act.strip() for act in actions.split(",")]
     variables = [var.strip() for var in variables.split(",")]
+
+    if Path(path.name).is_file():
+        typer.confirm(
+            "The stub file already exists and it will be overwritten. "
+            "Are you sure you want to continue?",
+            abort=True,
+        )
+
     generate_reactor(actions, variables, stub_file_path=path.name)

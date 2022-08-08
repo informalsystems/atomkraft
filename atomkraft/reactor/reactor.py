@@ -1,6 +1,6 @@
 import ast
 from os import PathLike
-from typing import List, Optional
+from typing import List
 
 from atomkraft.config.atomkraft_config import AtomkraftConfig
 from caseconverter import snakecase
@@ -51,8 +51,8 @@ def get_reactor() -> PathLike:
 def generate_reactor(
     actions_list: List[str],
     variables_list: List[str],
+    stub_file_path: PathLike,
     keypath: str = "action",
-    stub_file_path: Optional[PathLike] = None,
 ) -> PathLike:
 
     imports_stub = _imports_stub()
