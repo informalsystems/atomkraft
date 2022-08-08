@@ -1,11 +1,8 @@
 import ast
-import os
-import os.path
 from os import PathLike
 from typing import List, Optional
 
 from atomkraft.config.atomkraft_config import AtomkraftConfig
-from atomkraft.utils.project import project_root
 from caseconverter import snakecase
 
 from . import constants, utils
@@ -42,24 +39,6 @@ def get_reactor() -> PathLike:
     """
     returns the path to the current reactor from the internal config
     """
-    root = project_root()
-
-    if not root:
-        raise RuntimeError(
-            "could not find Atomkraft project: are you in the right directory?"
-        )
-
-    internal_config_file_path = os.path.join(
-        root,
-        constants.ATOMKRAFT_INTERNAL_FOLDER,
-        constants.ATOMKRAFT_INTERNAL_CONFIG,
-    )
-
-    if not os.path.isfile(internal_config_file_path):
-        raise RuntimeError(
-            "Atomkraft configuration not found: have you executed `atomkraft init`?"
-        )
-
     with AtomkraftConfig() as config:
         try:
             return config.query(constants.REACTOR_CONFIG_KEY)
