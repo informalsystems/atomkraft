@@ -102,7 +102,6 @@ def reactor(
         print(
             f"WARNING: Stub file already exists and it will be overwritten: {path.name}"
         )
-        if input("Continue? [Y/n] ").lower() != "y":
-            return
+        typer.confirm("Are you sure you want to continue and overwrite it?", abort=True)
 
     generate_reactor(actions, variables, stub_file_path=path.name)
