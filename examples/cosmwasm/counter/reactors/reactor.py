@@ -19,6 +19,9 @@ def state():
 
 @step("store_cw_contract")
 def store_contract(testnet, state, last_msg):
+    testnet.oneshot()
+    time.sleep(10)
+
     rest_endpoint = testnet.get_validator_port(0, "lcd")
     lcdclient = LCDClient(url=rest_endpoint, chain_id=testnet.chain_id)
     sender_key = testnet.accounts[last_msg["sender"]]
@@ -28,9 +31,7 @@ def store_contract(testnet, state, last_msg):
         )
     )
 
-    wasm_binary = (
-        "counter-example-contract/target/wasm32-unknown-unknown/release/counter.wasm"
-    )
+    wasm_binary = "cosmwasm-contract/target/wasm32-unknown-unknown/release/counter.wasm"
 
     with open(wasm_binary, "rb") as f:
         counter_cw_code = base64.b64encode(f.read()).decode("ascii")

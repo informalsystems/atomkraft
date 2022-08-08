@@ -5,7 +5,7 @@ from typing import Optional
 
 import tomlkit
 import typer
-from atomkraft.utils import project
+from atomkraft.utils import project, query, update
 
 from .node import Account, Coin, ConfigPort, Node
 from .testnet import Testnet
@@ -31,65 +31,16 @@ def config(
     if value is None:
         with open(f"{project.project_root()}/chain.toml") as f:
             data = tomlkit.load(f)
-            if property_path is not None:
-                keys = property_path.split(".")
-                for key in keys:
-                    match data:
-                        case dict():
-                            try:
-                                data = data[key]
-                            except KeyError:
-                                try:
-                                    data = data[key.replace("-", "_")]
-                                except KeyError:
-                                    data = data[key.replace("_", "-")]
-                                except Exception as e:
-                                    raise e
-                        case list():
-                            data = data[int(key)]
-            print(json.dumps({property_path: data}, indent=2))
+        print(json.dumps({property_path: query(data, property_path)}, indent=2))
     else:
         try:
             value = eval(value)
         except (SyntaxError, NameError):
             pass
         with open(f"{project.project_root()}/chain.toml") as f:
-            main_data = tomlkit.load(f)
-            if property_path is not None:
-                data = main_data
-                keys = property_path.split(".")
-                for key in keys[:-1]:
-                    match data:
-                        case dict():
-                            try:
-                                data = data[key]
-                            except KeyError:
-                                try:
-                                    data = data[key.replace("-", "_")]
-                                except KeyError:
-                                    data = data[key.replace("_", "-")]
-                                except Exception as e:
-                                    raise e
-                        case list():
-                            data = data[int(key)]
-                match data:
-                    case dict():
-                        key = keys[-1]
-                        try:
-                            data[key] = value
-                        except KeyError:
-                            try:
-                                data[key.replace("-", "_")] = value
-                            except KeyError:
-                                data[key.replace("_", "-")] = value
-                            except Exception as e:
-                                raise e
-                    case list():
-                        data[int(keys[-1])] = value
-            else:
-                main_data = value
+            data = update(tomlkit.load(f), property_path, value)
         with open(f"{project.project_root()}/chain.toml", "w") as f:
-            tomlkit.dump(main_data, f)
+            tomlkit.dump(data, f)
 
 
 @app.command()
@@ -105,9 +56,6 @@ def testnet(
     else:
         testnet = Testnet.load_toml(config)
     testnet.verbose = not silent
-    testnet.keep = True
-    testnet.overwrite = True
-    testnet.data_dir = ".atomkraft"
 
     testnet.oneshot()
     try:

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "atomkraft"
-version = "0.0.3"
+version = "0.0.4"
 description = "Testing for Cosmos Blockchains"
 authors = [
     "Andrey Kuprianov <andrey@informal.systems>",
@@ -30,10 +30,8 @@ bip-utils = "^2.3.0"
 tabulate = "^0.8.9"
 jsonrpcclient = "^4.0.2"
 websockets = "^10.3"
-toml = "^0.10.2"
 GitPython = "^3.1.27"
 tomlkit = "^0.11.1"
-munch = "^2.5.0"
 case-converter = "^1.1.0"
 
 [build-system]

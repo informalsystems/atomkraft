@@ -1,12 +1,12 @@
 import glob
 import time
+from pathlib import Path
 from typing import Dict
 
 import click
 import numpy as np
 import tabulate
 import tomlkit
-from munch import munchify
 
 from .node import Account, Coin, ConfigPort, Node
 from .utils import get_free_ports, update_port
@@ -26,8 +26,8 @@ class Testnet:
         node_config: Dict = {},
         account_balance: int = 10**27,
         validator_balance: int = 10**21,
-        overwrite=False,
-        keep=False,
+        overwrite=True,
+        keep=True,
         verbose=False,
         data_dir=None,
     ):
@@ -45,23 +45,23 @@ class Testnet:
         self.overwrite = overwrite
         self.keep = keep
         self.verbose = verbose
-        self.data_dir = "." if data_dir is None else data_dir
+        self.data_dir = Path(".atomkraft/nodes") if data_dir is None else data_dir
 
     @staticmethod
     def load_toml(path: str):
         with open(path) as f:
-            data = munchify(tomlkit.load(f))
+            data = tomlkit.load(f)
 
         return Testnet(
-            data.chain_id,
-            data.n_validator,
-            data.n_account,
-            data.binary,
-            data.denom,
-            data.prefix,
-            data.coin_type,
-            data.config.genesis,
-            data.config.node,
+            data["chain_id"],
+            data["n_validator"],
+            data["n_account"],
+            data["binary"],
+            data["denom"],
+            data["prefix"],
+            data["coin_type"],
+            data["config"]["genesis"],
+            data["config"]["node"],
         )
 
     @staticmethod
@@ -91,6 +91,7 @@ class Testnet:
         return self.validator_nodes[validator_id].get_port(self.ports()[port_type])
 
     def prepare(self):
+        self.data_dir.mkdir(parents=True, exist_ok=True)
         self.validator_nodes = [
             Node(
                 f"node-{i}",
@@ -188,9 +189,7 @@ class Testnet:
             if i > 0:
                 # because this
                 # https://github.com/cosmos/cosmos-sdk/blob/88ee7fb2e9303f43c52bd32410901841cad491fb/x/staking/client/cli/tx.go#L599
-                gentx_file = glob.glob(f"{node.home_dir}/config/gentx/*json")[0].split(
-                    "/", maxsplit=1
-                )[-1]
+                gentx_file = glob.glob(f"{node.home_dir}/config/gentx/*json")[0]
                 gentx_file = gentx_file.removeprefix(node.home_dir)
                 node_p2p = node.get(p2p.config_file, p2p.property_path).rsplit(
                     ":", maxsplit=1
@@ -230,6 +229,7 @@ def testnet(
     coin_type: int,
     overwrite: bool,
     keep: bool,
+    data_dir: Path,
 ):
     coin_type = 118
 
@@ -267,6 +267,7 @@ def testnet(
         validator_balance=10**16,
         overwrite=overwrite,
         keep=keep,
+        data_dir=data_dir,
     )
 
     net.oneshot()

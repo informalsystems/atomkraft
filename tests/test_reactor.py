@@ -1,5 +1,6 @@
 import os
 import py_compile
+from pathlib import Path
 
 from atomkraft.reactor import reactor
 
@@ -19,6 +20,7 @@ def test_parsing():
             )
             compiled_reactor = py_compile.compile(reactor_stub_file)
             assert compiled_reactor is not None
+            Path(reactor_stub_file).unlink()
 
 
 def test_check():
@@ -33,6 +35,7 @@ def test_check():
         trace="tests/project/traces/sample_trace.itf.json", reactor=generated_reactor
     )
     assert reactor_ok is True
+    Path(reactor_stub_file).unlink()
 
     # test that the reactor with missing actions will be deemed incorrect
     reactor_stub_file = "tests/project/reactors/check_faulty_reactor.py"
@@ -47,6 +50,7 @@ def test_check():
         trace="tests/project/traces/sample_trace.itf.json", reactor=generated_reactor
     )
     assert reactor_ok is False
+    Path(reactor_stub_file).unlink()
 
     # tets that the reactor which contains an all-encompassing actios is deemed correct
     reactor_ok = reactor.check_reactor(
