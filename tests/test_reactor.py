@@ -1,3 +1,4 @@
+import os
 import py_compile
 from pathlib import Path
 
@@ -8,6 +9,7 @@ from atomkraft.reactor import reactor
 
 # test if a generated reactor is syntactically correct
 def test_parsing():
+    os.environ["PROJECT_ROOT"] = "tests/project"
     actions_list = [["action_1", "action_2"], [], ["act"]]
     variables_list = [["a", "b", "c", "d"], [], ["a"]]
     for actions in actions_list:
@@ -22,6 +24,7 @@ def test_parsing():
 
 
 def test_check():
+    os.environ["PROJECT_ROOT"] = "tests/project"
     actions = ["store_cw_contract", "instantiate", "get_count", "increment", "reset"]
     variables = ["owner", "instantiated", "stepCount", "messages", "count", "last_msg"]
     reactor_stub_file = "tests/project/reactors/check_correct_reactor.py"

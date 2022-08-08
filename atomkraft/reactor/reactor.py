@@ -4,7 +4,7 @@ import os.path
 from os import PathLike
 from typing import List, Optional
 
-import tomlkit
+from atomkraft.config.atomkraft_config import AtomkraftConfig
 from atomkraft.utils.project import project_root
 from caseconverter import snakecase
 
@@ -42,7 +42,6 @@ def get_reactor() -> PathLike:
     """
     returns the path to the current reactor from the internal config
     """
-
     root = project_root()
 
     if not root:
@@ -61,13 +60,13 @@ def get_reactor() -> PathLike:
             "Atomkraft configuration not found: have you executed `atomkraft init`?"
         )
 
-    with open(internal_config_file_path) as config_f:
-        config_data = tomlkit.load(config_f)
-        if constants.REACTOR_CONFIG_KEY not in config_data:
+    with AtomkraftConfig() as config:
+        try:
+            return config.query(constants.REACTOR_CONFIG_KEY)
+        except KeyError:
             raise RuntimeError(
                 "Could not find default reactor; have you ran `atomkraft reactor`?"
             )
-        return config_data[constants.REACTOR_CONFIG_KEY]
 
 
 def generate_reactor(
@@ -93,22 +92,8 @@ def generate_reactor(
         f.write(state_stub)
         f.write(actions_stub)
 
-    if "PYTEST_CURRENT_TEST" in os.environ:
-        root = "tests/project"
-    else:
-        root = project_root()
-
-    internal_config_file_path = os.path.join(
-        root,
-        constants.ATOMKRAFT_INTERNAL_FOLDER,
-        constants.ATOMKRAFT_INTERNAL_CONFIG,
-    )
-
-    atomkraft_internal_config = tomlkit.load(open(internal_config_file_path))
-    atomkraft_internal_config[constants.REACTOR_CONFIG_KEY] = stub_file_path
-
-    with open(internal_config_file_path, "w") as internal_config_f:
-        tomlkit.dump(atomkraft_internal_config, internal_config_f)
+    with AtomkraftConfig() as config:
+        config.store(constants.REACTOR_CONFIG_KEY, stub_file_path)
 
     return stub_file_path
 
