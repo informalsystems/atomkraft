@@ -1,4 +1,3 @@
-from logging import warning
 import os
 from pathlib import Path
 
@@ -100,7 +99,7 @@ def reactor(
     variables = [var.strip() for var in variables.split(",")]
 
     if Path(path.name).is_file():
-        warning.warn("Stub file already exists: {path.name}")
-        typer.confirm("Are you sure you want to continue and overwrite it?", abort=True)
+        typer.confirm("The stub file already exists and it will be overwritten. " 
+            "Are you sure you want to continue?", abort=True)
 
     generate_reactor(actions, variables, stub_file_path=path.name)
