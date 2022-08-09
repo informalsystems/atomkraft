@@ -23,6 +23,14 @@ apt install python3-pip git golang curl default-jre -y
 pip install --upgrade poetry
 ```
 
+#### `macOS`
+
+```
+brew install pyenv git go java
+pyenv install 3.10.5
+pyenv global 3.10.5
+```
+
 #### `archlinux`
 
 ```
