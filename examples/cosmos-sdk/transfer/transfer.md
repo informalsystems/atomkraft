@@ -147,19 +147,19 @@ $ atomkraft reactor --actions "Init,Transfer" --variables "action"
 
 Once we have the stub ready, we can set up the chain binary for the testnet.
 
-We will use `juno` chain binary. But any Cosmos-SDK derived chain should work.
+We will use vanilla `cosmos-sdk` chain. Any other Cosmos-SDK derived chain should work too.
 
-#### Binary
+#### Chain binary compilation
 
 <!-- $MDX dir=transfer -->
 ```sh
-$ git clone --depth 1 --branch v9.0.0 https://github.com/CosmosContracts/juno
+$ git clone --depth 1 --branch v0.45.7 https://github.com/cosmos/cosmos-sdk
 ...
-$ (cd juno; make build)
+$ (cd cosmos-sdk; make build)
 ...
 ```
 
-The binary will be at `./juno/bin/junod`
+The binary will be at `./cosmos-sdk/build/simd`
 
 ### Chain parameters
 
@@ -167,9 +167,9 @@ Now we can update the chain parameters.
 
 <!-- $MDX dir=transfer -->
 ```sh
-$ atomkraft chain config chain_id test-cw
-$ atomkraft chain config binary ./juno/bin/junod
-$ atomkraft chain config prefix juno
+$ atomkraft chain config chain_id test-sdk
+$ atomkraft chain config binary ./cosmos-sdk/build/simd
+$ atomkraft chain config prefix cosmos
 ```
 
 ### Executing tests
