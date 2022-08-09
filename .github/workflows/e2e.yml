@@ -5,7 +5,7 @@ on:
   push:
     paths:
       - .github/workflows/e2e.yml
-      - examples/cosmos-sdk/transfer.md
+      - examples/cosmos-sdk/transfer/**
       - atomkraft/**
       - template/**
       - tests/**
