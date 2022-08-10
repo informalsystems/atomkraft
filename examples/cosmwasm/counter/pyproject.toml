@@ -7,7 +7,7 @@ authors = ["Ranadeep Biswas <mail@rnbguy.at>"]
 [tool.poetry.dependencies]
 python = "^3.10"
 atomkraft = {git = "https://github.com/informalsystems/atomkraft", rev = "dev"}
-terra-sdk = {git = "https://github.com/informalsystems/terra.py", rev = "rano/cosmos"}
+terra-sdk = {git = "https://github.com/informalsystems/terra.py", rev = "poetry"}
 
 [tool.poetry.dev-dependencies]
 
