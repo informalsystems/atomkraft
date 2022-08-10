@@ -24,7 +24,12 @@ def transfer(testnet, action):
     print("Step: Transfer")
 
     rest_endpoint = testnet.get_validator_port(0, "lcd")
-    lcdclient = LCDClient(url=rest_endpoint, chain_id=testnet.chain_id)
+    lcdclient = LCDClient(
+        url=rest_endpoint,
+        chain_id=testnet.chain_id,
+        gas_prices=f"10{testnet.denom}",
+        gas_adjustment=0.1,
+    )
 
     sender_id = action["value"]["sender"]
     receiver_id = action["value"]["receiver"]
@@ -35,9 +40,9 @@ def transfer(testnet, action):
 
     sender_wallet = lcdclient.wallet(
         MnemonicKey(
-            testnet.prefix,
             mnemonic=testnet.accounts[sender_id].mnemonic,
             coin_type=testnet.coin_type,
+            prefix=testnet.prefix,
         )
     )
 
