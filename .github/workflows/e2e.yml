@@ -9,6 +9,9 @@ on:
       - atomkraft/**
       - template/**
       - tests/**
+    branches:
+      - staging
+      - trying
 
 jobs:
   e2e:
