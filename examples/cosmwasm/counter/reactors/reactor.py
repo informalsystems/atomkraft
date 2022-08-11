@@ -23,11 +23,18 @@ def store_contract(testnet, state, last_msg):
     time.sleep(10)
 
     rest_endpoint = testnet.get_validator_port(0, "lcd")
-    lcdclient = LCDClient(url=rest_endpoint, chain_id=testnet.chain_id)
+    lcdclient = LCDClient(
+        url=rest_endpoint,
+        chain_id=testnet.chain_id,
+        gas_prices=f"10{testnet.denom}",
+        gas_adjustment=1.5,
+    )
     sender_key = testnet.accounts[last_msg["sender"]]
     sender = lcdclient.wallet(
         MnemonicKey(
-            testnet.prefix, mnemonic=sender_key.mnemonic, coin_type=testnet.coin_type
+            mnemonic=sender_key.mnemonic,
+            coin_type=testnet.coin_type,
+            prefix=testnet.prefix,
         )
     )
 
@@ -62,11 +69,18 @@ def store_contract(testnet, state, last_msg):
 @step("instantiate")
 def instantiate(testnet, state, last_msg):
     rest_endpoint = testnet.get_validator_port(0, "lcd")
-    lcdclient = LCDClient(url=rest_endpoint, chain_id=testnet.chain_id)
+    lcdclient = LCDClient(
+        url=rest_endpoint,
+        chain_id=testnet.chain_id,
+        gas_prices=f"10{testnet.denom}",
+        gas_adjustment=1.5,
+    )
     sender_key = testnet.accounts[last_msg["sender"]]
     sender = lcdclient.wallet(
         MnemonicKey(
-            testnet.prefix, mnemonic=sender_key.mnemonic, coin_type=testnet.coin_type
+            mnemonic=sender_key.mnemonic,
+            coin_type=testnet.coin_type,
+            prefix=testnet.prefix,
         )
     )
 
@@ -102,11 +116,18 @@ def instantiate(testnet, state, last_msg):
 @step("reset")
 def reset(testnet, state, last_msg):
     rest_endpoint = testnet.get_validator_port(0, "lcd")
-    lcdclient = LCDClient(url=rest_endpoint, chain_id=testnet.chain_id)
+    lcdclient = LCDClient(
+        url=rest_endpoint,
+        chain_id=testnet.chain_id,
+        gas_prices=f"10{testnet.denom}",
+        gas_adjustment=1.5,
+    )
     sender_key = testnet.accounts[last_msg["sender"]]
     sender = lcdclient.wallet(
         MnemonicKey(
-            testnet.prefix, mnemonic=sender_key.mnemonic, coin_type=testnet.coin_type
+            mnemonic=sender_key.mnemonic,
+            coin_type=testnet.coin_type,
+            prefix=testnet.prefix,
         )
     )
 
@@ -136,11 +157,18 @@ def reset(testnet, state, last_msg):
 @step("increment")
 def increment(testnet, state, last_msg):
     rest_endpoint = testnet.get_validator_port(0, "lcd")
-    lcdclient = LCDClient(url=rest_endpoint, chain_id=testnet.chain_id)
+    lcdclient = LCDClient(
+        url=rest_endpoint,
+        chain_id=testnet.chain_id,
+        gas_prices=f"10{testnet.denom}",
+        gas_adjustment=1.5,
+    )
     sender_key = testnet.accounts[last_msg["sender"]]
     sender = lcdclient.wallet(
         MnemonicKey(
-            testnet.prefix, mnemonic=sender_key.mnemonic, coin_type=testnet.coin_type
+            mnemonic=sender_key.mnemonic,
+            coin_type=testnet.coin_type,
+            prefix=testnet.prefix,
         )
     )
 
@@ -170,7 +198,12 @@ def increment(testnet, state, last_msg):
 @step("get_count")
 def get_count(testnet, state, count):
     rest_endpoint = testnet.get_validator_port(0, "lcd")
-    lcdclient = LCDClient(url=rest_endpoint, chain_id=testnet.chain_id)
+    lcdclient = LCDClient(
+        url=rest_endpoint,
+        chain_id=testnet.chain_id,
+        gas_prices=f"10{testnet.denom}",
+        gas_adjustment=1.5,
+    )
 
     dict_msg = {"get_count": {}}
     contract_address = state["contract_address"]
