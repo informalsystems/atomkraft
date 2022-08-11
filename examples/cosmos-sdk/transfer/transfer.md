@@ -217,7 +217,7 @@ from terra_sdk.key.mnemonic import MnemonicKey
 @step("Init")
 def init(testnet, action):
     print("Step: Init")
-    testnet.n_accounts = action["value"]["n_wallet"]
+    testnet.n_account = action["value"]["n_wallet"]
     testnet.verbose = True
 
     testnet.oneshot()
