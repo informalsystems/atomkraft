@@ -32,11 +32,8 @@ def test_trace(trace: PathLike, reactor: PathLike, keypath: str):
             "could not find Atomkraft project: are you in the right directory?"
         )
 
-    tests = os.path.join(root, "tests")
-    if not os.path.isdir(tests):
-        raise RuntimeError(
-            "Atomkraft tests directory not found: have you executed `atomkraft init`?"
-        )
+    tests = root / "tests"
+    tests.mkdir(exist_ok=True)
 
     timestamp = datetime.now().isoformat(timespec="milliseconds")
     test_name = f"test_{str(trace)}_{timestamp}"
