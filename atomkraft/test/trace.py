@@ -61,9 +61,14 @@ def test_trace(trace: PathLike, reactor: PathLike, keypath: str, verbose: bool):
     report_dir.mkdir(parents=True)
 
     logging_file = report_dir / "log.txt"
-    print(f"Writing logs at {logging_file} ...")
 
-    pytest_args = ["--log-file-level=INFO", f"--log-file={logging_file}"]
+    pytest_report_file = report_dir / "report.jsonl"
+
+    pytest_args = [
+        "--log-file-level=INFO",
+        f"--log-file={logging_file}",
+        f"--report-log={pytest_report_file}",
+    ]
 
     if verbose:
         pytest_args.append("--log-cli-level=INFO")
@@ -75,4 +80,4 @@ def test_trace(trace: PathLike, reactor: PathLike, keypath: str, verbose: bool):
 
     shutil.copytree(default_nodes_dir, report_nodes_dir)
 
-    print(f"Validator nodes are saved at {report_nodes_dir}")
+    print(f"Test data is saved at {report_dir}")
