@@ -1,4 +1,5 @@
 import os.path
+import shutil
 from datetime import datetime
 from os import PathLike
 
@@ -18,7 +19,7 @@ def test_trace():
 """
 
 
-def test_trace(trace: PathLike, reactor: PathLike, keypath: str):
+def test_trace(trace: PathLike, reactor: PathLike, keypath: str, verbose: bool):
     """
     Test blockchain by running one trace
     """
@@ -55,4 +56,23 @@ def test_trace(trace: PathLike, reactor: PathLike, keypath: str):
             )
         )
     print(f"Executing {test_name} ...")
-    pytest.main(["-s", test_path])
+
+    report_dir = root / "reports" / test_name
+    report_dir.mkdir(parents=True)
+
+    logging_file = report_dir / "log.txt"
+    print(f"Writing logs at {logging_file} ...")
+
+    pytest_args = ["--log-file-level=INFO", f"--log-file={logging_file}"]
+
+    if verbose:
+        pytest_args.append("--log-cli-level=INFO")
+
+    pytest.main(pytest_args + [test_path])
+
+    default_nodes_dir = root / ".atomkraft" / "nodes"
+    report_nodes_dir = report_dir / "nodes"
+
+    shutil.copytree(default_nodes_dir, report_nodes_dir)
+
+    print(f"Validator nodes are saved at {report_nodes_dir}")
