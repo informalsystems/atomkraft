@@ -46,7 +46,11 @@ class TmEventSubscribe:
         while True:
             msg = responses.to_result(json.loads(await self.websocket.recv()))
             if "query" in msg.result and msg.result["query"] == self.query:
-                break
+                try:
+                    if self.filter(msg.result):
+                        break
+                except AttributeError:
+                    break
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.loop.run_until_complete(self._wait())
