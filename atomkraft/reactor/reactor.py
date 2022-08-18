@@ -120,7 +120,7 @@ def _action_description_comment(action_name, variables):
         variables_sentence = f"It additionally has access to the model (trace) state variables: {vars_string}."
     return f"""'''
     Implements the effects of the step {repr(action_name)}
-    on blockchain `testnet` and state `state`. 
+    on blockchain `testnet` and state `state`.
     {variables_sentence}
     '''
     """
@@ -147,11 +147,11 @@ def _state_stub():
 def state():
     '''
     Defines any additional logical state (beyond the state of the chain)
-    that needs to be maintained throughout the execution. This state 
+    that needs to be maintained throughout the execution. This state
     will be passed as an argument to @step functions.
     '''
-    
-    #TODO: replace the empty stub object with a different state object 
+
+    #TODO: replace the empty stub object with a different state object
     # if necessary
     return {}
 """
