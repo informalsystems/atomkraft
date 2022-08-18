@@ -17,3 +17,9 @@ repos:
     rev: v2.6.2
     hooks:
       - id: prettier
+  - repo: https://github.com/rnbguy/pylama-pre-commit
+    rev: 0.2.0
+    hooks:
+      - id: pylama
+        args: ["-l", "pyflakes,pycodestyle,isort"]
+        pass_filenames: false
