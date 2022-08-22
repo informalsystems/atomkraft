@@ -49,9 +49,15 @@ pacman -Syu python-pip python-poetry git make go jre-openjdk gcc --noconfirm --n
 
 ## Install Atomkraft
 
+<!-- 
 ```sh
 $ pip install --upgrade atomkraft
 ...
+```
+-->
+
+```
+pip install --upgrade atomkraft
 ```
 
 ## Use Atomkraft
@@ -65,20 +71,29 @@ We will see:
 
 ### Initialize project
 
+
+`atomkraft init` creates a new directory and initializes a Poetry project in it.
+It auto-installs Poetry if needed and activates a new virtual environment (by running `poetry shell`). 
+This environment contains all necessary dependencies.
+
+<!-- 
 ```sh
 $ atomkraft init transfer
 ...
 $ cd transfer
 ```
-
-`atomkraft init` creates a new directory and initializes a Poetry project in it.
-It also auto-installs Poetry if needed. It also adds required dependencies to the project.
-
-### Activate Poetry shell
-
+ -->
 ```
+atomkraft init transfer
+cd transfer
 poetry shell
 ```
+
+Let's inspect the structure of the generated `transfer` project.
+Two directories deserve special attention: those are `models` and `reactors`.
+In those two directories we will put files which specify what kind of tests we want to generate.
+
+
 
 ### Create a model specification
 
@@ -87,8 +102,9 @@ Alice and Bob both start with 100 tokens.
 At each step, Alice or Bob will send some amount of tokens to the other person.
 We will use TLA+ to specify this model.
 You can use the following code to _jump-start_ a new model at `models/transfer.tla`.
+(For a gentle introduction to modelling with TLA+, see [this tutorial](https://mbt.informal.systems/docs/tla_basics_tutorials/))
 
-<!-- $MDX dir=transfer -->
+<!-- $MDX dir=transfer 
 ```sh
 $ curl -Lo models/transfer.tla https://raw.githubusercontent.com/informalsystems/atomkraft/dev/examples/cosmos-sdk/transfer/transfer.tla
 ...
@@ -133,20 +149,28 @@ Inv == step < 10
 
 ====
 ```
+-->
 
-### Generate traces
-
-We will use Apalache model checker to generate traces from our model.
-
-#### Download Apalache
-
-<!-- $MDX dir=transfer -->
-```sh
-$ curl -Lo- https://github.com/informalsystems/apalache/releases/download/v0.26.0/apalache-0.26.0.tgz | tar -zxf-
-...
+```
+curl -Lo models/transfer.tla https://raw.githubusercontent.com/informalsystems/atomkraft/dev/examples/cosmos-sdk/transfer/transfer.tla
 ```
 
-The Apalache executable will be at `./apalache-0.26.0/bin/apalache-mc`.
+### Generate test scenarios
+
+Atomkraft can use different model checkers to generate test scenarios from the model.
+Let us use [Apalache](https://apalache.informal.systems/) as our checker.
+To get it, run 
+
+<!-- $MDX dir=transfer 
+```sh
+$ atomkraft model apalache get
+...
+```
+-->
+```sh
+atomkraft model apalache get
+```
+
 
 The following will generate traces at `traces/`.
 
