@@ -1,19 +1,22 @@
-# Atomkraft test project
+# Atomkraft test project: token transfer
 
-## Token transfer
+We will see the basic functionality of Atomkraft on testing a basic token-transfer application.
+Note that Atomkraft is typically used for testing Cosmos-SDK modules,
+and we are using a simple, restricted token-transfer example here to illustrate Atomkraft concepts
+without introducing additional complexity.
+For examples on using Atomkraft on Cosmos-SDK modules, check the [atomkraft-cosmos](https://github.com/informalsystems/atomkraft-cosmos) repository.
 
-### Prerequisite
+## Prerequisites
 
-- [`pip3.10`](https://pip.pypa.io/en/stable/installation) for `python3.10`: To install Atomkraft executable
-  - If `python3.10` is unavailable for your distribution, you can use `pyenv` to setup `python3.10`.
-    - `pyenv install 3.10.5; pyenv global 3.10.5`.
-    - When you're done, you can revert back by `pyenv global system`.
-- [`poetry`](https://python-poetry.org/docs/#installation): For Atomkraft project
-  - It will be auto-installed if not present.
-- [`git`](https://github.com/git-guides/install-git): To clone Atomkraft template and Cosmos-SDK chain repo
-- [`make`](https://www.gnu.org/software/make): Compile Cosmos-SDK chain binary
-- [`go`](https://go.dev/doc/install): Compile Cosmos-SDK chain binary
-- [`java`](https://www.java.com/download): For [Apalache](https://apalache.informal.systems) model checker
+For using Atomkraft, the following software is necessary:
+[`pip3.10`](https://pip.pypa.io/en/stable/installation),
+[`git`](https://github.com/git-guides/install-git),
+[`make`](https://www.gnu.org/software/make),
+[`go`](https://go.dev/doc/install),
+and
+[`java`](https://www.java.com/download).
+
+Depending on your platform, you can get the necessary software by executing the following commands:
 
 #### `ubuntu`
 
@@ -27,9 +30,16 @@ pip install --upgrade poetry
 
 ```
 brew install pyenv git go java
+```
+
+Because `macOS` does not come with `python3.10.5`, we are using `pyenv` install and managed between different versions of `python`.
+
+```
 pyenv install 3.10.5
 pyenv global 3.10.5
 ```
+
+When you are done using Atomkraft, run `pyenv global system` to get back to using the system python as default.
 
 #### `archlinux`
 
@@ -37,12 +47,21 @@ pyenv global 3.10.5
 pacman -Syu python-pip python-poetry git make go jre-openjdk gcc --noconfirm --needed
 ```
 
-### Install Atomkraft
+## Install Atomkraft
 
 ```sh
 $ pip install --upgrade atomkraft
 ...
 ```
+
+## Use Atomkraft
+
+Now we are ready to show Atomkraft in action.
+We will see:
+
+- how to initialize Atomkraft project
+- how to use Atomkraft to automatically generate test scenarios from a model
+- how to generate stubs of reactor files (which connect generated test scenarios with the software under test)
 
 ### Initialize project
 
@@ -70,6 +89,7 @@ We will use TLA+ to specify this model.
 You can use the following code to _jump-start_ a new model at `models/transfer.tla`.
 
 <!-- $MDX dir=transfer -->
+
 ```sh
 $ curl -Lo models/transfer.tla https://raw.githubusercontent.com/informalsystems/atomkraft/dev/examples/cosmos-sdk/transfer/transfer.tla
 ...
@@ -122,6 +142,7 @@ We will use Apalache model checker to generate traces from our model.
 #### Download Apalache
 
 <!-- $MDX dir=transfer -->
+
 ```sh
 $ curl -Lo- https://github.com/informalsystems/apalache/releases/download/v0.26.0/apalache-0.26.0.tgz | tar -zxf-
 ...
@@ -132,6 +153,7 @@ The Apalache executable will be at `./apalache-0.26.0/bin/apalache-mc`.
 The following will generate traces at `traces/`.
 
 <!-- $MDX dir=transfer -->
+
 ```sh
 $ ./apalache-0.26.0/bin/apalache-mc check --init=Init --next=Next --inv=Inv --view=View --max-error=10 --run-dir=mc_traces models/transfer.tla
 ...
@@ -147,6 +169,7 @@ Once we have some traces, we can generate reactor stubs for the traces.
 In our model, the `action` variable had two tags - `Init`, `Transfer`.
 
 <!-- $MDX dir=transfer -->
+
 ```sh
 $ atomkraft reactor --actions "Init,Transfer" --variables "action"
 ```
@@ -160,6 +183,7 @@ We will use vanilla `cosmos-sdk` chain. Any other Cosmos-SDK derived chain shoul
 #### Chain binary compilation
 
 <!-- $MDX dir=transfer -->
+
 ```sh
 $ git clone --depth 1 --branch v0.45.7 https://github.com/cosmos/cosmos-sdk
 ...
@@ -174,6 +198,7 @@ The binary will be at `./cosmos-sdk/build/simd`
 Now we can update the chain parameters.
 
 <!-- $MDX dir=transfer -->
+
 ```sh
 $ atomkraft chain config chain_id test-sdk
 $ atomkraft chain config binary ./cosmos-sdk/build/simd
@@ -185,6 +210,7 @@ $ atomkraft chain config prefix cosmos
 We have some traces and a reactor stub ready. Now we can smoke-test the test.
 
 <!-- $MDX dir=transfer -->
+
 ```sh
 $ poetry run atomkraft test trace --trace traces/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag
 ...
@@ -199,6 +225,7 @@ For now, this just prints the name of the action tag. Let's complete the reactor
 Update `reactors/reactor.py` with the following complete reactor code.
 
 <!-- $MDX dir=transfer -->
+
 ```sh
 $ curl -Lo reactors/reactor.py https://raw.githubusercontent.com/informalsystems/atomkraft/dev/examples/cosmos-sdk/transfer/reactor.py
 ...
@@ -272,6 +299,7 @@ def transfer(testnet, action):
 Finally, you can run the complete test with the completed reactor and a trace.
 
 <!-- $MDX dir=transfer -->
+
 ```sh
 $ poetry run atomkraft test trace --trace traces/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag
 ...
