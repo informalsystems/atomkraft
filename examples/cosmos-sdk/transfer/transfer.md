@@ -89,7 +89,6 @@ We will use TLA+ to specify this model.
 You can use the following code to _jump-start_ a new model at `models/transfer.tla`.
 
 <!-- $MDX dir=transfer -->
-
 ```sh
 $ curl -Lo models/transfer.tla https://raw.githubusercontent.com/informalsystems/atomkraft/dev/examples/cosmos-sdk/transfer/transfer.tla
 ...
@@ -142,7 +141,6 @@ We will use Apalache model checker to generate traces from our model.
 #### Download Apalache
 
 <!-- $MDX dir=transfer -->
-
 ```sh
 $ curl -Lo- https://github.com/informalsystems/apalache/releases/download/v0.26.0/apalache-0.26.0.tgz | tar -zxf-
 ...
@@ -153,7 +151,6 @@ The Apalache executable will be at `./apalache-0.26.0/bin/apalache-mc`.
 The following will generate traces at `traces/`.
 
 <!-- $MDX dir=transfer -->
-
 ```sh
 $ ./apalache-0.26.0/bin/apalache-mc check --init=Init --next=Next --inv=Inv --view=View --max-error=10 --run-dir=mc_traces models/transfer.tla
 ...
@@ -169,7 +166,6 @@ Once we have some traces, we can generate reactor stubs for the traces.
 In our model, the `action` variable had two tags - `Init`, `Transfer`.
 
 <!-- $MDX dir=transfer -->
-
 ```sh
 $ atomkraft reactor --actions "Init,Transfer" --variables "action"
 ```
@@ -183,7 +179,6 @@ We will use vanilla `cosmos-sdk` chain. Any other Cosmos-SDK derived chain shoul
 #### Chain binary compilation
 
 <!-- $MDX dir=transfer -->
-
 ```sh
 $ git clone --depth 1 --branch v0.45.7 https://github.com/cosmos/cosmos-sdk
 ...
@@ -198,7 +193,6 @@ The binary will be at `./cosmos-sdk/build/simd`
 Now we can update the chain parameters.
 
 <!-- $MDX dir=transfer -->
-
 ```sh
 $ atomkraft chain config chain_id test-sdk
 $ atomkraft chain config binary ./cosmos-sdk/build/simd
@@ -210,7 +204,6 @@ $ atomkraft chain config prefix cosmos
 We have some traces and a reactor stub ready. Now we can smoke-test the test.
 
 <!-- $MDX dir=transfer -->
-
 ```sh
 $ poetry run atomkraft test trace --trace traces/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag
 ...
@@ -225,7 +218,6 @@ For now, this just prints the name of the action tag. Let's complete the reactor
 Update `reactors/reactor.py` with the following complete reactor code.
 
 <!-- $MDX dir=transfer -->
-
 ```sh
 $ curl -Lo reactors/reactor.py https://raw.githubusercontent.com/informalsystems/atomkraft/dev/examples/cosmos-sdk/transfer/reactor.py
 ...
@@ -299,7 +291,6 @@ def transfer(testnet, action):
 Finally, you can run the complete test with the completed reactor and a trace.
 
 <!-- $MDX dir=transfer -->
-
 ```sh
 $ poetry run atomkraft test trace --trace traces/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag
 ...
