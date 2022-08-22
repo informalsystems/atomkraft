@@ -1,29 +1,7 @@
-# atomkraft
+# Atomkraft: E2E testing for Cosmos blockchains
 
-Testing for Cosmos Blockchains
+The [Cosmos Network](https://cosmos.network) of [IBC](https://ibcprotocol.org)-connected blockchains is growing tremendously fast. There is one aspect though, which has been not yet fully addressed, namely quality assurance: how do we make sure that Cosmos-based blockchains are secure, and don't contain security issues that pose hazards for user funds?
 
-### Using `pip` (inside a system or virtual env)
+`Atomkraft` is designed as an automated solution for easy generation and execution of massive end-to-end (E2E) test suites for Cosmos SDK based blockchains. When designing the tool we kept two main categories of users for it: security auditors, and Cosmos SDK developers. The list is of course non-exclusive, and the roles may intersect.
 
-```
-pip install atomkraft
-atomkraft --help
-# or
-python -m atomkraft --help
-```
-
-### Using `poetry` (inside a project)
-
-```
-poetry add atomkraft
-poerty run atomkraft --help
-# or
-poetry run python -m atomkraft --help
-```
-
-### Code Quality
-
-```
-pip install black pylama[all]
-black . --check
-pylama -l pyflakes,pycodestyle,isort
-```
+![Atomkraft users](docs/images/atomkraft-users.svg)
