@@ -49,7 +49,7 @@ pacman -Syu python-pip python-poetry git make go jre-openjdk gcc --noconfirm --n
 
 ## Install Atomkraft
 
-<!-- 
+<!--
 ```sh
 $ pip install --upgrade atomkraft
 ...
@@ -71,18 +71,18 @@ We will see:
 
 ### Initialize project
 
-
 `atomkraft init` creates a new directory and initializes a Poetry project in it.
-It auto-installs Poetry if needed and activates a new virtual environment (by running `poetry shell`). 
+It auto-installs Poetry if needed and activates a new virtual environment (by running `poetry shell`).
 This environment contains all necessary dependencies.
 
-<!-- 
+<!--
 ```sh
 $ atomkraft init transfer
 ...
 $ cd transfer
 ```
  -->
+
 ```
 atomkraft init transfer
 cd transfer
@@ -93,8 +93,6 @@ Let's inspect the structure of the generated `transfer` project.
 Two directories deserve special attention: those are `models` and `reactors`.
 In those two directories we will put files which specify what kind of tests we want to generate.
 
-
-
 ### Create a model specification
 
 We will model a simple token transfer between two users.
@@ -104,7 +102,7 @@ We will use TLA+ to specify this model.
 You can use the following code to _jump-start_ a new model at `models/transfer.tla`.
 (For a gentle introduction to modelling with TLA+, see [this tutorial](https://mbt.informal.systems/docs/tla_basics_tutorials/))
 
-<!-- $MDX dir=transfer 
+<!-- $MDX dir=transfer
 ```sh
 $ curl -Lo models/transfer.tla https://raw.githubusercontent.com/informalsystems/atomkraft/dev/examples/cosmos-sdk/transfer/transfer.tla
 ...
@@ -159,18 +157,18 @@ curl -Lo models/transfer.tla https://raw.githubusercontent.com/informalsystems/a
 
 Atomkraft can use different model checkers to generate test scenarios from the model.
 Let us use [Apalache](https://apalache.informal.systems/) as our checker.
-To get it, run 
+To get it, run
 
-<!-- $MDX dir=transfer 
+<!-- $MDX dir=transfer
 ```sh
 $ atomkraft model apalache get
 ...
 ```
 -->
+
 ```sh
 atomkraft model apalache get
 ```
-
 
 The following will generate traces at `traces/`.
 
