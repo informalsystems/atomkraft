@@ -6,59 +6,10 @@ and we are using a simple, restricted token-transfer example here to illustrate 
 without introducing additional complexity.
 For examples on using Atomkraft on Cosmos-SDK modules, check the [atomkraft-cosmos](https://github.com/informalsystems/atomkraft-cosmos) repository.
 
-## Prerequisites
 
-For using Atomkraft, the following software is necessary:
-[`pip3.10`](https://pip.pypa.io/en/stable/installation),
-[`git`](https://github.com/git-guides/install-git),
-[`make`](https://www.gnu.org/software/make),
-[`go`](https://go.dev/doc/install),
-and
-[`java`](https://www.java.com/download).
+## Installation
+Before starting, make sure to install Atomkraft and its dependencies, as decribed in [INSTALLATION.md](/INSTALLATION.md).
 
-Depending on your platform, you can get the necessary software by executing the following commands:
-
-#### `ubuntu`
-
-```
-apt update -y && apt upgrade -y
-apt install python3-pip git golang curl default-jre -y
-pip install --upgrade poetry
-```
-
-#### `macOS`
-
-```
-brew install pyenv git go java
-```
-
-Because `macOS` does not come with `python3.10.5`, we are using `pyenv` install and managed between different versions of `python`.
-
-```
-pyenv install 3.10.5
-pyenv global 3.10.5
-```
-
-When you are done using Atomkraft, run `pyenv global system` to get back to using the system python as default.
-
-#### `archlinux`
-
-```
-pacman -Syu python-pip python-poetry git make go jre-openjdk gcc --noconfirm --needed
-```
-
-## Install Atomkraft
-
-<!--
-```sh
-$ pip install --upgrade atomkraft
-...
-```
--->
-
-```
-pip install --upgrade atomkraft
-```
 
 ## Use Atomkraft
 
