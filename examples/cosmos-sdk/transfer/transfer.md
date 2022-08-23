@@ -7,20 +7,19 @@ without introducing additional complexity.
 For examples on using Atomkraft on Cosmos-SDK modules, check the [atomkraft-cosmos](https://github.com/informalsystems/atomkraft-cosmos) repository.
 
 
-## Installation
-Before starting, make sure to install Atomkraft and its dependencies, as decribed in [INSTALLATION.md](/INSTALLATION.md).
-
-
-## Use Atomkraft
-
-Now we are ready to show Atomkraft in action.
-We will see:
+This document will cover the following:
 
 - how to initialize Atomkraft project
 - how to use Atomkraft to automatically generate test scenarios from a model
 - how to generate stubs of reactor files (which connect generated test scenarios with the software under test)
 
-### Initialize project
+
+## Installation
+Before starting, make sure to install Atomkraft and its dependencies, as decribed in [INSTALLATION.md](/INSTALLATION.md).
+
+
+
+## Initialize project
 
 `atomkraft init` creates a new directory and initializes a Poetry project in it.
 It auto-installs Poetry if needed and activates a new virtual environment (by running `poetry shell`).
@@ -40,11 +39,12 @@ cd transfer
 poetry shell
 ```
 
+
 Let's inspect the structure of the generated `transfer` project.
 Two directories deserve special attention: those are `models` and `reactors`.
 In those two directories we will put files which specify what kind of tests we want to generate.
 
-### Create a model specification
+## Create a model specification
 
 We will model a simple token transfer between two users.
 Alice and Bob both start with 100 tokens.
@@ -94,7 +94,7 @@ View ==
     THEN action.value
     ELSE [sender |-> -1, receiver |-> -1, amount |-> 0]
 
-Inv == step < 10
+...
 
 ====
 ```
@@ -104,7 +104,7 @@ Inv == step < 10
 curl -Lo models/transfer.tla https://raw.githubusercontent.com/informalsystems/atomkraft/dev/examples/cosmos-sdk/transfer/transfer.tla
 ```
 
-### Generate test scenarios
+## Generate test scenarios
 
 Atomkraft can use different model checkers to generate test scenarios from the model.
 Let us use [Apalache](https://apalache.informal.systems/) as our checker.
@@ -117,31 +117,56 @@ $ atomkraft model apalache get
 ```
 -->
 
-```sh
+```
 atomkraft model apalache get
 ```
 
-The following will generate traces at `traces/`.
+Having obtained the checker, we can smaple test scenarios from the model.
 
-<!-- $MDX dir=transfer -->
+
+<!-- $MDX dir=transfer
 ```sh
-$ ./apalache-0.26.0/bin/apalache-mc check --init=Init --next=Next --inv=Inv --view=View --max-error=10 --run-dir=mc_traces models/transfer.tla
+$ atomkraft model sample --model-path models/transfer.tla --examples Ex
 ...
-[12]
-$ find mc_traces -type f -iname "violation*.itf.json" -not -iname "violation.itf.json" -exec cp {} traces \;
-$ rm -r mc_traces
+```
+-->
+
+```
+atomkraft model sample --model-path models/transfer.tla --examples Ex
 ```
 
-### Generate reactors
+If you inspect the `transfer.tla` file, you will find that the predicate `Ex` was defined as `step > 3`.
+This requires that sampled test scenarios contain more than 3 transactions.
 
-Once we have some traces, we can generate reactor stubs for the traces.
+Indeed, if you check the `traces` directory, you will find a set of `json` files in it.
+Each file contains one test scenario satisfying the property that there are more than 3 transactions.
 
-In our model, the `action` variable had two tags - `Init`, `Transfer`.
+While Atomkraft can generate test scenarios from the model, it would also be able to work with test scenarios created some other way (e.g., by hand).
+As a side note, for every `atomkraft` command, you can inspect all options by appending `--help`. 
+For instance, `atomkraft model sample --help`.)
 
-<!-- $MDX dir=transfer -->
+
+## Generate reactors
+
+In the previous step, we have generated test scenarios.
+However, we are still missing a link from those `json` scenarios to the actual execution on chain.
+*Reactors* provide this missing link.
+Once we have some traces, we can generate reactor stubs for the traces
+and Atomkraft can help us generaing stubs for reactors.
+
+In our `transfer.tla` model, the `action` variable had two tags - `Init`, `Transfer`.
+We will generate a reactor stub by running
+
+<!-- $MDX dir=transfer 
 ```sh
 $ atomkraft reactor --actions "Init,Transfer" --variables "action"
 ```
+-->
+```
+atomkraft reactor --actions "Init,Transfer" --variables "action"
+```
+
+Inspect the `reactors` directory now: it contains a generator stub named `reactor.md`. 
 
 ### Setting up chains
 
