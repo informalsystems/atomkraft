@@ -11,7 +11,6 @@ from terra_sdk.key.mnemonic import MnemonicKey
 chain_id = "test-cosmoshub"
 binary = "gaiad"
 denom = "stake"
-prefix = "cosmos"
 
 genesis_config = {
     "app_state.gov.voting_params.voting_period": "600s",
@@ -40,7 +39,6 @@ net = Testnet(
     n_account=3,
     binary=binary,
     denom=denom,
-    prefix=prefix,
     coin_type=118,
     genesis_config=genesis_config,
     node_config=node_config,
@@ -64,14 +62,14 @@ client = LCDClient(
 
 wallets = [
     client.wallet(
-        MnemonicKey(prefix, mnemonic=validator.mnemonic, coin_type=net.coin_type)
+        MnemonicKey(net.prefix, mnemonic=validator.mnemonic, coin_type=net.coin_type)
     )
     for validator in validators
 ]
 
 msg_del = MsgDelegate(
-    validator_address=validators[1].validator_address(prefix),
-    delegator_address=validators[2].address(prefix),
+    validator_address=validators[1].validator_address(net.prefix),
+    delegator_address=validators[2].address(net.prefix),
     amount=f"1000000{denom}",
 )
 
