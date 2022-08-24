@@ -24,9 +24,8 @@ This environment contains all necessary dependencies.
 
 <!--
 ```sh
-$ atomkraft init transfer
+$ poetry run atomkraft init transfer
 ...
-$ cd transfer
 ```
  -->
 
@@ -49,11 +48,12 @@ We will use TLA+ to specify this model.
 You can use the following code to _jump-start_ a new model at `models/transfer.tla`.
 (For a gentle introduction to modelling with TLA+, see [this tutorial](https://mbt.informal.systems/docs/tla_basics_tutorials/))
 
-<!-- $MDX dir=transfer
+<!--
+
 ```sh
-$ curl -Lo models/transfer.tla https://raw.githubusercontent.com/informalsystems/atomkraft/dev/examples/cosmos-sdk/transfer/transfer.tla
+$ cd transfer; pwd; curl -Lo models/transfer.tla https://raw.githubusercontent.com/informalsystems/atomkraft/dev/examples/cosmos-sdk/transfer/transfer.tla
 ...
-$ cat models/transfer.tla
+$ cd transfer; cat models/transfer.tla
 ---- MODULE transfer ----
 EXTENDS Apalache, Integers, FiniteSets
 
@@ -106,9 +106,9 @@ Atomkraft can use different model checkers to generate test scenarios from the m
 Let us use [Apalache](https://apalache.informal.systems/) as our checker.
 To get it, run
 
-<!-- $MDX dir=transfer
+<!--
 ```sh
-$ atomkraft model apalache get
+$ cd transfer; poetry run atomkraft model apalache get
 ...
 ```
 -->
@@ -119,15 +119,15 @@ atomkraft model apalache get
 
 Having obtained the checker, we can smaple test scenarios from the model.
 
-<!-- $MDX dir=transfer
+<!--
 ```sh
-$ atomkraft model sample --model-path models/transfer.tla --examples Ex
+$ cd transfer; atomkraft model sample --model-path models/transfer.tla --traces-dir traces --examples Ex
 ...
 ```
 -->
 
 ```
-atomkraft model sample --model-path models/transfer.tla --examples Ex
+atomkraft model sample --model-path models/transfer.tla --traces-dir traces --examples Ex
 ```
 
 If you inspect the `transfer.tla` file, you will find that the predicate `Ex` was defined as `step > 3`.
@@ -151,9 +151,10 @@ Atomkraft can help us generate stubs for such reactors.
 In our `transfer.tla` model, the `action` variable had two tags - `Init`, `Transfer`.
 We will generate a reactor stub by running
 
-<!-- $MDX dir=transfer
+<!--
 ```sh
-$ atomkraft reactor --actions "Init,Transfer" --variables "action"
+$ cd transfer; poetry run atomkraft reactor --actions "Init,Transfer" --variables "action"
+...
 ```
 -->
 
@@ -186,11 +187,11 @@ atomkraft chain config prefix <prefix?>
 All three elements for running a test are now in place: a testnet, a test scenario, and a reactor.
 Thus, we are ready to run some tests (though, trivial ones since the reactor is still only a stub).
 
-<!-- $MDX dir=transfer
+<!--
 ```sh
-$ poetry run atomkraft test trace --trace traces/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag
+$ cd transfer; poetry run atomkraft test trace --trace traces/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag
 ...
-Successfully executed trace traces/violation1.itf.json
+Successfully executed
 ...
 ```
 -->
@@ -202,7 +203,7 @@ atomkraft test trace --trace traces/violation1.itf.json --reactor reactors/react
 The output of the command contains
 
 ```
-Successfully executed trace traces/violation2.itf.json
+Successfully executed trace traces/violation1.itf.json
 ```
 
 Other than that, it only names the actions executed at each step.
@@ -214,9 +215,10 @@ Update `reactors/reactor.py` with the complete reactor code from [here](https://
 
 While explaining the reactor code is out of the scope of this tutorial, you can skim through it and notice that it describes transfering coins from one account to another by broadcasting messages to the chain.
 
-<!-- $MDX dir=transfer
+<!--
 ```sh
-$ curl -Lo reactors/reactor.py https://raw.githubusercontent.com/informalsystems/atomkraft/dev/examples/cosmos-sdk/transfer/reactor.py
+$ cd transfer; curl -Lo reactors/reactor.py https://raw.githubusercontent.com/informalsystems/atomkraft/dev/examples/cosmos-sdk/transfer/reactor.py
+...
 -->
 
 ```
@@ -227,11 +229,11 @@ curl -Lo reactors/reactor.py https://raw.githubusercontent.com/informalsystems/a
 
 Finally, we can run the complete test with the completed reactor.
 
-<!-- $MDX dir=transfer
+<!--
 ```sh
-$ atomkraft test trace --trace traces/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag
+$ cd transfer; poetry run atomkraft test trace --trace traces/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag
 ...
-Successfully executed trace traces/violation1.itf.json
+Successfully executed
 ...
 ```
 -->
