@@ -1,6 +1,7 @@
 import glob
 import time
 from pathlib import Path
+from subprocess import PIPE, Popen
 from typing import Dict
 
 import click
@@ -20,7 +21,6 @@ class Testnet:
         n_account=0,
         binary="gaiad",
         denom="uatom",
-        prefix="cosmos",
         coin_type=118,
         genesis_config: Dict = {},
         node_config: Dict = {},
@@ -36,7 +36,6 @@ class Testnet:
         self.n_account = n_account
         self.binary = binary
         self.denom = denom
-        self.prefix = prefix
         self.coin_type = coin_type
         self.genesis_config = genesis_config
         self.node_config = node_config
@@ -46,6 +45,27 @@ class Testnet:
         self.keep = keep
         self.verbose = verbose
         self.data_dir = Path(".atomkraft/nodes") if data_dir is None else data_dir
+
+        self.prefix = next(
+            x.removeprefix("- ")
+            for x in self._execute("keys parse 00", stdout=PIPE)[0]
+            .decode()
+            .splitlines()
+            if x.startswith("- ")
+        ).split("1")[0]
+
+    def _execute(
+        self, args: str, *, stdin: bytes | None = None, stdout=None, stderr=None
+    ):
+        final_args = [self.binary] + args.split()
+        # print(" ".join(final_args))
+        stdin_pipe = None if stdin is None else PIPE
+        with Popen(final_args, stdin=stdin_pipe, stdout=stdout, stderr=stderr) as p:
+            out, err = p.communicate(input=stdin)
+            rt = p.wait()
+            if rt != 0:
+                raise RuntimeError(f"Non-zero return code {rt}\n{err.decode()}")
+            return (out, err)
 
     @staticmethod
     def load_toml(path: str):
