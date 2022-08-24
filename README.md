@@ -11,8 +11,18 @@ Atomkraft is likely to benefit you as an (abstract) _security auditor_ if:
 
 Atomkraft is likely to benefit you as an (abstract) _Cosmos SDK developer_ if:
 
-- the new functionality you've implemented interacts in non-trivial ways with other important modules (e.g. with [bank](https://docs.cosmos.network/master/modules/bank/), [staking](https://docs.cosmos.network/master/modules/staking/), [authz](https://docs.cosmos.network/master/modules/authz/), etc.), and you are unsure whether some important invariants of those modules are preserved.
-- you want to grow and maintain a regression test suite for the blockchain modules you are developing, to make sure of their correctness as your blockchain evolves
+- the new functionality you've implemented interacts in non-trivial ways with other important modules (e.g. with [bank](https://docs.cosmos.network/master/modules/bank/), [staking](https://docs.cosmos.network/master/modules/staking/), [authz](https://docs.cosmos.network/master/modules/authz/), etc.), and you are unsure whether some important invariants of those modules are preserved;
+- you want to grow and maintain a regression test suite for the blockchain modules you are developing, to make sure of their correctness as your blockchain evolves;
 - you want to automate quality assurance for your blockchain modules, and integrate fast E2E testing solution that's executed on every PR.
+
+**Key Atomkraft features** that allow it to address the above concerns:
+
+- Push-button automation of local testnet creation (fully customizable)
+- Clean, fully customizable path from test case generation to its execution on the local testnet
+- Automatic generation of massive test suites from compact TLA+ models possible
+- Easy execution of test cases generated via other means (e.g. BDD, PBT) possible
+- Anytime ready-to-integrate regression test suite in the form of a standard Pytest project
+- Ready-to-execute standard test suites for important Cosmos SDK modules (coming soon!)
+- Generation of reports and dashboards for presentation and analysis of testing results (coming soon!)
 
 ![Atomkraft users](docs/images/atomkraft-users.svg)
