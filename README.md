@@ -1,9 +1,9 @@
 # Atomkraft: E2E testing for Cosmos blockchains
 
-- [Atomkraft: E2E testing for Cosmos blockchains](#atomkraft-e2e-testing-for-cosmos-blockchains)
-  - [Introduction](#introduction)
-  - [Conceptual overview](#conceptual-overview)
-    - [Atomkraft project](#atomkraft-project)
+- [Introduction](#introduction)
+- [Conceptual overview](#conceptual-overview)
+  - [Atomkraft project](#atomkraft-project)
+- [Local testnets](#local-testnets)
 
 ## Introduction
 
@@ -24,10 +24,10 @@ Atomkraft is likely to benefit you as a _Cosmos SDK developer_ if:
 
 **Key Atomkraft features** that allow to address the above concerns:
 
-- Push-button automation of local testnet creation (fully customizable)
-- Clean, fully customizable path from test case generation to its execution on the local testnet
+- Push-button, but fully customizable, automation of local testnet creation
+- Clean, fully customizable trajectory from test case generation to its execution on the local testnet
 - Automatic generation of massive test suites from compact TLA+ models possible
-- Easy execution of test cases generated via other means (e.g. BDD, PBT) possible
+- Easy execution of test cases generated via other means (e.g. manual, BDD, PBT) possible
 - Anytime ready-to-integrate regression test suite in the form of a standard Pytest project
 - Ready-to-execute standard test suites for important Cosmos SDK modules (coming soon!)
 - Generation of reports and dashboards for presentation and analysis of testing results (coming soon!)
@@ -61,3 +61,7 @@ At the top level, an Atomkraft project contains the following:
   - `pyproject.toml` contains the Poetry project configuration.
 
 All of the above configuration files are filled with the default configuration, so you don't need to worry about them, if you don't want to. On the other hand, when needed, everything is fully customizable.
+
+## Local testnets
+
+With Atomkraft project created, you should be ready to go. By default, we configure local testnets to use the `gaiad` (Cosmos Hub) binary. If it is available via your `PATH`, executing `atomkraft chain testnet` should bring up a local testnet with 2 node and 3 validators. If you would like to configure any parameters differently (e.g. to run your custom blockchain binary), you can do it either via `atomkraft chain config` command, or by directly editing `chain.toml` config file. Please make sure your changes are valid by executing `atomkraft chain testnet`; we use the local testnet to run the tests.
