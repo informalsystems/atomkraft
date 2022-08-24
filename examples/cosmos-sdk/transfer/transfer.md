@@ -108,7 +108,7 @@ To get it, run
 
 <!--
 ```sh
-$ cd transfer; poetry run atomkraft model apalache get
+$ poetry run atomkraft model apalache get
 ...
 ```
 -->
@@ -219,6 +219,7 @@ While explaining the reactor code is out of the scope of this tutorial, you can 
 ```sh
 $ cd transfer; curl -Lo reactors/reactor.py https://raw.githubusercontent.com/informalsystems/atomkraft/dev/examples/cosmos-sdk/transfer/reactor.py
 ...
+```
 -->
 
 ```
