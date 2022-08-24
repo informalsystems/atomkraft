@@ -1,10 +1,10 @@
 # Atomkraft test project: token transfer
 
-We will see the basic functionality of Atomkraft on testing a basic token-transfer application.
+We will see the basic functionality of Atomkraft in testing a basic token-transfer application.
 Note that Atomkraft is typically used for testing Cosmos-SDK modules,
-and we are using a simple, restricted token-transfer example here to illustrate Atomkraft concepts
-without introducing additional complexity.
-For examples on using Atomkraft on Cosmos-SDK modules, check the [atomkraft-cosmos](https://github.com/informalsystems/atomkraft-cosmos) repository.
+but we are using a simple, restricted token-transfer example here.
+This will allow us to cover key Atomkraft concepts without introducing additional complexity.
+For examples of using Atomkraft on Cosmos-SDK modules, check the [atomkraft-cosmos](https://github.com/informalsystems/atomkraft-cosmos) repository.
 
 This document will cover the following:
 
@@ -14,7 +14,7 @@ This document will cover the following:
 
 ## Installation
 
-Before starting, make sure to install Atomkraft and its dependencies, as decribed in [INSTALLATION.md](/INSTALLATION.md).
+Before starting, make sure to install Atomkraft and its dependencies, as described in [INSTALLATION.md](/INSTALLATION.md).
 
 ## Initialize project
 
