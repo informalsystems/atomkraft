@@ -33,7 +33,7 @@ Atomkraft is likely to benefit you as a _Cosmos SDK developer_ if:
 - Push-button, but fully customizable, automation of local testnet creation
 - Clean, fully customizable trajectory from test case generation to its execution on the local testnet
 - Automatic generation of massive test suites from compact TLA+ models possible
-- Easy execution of test cases generated via other means (e.g. manual, BDD, PBT) possible
+- Easy execution of test cases generated via other means (e.g. manual, BDD, PBT)
 - Anytime ready-to-integrate regression test suite in the form of a standard Pytest project
 - Ready-to-execute standard test suites for important Cosmos SDK modules (coming soon!)
 - Generation of reports and dashboards for presentation and analysis of testing results (coming soon!)
@@ -46,17 +46,17 @@ In itself, Atomkraft is nothing more than a command-line application, which is a
 
 ### Atomkraft project
 
-Every work with Atomkraft happens in the scope of an _Atomkraft project_; you create an Atomkraft project via `atomkraft init` command. The command will initialize a new project in a given directory, and install all necessary software for it; all fully automatically.
+Working with Atomkraft takes place in the scope of an _Atomkraft project_, which is initialized via `atomkraft init` command. The command will setup a new project in a given directory and install all necessary software for it, all fully automatically.
 
-The good news is that an Atomkraft project is simultaneously a [Pytest](https://docs.pytest.org/) project! At any point in time you can execute `pytest` inside your Atomkraft project, and this command will rerun all tests you've created or executed with Atomkraft in the scope of this project. So, when you've executed `atomkraft init`, you've also started to create your regression test suite; congratulations!
+The good news is that an Atomkraft project is simultaneously a [Pytest](https://docs.pytest.org/) project! At any point in time you can execute `pytest` inside your Atomkraft project, and this command will rerun all tests you've created in the scope of this project. So, when you've executed `atomkraft init`, you've also started to create your regression test suite; congratulations!
 
-More than that, an Atomkraft project is also a [Python Poetry](https://python-poetry.org) project: you can treat is just as a normal Python project, and add your custom Python tests there.
+More than that, an Atomkraft project is also a [Python Poetry](https://python-poetry.org) project: you can treat it just as a normal Python project, and add your custom Python tests there.
 
 At the top level, an Atomkraft project contains the following:
 
 - Folders that hold the corresponding artifacts:
   - `models` is meant to keep your TLA+ models, if you are willing to generate test cases from formal models;
-  - `traces` contain abstract test cases, represented in the form of [ITF traces](https://apalache.informal.systems/docs/adr/015adr-trace.html) (ITF stands for _Informal Trace Format_, a JSON encoding of a sequence of test case steps);
+  - `traces` contain abstract test cases, represented in the form of [ITF traces](https://apalache.informal.systems/docs/adr/015adr-trace.html) (a JSON encoding of a sequence of test case steps);
   - `reactors` hold Python functions that interpret ITF traces, and map trace steps to concrete blockchain transactions;
   - in `tests` we collect all reproducible Pytest tests that are executed in the scope of this Atomkraft project;
   - finally, `reports` hold the test reports.
@@ -89,7 +89,7 @@ We have automated the process of writing a reactor via `atomkraft reactor` comma
 
 ### Generating traces from TLA+ models
 
-As explained above, abstract traces can be obtained by whatever means; we do not constrain the user in this respect. The most time efficient method, from our point of view, is to generate traces from formal models expressed in [TLA+](https://lamport.azurewebsites.net/tla/tla.html), the specification language designed by Leslie Lamport. For a gentle introduction to TLA+ you may use the Informal's [TLA+ Language Reference Manual](https://apalache.informal.systems/docs/lang/index.html) [TLA+ Basics Tutorial](https://mbt.informal.systems/docs/tla_basics_tutorials/). While TLA+ may look scary for beginners, we can assure you that learning it will greatly improve your productivity when reasoning about (and testing!) both protocols and code.
+As explained above, abstract traces can be obtained by whatever means; we do not constrain the user in this respect. The most time efficient method, from our point of view, is to generate traces from formal models expressed in [TLA+](https://lamport.azurewebsites.net/tla/tla.html), the specification language designed by Leslie Lamport. For a gentle introduction to TLA+ you may use the Informal's [TLA+ Language Reference Manual](https://apalache.informal.systems/docs/lang/index.html) and [TLA+ Basics Tutorial](https://mbt.informal.systems/docs/tla_basics_tutorials/). While TLA+ may look scary for beginners, we can assure you that learning it will greatly improve your productivity when reasoning about (and testing!) both protocols and code.
 
 The good news is that we have done a thorough work in making user's life as easy as possible when working with TLA+ models, and using them to generate abstract test traces. All heavy-lifting work wrt. TLA+ models is done by our [Apalache](https://apalache.informal.systems) model checker. The model checker itself is meant for expert users; Atomkraft tries its best to hide excessive complexity from its users and exposes only the most essential functionality for working with models. You can access this functionality via `atomkraft model` command, which provides you with the functions like listed in the screenshot below:
 
@@ -123,7 +123,7 @@ Both of the above `atomkraft test` commands populate the `tests` directory of yo
 
 Atomkraft's functionality outlined above represents the tool MVP: please feel free to employ it in your projects, and let us know of your experience: we are always ready to assist!
 
-There is many more features that are planned or are already being implemented; so stay tuned. Below is the preview of the future Atomkraft functionality:
+There are many more features that are planned or are already being implemented; so stay tuned. Below is the preview of the future Atomkraft functionality:
 
 - **Standard test suites**: we have already started the effort to provide standard reactors and tests for most important Cosmos SDK modules: [bank](https://docs.cosmos.network/master/modules/bank/), [staking](https://docs.cosmos.network/master/modules/staking/), [authz](https://docs.cosmos.network/master/modules/authz/); you name it! This will serve the community at large, and will allow you, as an Atomkraft user, to easily bootstrap your new Atomkraft projects:
   - running standard test suites in your CI will make sure that your new functionality doesn't break the important blockchain invariants;
