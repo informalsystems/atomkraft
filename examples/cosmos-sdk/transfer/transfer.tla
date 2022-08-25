@@ -34,6 +34,6 @@ View ==
     THEN action.value
     ELSE [sender |-> -1, receiver |-> -1, amount |-> 0]
 
-Inv == step < 10
+Ex == step > 3
 
 ====

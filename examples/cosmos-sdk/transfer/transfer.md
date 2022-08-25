@@ -1,79 +1,59 @@
-# Atomkraft test project
+# Atomkraft test project: token transfer
 
-## Token transfer
+We will see the basic functionality of Atomkraft in testing a basic token-transfer application.
+Note that Atomkraft is typically used for testing Cosmos-SDK modules,
+but we are using a simple, restricted token-transfer example here.
+This will allow us to cover key Atomkraft concepts without introducing additional complexity.
+For examples of using Atomkraft on Cosmos-SDK modules, check the [atomkraft-cosmos](https://github.com/informalsystems/atomkraft-cosmos) repository.
 
-### Prerequisite
+This document will cover the following:
 
-- [`pip3.10`](https://pip.pypa.io/en/stable/installation) for `python3.10`: To install Atomkraft executable
-  - If `python3.10` is unavailable for your distribution, you can use `pyenv` to setup `python3.10`.
-    - `pyenv install 3.10.5; pyenv global 3.10.5`.
-    - When you're done, you can revert back by `pyenv global system`.
-- [`poetry`](https://python-poetry.org/docs/#installation): For Atomkraft project
-  - It will be auto-installed if not present.
-- [`git`](https://github.com/git-guides/install-git): To clone Atomkraft template and Cosmos-SDK chain repo
-- [`make`](https://www.gnu.org/software/make): Compile Cosmos-SDK chain binary
-- [`go`](https://go.dev/doc/install): Compile Cosmos-SDK chain binary
-- [`java`](https://www.java.com/download): For [Apalache](https://apalache.informal.systems) model checker
+- how to initialize Atomkraft project
+- how to use Atomkraft to automatically generate test scenarios from a model
+- how to generate stubs of reactor files (which connect generated test scenarios with the software under test)
 
-#### `ubuntu`
+## Installation
 
-```
-apt update -y && apt upgrade -y
-apt install python3-pip git golang curl default-jre -y
-pip install --upgrade poetry
-```
+Before starting, make sure to install Atomkraft and its dependencies, as described in [INSTALLATION.md](/INSTALLATION.md).
 
-#### `macOS`
-
-```
-brew install pyenv git go java
-pyenv install 3.10.5
-pyenv global 3.10.5
-```
-
-#### `archlinux`
-
-```
-pacman -Syu python-pip python-poetry git make go jre-openjdk gcc --noconfirm --needed
-```
-
-### Install Atomkraft
-
-```sh
-$ pip install --upgrade atomkraft
-...
-```
-
-### Initialize project
-
-```sh
-$ atomkraft init transfer
-...
-$ cd transfer
-```
+## Initialize project
 
 `atomkraft init` creates a new directory and initializes a Poetry project in it.
-It also auto-installs Poetry if needed. It also adds required dependencies to the project.
+It auto-installs Poetry if needed and activates a new virtual environment (by running `poetry shell`).
+This environment contains all necessary dependencies.
 
-### Activate Poetry shell
+<!--
+```sh
+$ poetry run atomkraft init transfer
+...
+```
+ -->
 
 ```
+atomkraft init transfer
+cd transfer
 poetry shell
 ```
 
-### Create a model specification
+Let's inspect the structure of the generated `transfer` project.
+Two directories deserve special attention: those are `models` and `reactors`.
+In those two directories we will put files which specify what kind of tests we want to generate.
+
+## Create a model specification
 
 We will model a simple token transfer between two users.
 Alice and Bob both start with 100 tokens.
 At each step, Alice or Bob will send some amount of tokens to the other person.
 We will use TLA+ to specify this model.
 You can use the following code to _jump-start_ a new model at `models/transfer.tla`.
+(For a gentle introduction to modelling with TLA+, see [this tutorial](https://mbt.informal.systems/docs/tla_basics_tutorials/))
 
-<!-- $MDX dir=transfer -->
+<!--
+
 ```sh
-$ curl -Lo models/transfer.tla https://raw.githubusercontent.com/informalsystems/atomkraft/dev/examples/cosmos-sdk/transfer/transfer.tla
+$ cd transfer; pwd; curl -Lo models/transfer.tla https://raw.githubusercontent.com/informalsystems/atomkraft/dev/examples/cosmos-sdk/transfer/transfer.tla
 ...
-$ cat models/transfer.tla
+$ cd transfer; cat models/transfer.tla
 ---- MODULE transfer ----
 EXTENDS Apalache, Integers, FiniteSets
 
@@ -110,171 +90,155 @@ View ==
     THEN action.value
     ELSE [sender |-> -1, receiver |-> -1, amount |-> 0]
 
-Inv == step < 10
+...
 
 ====
 ```
+-->
 
-### Generate traces
-
-We will use Apalache model checker to generate traces from our model.
-
-#### Download Apalache
-
-<!-- $MDX dir=transfer -->
-```sh
-$ curl -Lo- https://github.com/informalsystems/apalache/releases/download/v0.26.0/apalache-0.26.0.tgz | tar -zxf-
-...
+```
+curl -Lo models/transfer.tla https://raw.githubusercontent.com/informalsystems/atomkraft/dev/examples/cosmos-sdk/transfer/transfer.tla
 ```
 
-The Apalache executable will be at `./apalache-0.26.0/bin/apalache-mc`.
+## Generate test scenarios
 
-The following will generate traces at `traces/`.
+Atomkraft can use different model checkers to generate test scenarios from the model.
+Let us use [Apalache](https://apalache.informal.systems/) as our checker.
+To get it, run
 
-<!-- $MDX dir=transfer -->
+<!--
 ```sh
-$ ./apalache-0.26.0/bin/apalache-mc check --init=Init --next=Next --inv=Inv --view=View --max-error=10 --run-dir=mc_traces models/transfer.tla
-...
-[12]
-$ find mc_traces -type f -iname "violation*.itf.json" -not -iname "violation.itf.json" -exec cp {} traces \;
-$ rm -r mc_traces
-```
-
-### Generate reactors
-
-Once we have some traces, we can generate reactor stubs for the traces.
-
-In our model, the `action` variable had two tags - `Init`, `Transfer`.
-
-<!-- $MDX dir=transfer -->
-```sh
-$ atomkraft reactor --actions "Init,Transfer" --variables "action"
-```
-
-### Setting up chains
-
-Once we have the stub ready, we can set up the chain binary for the testnet.
-
-We will use vanilla `cosmos-sdk` chain. Any other Cosmos-SDK derived chain should work too.
-
-#### Chain binary compilation
-
-<!-- $MDX dir=transfer -->
-```sh
-$ git clone --depth 1 --branch v0.45.7 https://github.com/cosmos/cosmos-sdk
-...
-$ (cd cosmos-sdk; make build)
+$ poetry run atomkraft model apalache get
 ...
 ```
+-->
 
-The binary will be at `./cosmos-sdk/build/simd`
-
-### Chain parameters
-
-Now we can update the chain parameters.
-
-<!-- $MDX dir=transfer -->
-```sh
-$ atomkraft chain config chain_id test-sdk
-$ atomkraft chain config binary ./cosmos-sdk/build/simd
-$ atomkraft chain config prefix cosmos
+```
+atomkraft model apalache get
 ```
 
-### Executing tests
+Having obtained the checker, we can smaple test scenarios from the model.
 
-We have some traces and a reactor stub ready. Now we can smoke-test the test.
-
-<!-- $MDX dir=transfer -->
+<!--
 ```sh
-$ poetry run atomkraft test trace --trace traces/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag
+$ cd transfer; atomkraft model sample --model-path models/transfer.tla --traces-dir traces --examples Ex
 ...
+```
+-->
+
+```
+atomkraft model sample --model-path models/transfer.tla --traces-dir traces --examples Ex
+```
+
+If you inspect the `transfer.tla` file, you will find that the predicate `Ex` was defined as `step > 3`.
+This requires that sampled test scenarios contain more than 3 transactions.
+
+Indeed, if you check the `traces` directory, you will find a set of `json` files in it.
+Each file contains one test scenario satisfying the property that there are more than 3 transactions.
+
+While Atomkraft can generate test scenarios from the model, it would also be able to work with test scenarios created some other way (e.g., by hand).
+As a side note, for every `atomkraft` command, you can inspect all options by appending `--help`.
+For instance, `atomkraft model sample --help`.)
+
+## Generate reactors
+
+In the previous step, we have generated test scenarios (also called _traces_).
+However, we are still missing a link from those `json` scenarios to the actual execution on chain.
+_Reactors_ provide this missing link.
+With some traces at hand, we need to write reactors corresponding to them.
+Atomkraft can help us generate stubs for such reactors.
+
+In our `transfer.tla` model, the `action` variable had two tags - `Init`, `Transfer`.
+We will generate a reactor stub by running
+
+<!--
+```sh
+$ cd transfer; poetry run atomkraft reactor --actions "Init,Transfer" --variables "action"
+...
+```
+-->
+
+```
+atomkraft reactor --actions "Init,Transfer" --variables "action"
+```
+
+Inspect the `reactors` directory now: it contains a generator stub named `reactor.py`.
+For the moment, `reactor.py` is a stub, which will for every step of the test scenario simply print the information about the action.
+We will see how to extend the stub in section [Expanding reactors](#expanding-reactors).
+
+## Setting up chains
+
+Our ultimate goal is to execute tests on a chain.
+Now we set up the testnet to be used with Atomkraft.
+
+If you were following along the instructions in [INSTALLATION.md](/INSTALLATION.md), you are already have `gaiad` installed.
+Since `gaiad` is a default testnet in Atomkraft, there is nothing else to be done.
+
+Working with other chains is possible too, by installing them and then invoking:
+
+```
+atomkraft chain config chain_id <name_of_the_chain>
+atomkraft chain config binary <path-to-the-chain-binary>
+atomkraft chain config prefix <prefix?>
+```
+
+## Executing tests
+
+All three elements for running a test are now in place: a testnet, a test scenario, and a reactor.
+Thus, we are ready to run some tests (though, trivial ones since the reactor is still only a stub).
+
+<!--
+```sh
+$ cd transfer; poetry run atomkraft test trace --trace traces/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag
+...
+Successfully executed
+...
+```
+-->
+
+```
+atomkraft test trace --trace traces/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag
+```
+
+The output of the command contains
+
+```
 Successfully executed trace traces/violation1.itf.json
-...
 ```
 
-For now, this just prints the name of the action tag. Let's complete the reactor stub.
+Other than that, it only names the actions executed at each step.
+We will now expand the reactor to execute on chain the transactions from the test scenario.
 
-### Updating reactors
+## Expanding reactors
 
-Update `reactors/reactor.py` with the following complete reactor code.
+Update `reactors/reactor.py` with the complete reactor code from [here](https://raw.githubusercontent.com/informalsystems/atomkraft/dev/examples/cosmos-sdk/transfer/reactor.py).
 
-<!-- $MDX dir=transfer -->
+While explaining the reactor code is out of the scope of this tutorial, you can skim through it and notice that it describes transfering coins from one account to another by broadcasting messages to the chain.
+
+<!--
 ```sh
-$ curl -Lo reactors/reactor.py https://raw.githubusercontent.com/informalsystems/atomkraft/dev/examples/cosmos-sdk/transfer/reactor.py
+$ cd transfer; curl -Lo reactors/reactor.py https://raw.githubusercontent.com/informalsystems/atomkraft/dev/examples/cosmos-sdk/transfer/reactor.py
 ...
-$ cat reactors/reactor.py
-import time
+```
+-->
 
-from modelator.pytest.decorators import step
-from terra_sdk.client.lcd import LCDClient
-from terra_sdk.client.lcd.api.tx import CreateTxOptions
-from terra_sdk.core import Coin, Coins
-from terra_sdk.core.bank import MsgSend
-from terra_sdk.core.fee import Fee
-from terra_sdk.key.mnemonic import MnemonicKey
-
-
-@step("Init")
-def init(testnet, action):
-    print("Step: Init")
-    testnet.n_account = action["value"]["n_wallet"]
-    testnet.verbose = True
-
-    testnet.oneshot()
-    time.sleep(10)
-
-
-@step("Transfer")
-def transfer(testnet, action):
-    print("Step: Transfer")
-
-    rest_endpoint = testnet.get_validator_port(0, "lcd")
-    lcdclient = LCDClient(
-        url=rest_endpoint,
-        chain_id=testnet.chain_id,
-        gas_prices=f"10{testnet.denom}",
-        gas_adjustment=0.1,
-    )
-
-    sender_id = action["value"]["sender"]
-    receiver_id = action["value"]["receiver"]
-    amount = action["value"]["amount"]
-
-    sender = testnet.accounts[sender_id].address(testnet.prefix)
-    receiver = testnet.accounts[receiver_id].address(testnet.prefix)
-
-    sender_wallet = lcdclient.wallet(
-        MnemonicKey(
-            mnemonic=testnet.accounts[sender_id].mnemonic,
-            coin_type=testnet.coin_type,
-            prefix=testnet.prefix,
-        )
-    )
-
-    msg = MsgSend(sender, receiver, Coins([Coin(testnet.denom, amount)]))
-
-    tx = sender_wallet.create_and_sign_tx(
-        CreateTxOptions(
-            msgs=[msg], fee=Fee(20000000, Coins([Coin(testnet.denom, 2000000)]))
-        )
-    )
-
-    result = lcdclient.tx.broadcast(tx)
-
-    print("[MSG]", msg)
-    print("[RES]", result)
-
-    time.sleep(2)
+```
+curl -Lo reactors/reactor.py https://raw.githubusercontent.com/informalsystems/atomkraft/dev/examples/cosmos-sdk/transfer/reactor.py
 ```
 
-### Re-executing tests with complete reactors
+## Re-executing tests with complete reactors
 
-Finally, you can run the complete test with the completed reactor and a trace.
+Finally, we can run the complete test with the completed reactor.
 
-<!-- $MDX dir=transfer -->
+<!--
 ```sh
-$ poetry run atomkraft test trace --trace traces/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag
+$ cd transfer; poetry run atomkraft test trace --trace traces/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag
 ...
-Successfully executed trace traces/violation1.itf.json
+Successfully executed
 ...
+```
+-->
+
+```
+atomkraft test trace --trace traces/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag
 ```
