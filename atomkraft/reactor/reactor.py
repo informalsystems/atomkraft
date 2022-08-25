@@ -85,7 +85,7 @@ The reactor file connects a test scenario described by a trace
 (obtained from a model or written by hand) with the actual execution
 of the test scenario on the testnet.
 
-It contains one @step function per each action appearing in the trace:
+It contains one @step decorated function per each action appearing in the trace:
 those function implement changes to the blockchain corresponding to the
 abstract action from the trace.
 
