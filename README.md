@@ -2,6 +2,8 @@
 
 Below we describe what Atomkraft is about, and explain the concepts behind the tool. In case you would like to skip that, and jump directly into action, please read our [Installation guide](./INSTALLATION.md) to install the tool; afterwards it's worth following either our [Cosmos SDK Token Transfer tutorial](examples/cosmos-sdk/transfer/transfer.md), or [CosmWasm tutorial](examples/cosmwasm/counter/README.md).
 
+We cover the following topics in this file:
+
 - [Introduction](#introduction)
 - [Conceptual overview](#conceptual-overview)
   - [Atomkraft project](#atomkraft-project)
