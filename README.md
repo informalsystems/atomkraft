@@ -6,6 +6,7 @@
   - [Local testnets](#local-testnets)
   - [Traces and reactors](#traces-and-reactors)
   - [Generating traces from TLA+ models](#generating-traces-from-tla-models)
+  - [Running the tests against the local testnet](#running-the-tests-against-the-local-testnet)
 
 ## Introduction
 
@@ -87,7 +88,7 @@ We have automated the process of writing a reactor via `atomkraft reactor` comma
 
 As explained above, abstract traces can be obtained by whatever means; we do not constrain the user in this respect. The most time efficient method, from our point of view, is to generate traces from formal models expressed in [TLA+](https://lamport.azurewebsites.net/tla/tla.html), the specification language designed by Leslie Lamport. For a gentle introduction to TLA+ you may use the Informal's [TLA+ Language Reference Manual](https://apalache.informal.systems/docs/lang/index.html) [TLA+ Basics Tutorial](https://mbt.informal.systems/docs/tla_basics_tutorials/). While TLA+ may look scary for beginners, we can assure you that learning it will greatly improve your productivity when reasoning about (and testing!) both protocols and code.
 
-The good news is that we have done a thorough work in making user's life as easy as possible when working with TLA+ models, and using them to generate abstract test traces. All heavy-lifting work wrt. working with TLA+ models is done by our [Apalache](https://apalache.informal.systems) model checker. The model checker itself is meant for expert users; Atomkraft tries its best to hide excessive complexity from its users and exposes only the most essential functionality for working with models. You can access this functionality via `atomkraft model` command, which provides you with the functions like listed in the screenshot below:
+The good news is that we have done a thorough work in making user's life as easy as possible when working with TLA+ models, and using them to generate abstract test traces. All heavy-lifting work wrt. TLA+ models is done by our [Apalache](https://apalache.informal.systems) model checker. The model checker itself is meant for expert users; Atomkraft tries its best to hide excessive complexity from its users and exposes only the most essential functionality for working with models. You can access this functionality via `atomkraft model` command, which provides you with the functions like listed in the screenshot below:
 
 ![Atomkraft model](docs/images/atomkraft-model.png)
 
@@ -98,3 +99,19 @@ atomkraft model sample --model-path models/transfer.tla --traces-dir traces --ex
 ```
 
 will generate an abstract trace from the [transfer.tla](examples/cosmos-sdk/transfer/transfer.tla) model, and store the generated trace in the `traces` directory of your Atomkraft project.
+
+### Running the tests against the local testnet
+
+Let's assume you've done all the steps outlined above:
+
+1. created a fresh Atomkraft project using `atomkraft init`
+2. configured a Cosmos-based blockchain of your choice using `atomkraft chain`
+3. created a reactor stub using `atomkraft reactor`, and populated it with code
+4. generated abstract traces from a TLA+ model using `atomkraft model sample`, or created abstract traces by some other means
+
+Then you are ready to go, and execute your tests! We provide two commands for doing that:
+
+- `atomkraft test trace` will accept an abstract trace and a reactor, spin the local testnet, and execute the trace against the testnet
+- `atomkraft test model` is a convenience shorthand that combines step 4 above (`atomkraft model sample`) with `atomkraft test trace`, and allows you to execute tests directly from a TLA+ model, sidestepping explicit trace generation.
+
+Both of the above `atomkraft test` commands populate the `tests` directory of your project with Pytest-based tests; so executing `pytest` inside your Atomkraft project at any point in time will reproduce all of your tests. In fact, the complete Atomkraft project directory is ready at any point in time to be exported, and used as a Pytest project, for example for reproducing your tests in the CI.
