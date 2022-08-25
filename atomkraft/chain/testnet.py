@@ -1,4 +1,5 @@
 import glob
+import json
 import time
 from pathlib import Path
 from subprocess import PIPE, Popen
@@ -46,13 +47,9 @@ class Testnet:
         self.verbose = verbose
         self.data_dir = Path(".atomkraft/nodes") if data_dir is None else data_dir
 
-        self.prefix = next(
-            x.removeprefix("- ")
-            for x in self._execute("keys parse 00", stdout=PIPE)[0]
-            .decode()
-            .splitlines()
-            if x.startswith("- ")
-        ).split("1")[0]
+        self.prefix = json.loads(
+            self._execute("keys parse 00 --output json", stdout=PIPE)[0]
+        )["formats"][0].split("1", 1)[0]
 
     def _execute(
         self, args: str, *, stdin: bytes | None = None, stdout=None, stderr=None
