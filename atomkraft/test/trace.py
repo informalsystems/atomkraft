@@ -80,5 +80,6 @@ def test_trace(trace: PathLike, reactor: PathLike, keypath: str, verbose: bool):
     report_nodes_dir = report_dir / "nodes"
 
     shutil.copytree(default_nodes_dir, report_nodes_dir)
+    shutil.copy(trace, report_dir)
 
     print(f"Test data is saved at {report_dir}")
