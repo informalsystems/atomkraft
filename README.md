@@ -5,6 +5,7 @@
   - [Atomkraft project](#atomkraft-project)
   - [Local testnets](#local-testnets)
   - [Traces and reactors](#traces-and-reactors)
+  - [Generating traces from TLA+ models](#generating-traces-from-tla-models)
 
 ## Introduction
 
@@ -81,3 +82,9 @@ This separation between abstract traces and reactors, which apply abstract trace
 - Abstract traces are lightweight in terms of storage, which allows us to generate and maintain thousands of them, covering many corner cases, at no extra cost.
 
 We have automated the process of writing a reactor via `atomkraft reactor` command. A user needs only to supply the lists of actions, and of state variables, and the command will generate a reactor stub with a function for each action; what remains is only to fill the body of each such function.
+
+### Generating traces from TLA+ models
+
+As explained above, abstract traces can be obtained by whatever means; we do not constrain the user in this respect. The most time efficient method, from our point of view, is to generate traces from formal models expressed in [TLA+](https://lamport.azurewebsites.net/tla/tla.html), the specification language designed by Leslie Lamport. For a gentle introduction to TLA+ you may use the Informal's [TLA+ Language Reference Manual](https://apalache.informal.systems/docs/lang/index.html) [TLA+ Basics Tutorial](https://mbt.informal.systems/docs/tla_basics_tutorials/). While TLA+ may look scary for beginners, we can assure you that learning it will greatly improve your productivity when reasoning about (and testing!) both protocols and code.
+
+The good news is that we have done a thorough work in making user's life as easy as possible when working with TLA+ models, and using them to generate abstract test traces.
