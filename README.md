@@ -32,7 +32,7 @@ Atomkraft is likely to benefit you as a _Cosmos SDK developer_ if:
 
 - Push-button, but fully customizable, automation of local testnet creation
 - Clean, fully customizable trajectory from test case generation to its execution on the local testnet
-- Automatic generation of massive test suites from compact TLA+ models possible
+- Support for automatic generation of massive test suites from compact TLA+ models
 - Easy execution of test cases generated via other means (e.g. manual, BDD, PBT)
 - Anytime ready-to-integrate regression test suite in the form of a standard Pytest project
 - Ready-to-execute standard test suites for important Cosmos SDK modules (coming soon!)
