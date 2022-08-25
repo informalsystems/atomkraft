@@ -70,7 +70,7 @@ With Atomkraft project created, you should be ready to go. By default, we config
 
 ### Traces and reactors
 
-For describing test cases we use the [_Informal Trace Format_](https://apalache.informal.systems/docs/adr/015adr-trace.html), which is a JSON encoding of a sequence of steps, and each step encodes values of key state variables; please see [this example trace](examples/cosmos-sdk/transfer/example_trace.itf.json). The trace has been produced by our in-house [Apalache model checker](https://apalache.informal.systems) from [this TLA+ model](examples//cosmos-sdk/transfer/transfer.tla).
+For describing test cases we use the [_Informal Trace Format_](https://apalache.informal.systems/docs/adr/015adr-trace.html), which is a JSON encoding of a sequence of steps, and each step encodes values of key state variables; please see [this example trace](examples/cosmos-sdk/transfer/example_trace.itf.json). The trace has been produced by our in-house [Apalache model checker](https://apalache.informal.systems) from [this TLA+ model](examples/cosmos-sdk/transfer/transfer.tla).
 
 ITF traces are abstract; in the example trace above, it holds wallet balances as a simple mapping `balances` from abstract addresses, represented as integers, to their balances, also represented as integers without denomination. There are two abstract actions in this trace: `Init`, and `Transfer`. In order to be able to replay the abstract trace on a blockchain, each of those abstract actions needs to be translated to a concrete transaction, as well as all abstract parameters of an action need to be translated to concrete values (e.g. an abstract integer address needs to be translated into a concrete Cosmos address). This translation step is performed by a component that we call `reactor`: a reactor is a centerpiece for an Atomkraft project, without which it can't function, similar to a nuclear reactor for the atomic power plant. You can see [this example reactor](examples/cosmos-sdk/transfer/reactor.py) that is able to playback the above trace on the blockchain.
 
@@ -87,4 +87,14 @@ We have automated the process of writing a reactor via `atomkraft reactor` comma
 
 As explained above, abstract traces can be obtained by whatever means; we do not constrain the user in this respect. The most time efficient method, from our point of view, is to generate traces from formal models expressed in [TLA+](https://lamport.azurewebsites.net/tla/tla.html), the specification language designed by Leslie Lamport. For a gentle introduction to TLA+ you may use the Informal's [TLA+ Language Reference Manual](https://apalache.informal.systems/docs/lang/index.html) [TLA+ Basics Tutorial](https://mbt.informal.systems/docs/tla_basics_tutorials/). While TLA+ may look scary for beginners, we can assure you that learning it will greatly improve your productivity when reasoning about (and testing!) both protocols and code.
 
-The good news is that we have done a thorough work in making user's life as easy as possible when working with TLA+ models, and using them to generate abstract test traces.
+The good news is that we have done a thorough work in making user's life as easy as possible when working with TLA+ models, and using them to generate abstract test traces. All heavy-lifting work wrt. working with TLA+ models is done by our [Apalache](https://apalache.informal.systems) model checker. The model checker itself is meant for expert users; Atomkraft tries its best to hide excessive complexity from its users and exposes only the most essential functionality for working with models. You can access this functionality via `atomkraft model` command, which provides you with the functions like listed in the screenshot below:
+
+![Atomkraft model](docs/images/atomkraft-model.png)
+
+The most important command in the scope of test case generation is `atomkraft model sample`. E.g. the command below (assuming you are in the Atomkraft project)
+
+```sh
+atomkraft model sample --model-path models/transfer.tla --traces-dir traces --examples Ex
+```
+
+will generate an abstract trace from the [transfer.tla](examples/cosmos-sdk/transfer/transfer.tla) model, and store the generated trace in the `traces` directory of your Atomkraft project.
