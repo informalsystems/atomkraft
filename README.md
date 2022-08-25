@@ -119,7 +119,7 @@ Both of the above `atomkraft test` commands populate the `tests` directory of yo
 
 ## What's next
 
-Atomkraft's functionality outlined above represents the tool prototype: please feel free to employ it in your projects, and let us know of your experience: we are always ready to assist!
+Atomkraft's functionality outlined above represents the tool MVP: please feel free to employ it in your projects, and let us know of your experience: we are always ready to assist!
 
 There is many more features that are planned or are already being implemented; so stay tuned. Below is the preview of the future Atomkraft functionality:
 
