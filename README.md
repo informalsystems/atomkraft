@@ -6,7 +6,8 @@
   - [Local testnets](#local-testnets)
   - [Traces and reactors](#traces-and-reactors)
   - [Generating traces from TLA+ models](#generating-traces-from-tla-models)
-  - [Running the tests against the local testnet](#running-the-tests-against-the-local-testnet)
+  - [Running the tests against testnet](#running-the-tests-against-testnet)
+- [What's next](#whats-next)
 
 ## Introduction
 
@@ -100,7 +101,7 @@ atomkraft model sample --model-path models/transfer.tla --traces-dir traces --ex
 
 will generate an abstract trace from the [transfer.tla](examples/cosmos-sdk/transfer/transfer.tla) model, and store the generated trace in the `traces` directory of your Atomkraft project.
 
-### Running the tests against the local testnet
+### Running the tests against testnet
 
 Let's assume you've done all the steps outlined above:
 
@@ -115,3 +116,18 @@ Then you are ready to go, and execute your tests! We provide two commands for do
 - `atomkraft test model` is a convenience shorthand that combines step 4 above (`atomkraft model sample`) with `atomkraft test trace`, and allows you to execute tests directly from a TLA+ model, sidestepping explicit trace generation.
 
 Both of the above `atomkraft test` commands populate the `tests` directory of your project with Pytest-based tests; so executing `pytest` inside your Atomkraft project at any point in time will reproduce all of your tests. In fact, the complete Atomkraft project directory is ready at any point in time to be exported, and used as a Pytest project, for example for reproducing your tests in the CI.
+
+## What's next
+
+Atomkraft's functionality outlined above represents the tool prototype: please feel free to employ it in your projects, and let us know of your experience: we are always ready to assist!
+
+There is many more features that are planned or are already being implemented; so stay tuned. Below is the preview of the future Atomkraft functionality:
+
+- **Standard test suites**: we have already started the effort to provide standard reactors and tests for most important Cosmos SDK modules: [bank](https://docs.cosmos.network/master/modules/bank/), [staking](https://docs.cosmos.network/master/modules/staking/), [authz](https://docs.cosmos.network/master/modules/authz/); you name it! This will serve the community at large, and will allow you, as an Atomkraft user, to easily bootstrap your new Atomkraft projects:
+  - running standard test suites in your CI will make sure that your new functionality doesn't break the important blockchain invariants;
+  - using standard test suites as blueprints will allow you to easily create your own tests suites via examination and adaptation of already existing tests.
+- **Test understanding and debugging**: we started to work in the direction of assisting the user in simplified creation and understanding of the test scenarios, as well as debugging the failed test runs:
+  - for the former, we will provide the differential trace viewer, which highlights only the changes between the trace steps;
+  - for the latter, we will provide the built-in blockchain explorer, and integrate into it the capabilities to trace back and forth between abstract trace steps and concrete blockchain transactions.
+- **Test reports and dashboards**: we plan to implement the functionality for generation of test reports as well as live dashboards that would provide an easy-to-grasp overview and categorization of executed and running tests.
+- **Exhaustiveness**: we plan to implement certain coverage metrics (e.g. transaction sequences up to specified length), and to help user achieving full coverage according to those metrics to provide confidence in the code in case no bugs are discovered.
