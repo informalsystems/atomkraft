@@ -4,16 +4,16 @@ Below we describe what Atomkraft is about, and explain the concepts behind the t
 
 We cover the following topics in this file:
 
-- [Introduction](#introduction)
+- [Atomkraft Introduction](#atomkraft-introduction)
 - [Conceptual overview](#conceptual-overview)
   - [Atomkraft project](#atomkraft-project)
   - [Local testnets](#local-testnets)
   - [Traces and reactors](#traces-and-reactors)
   - [Generating traces from TLA+ models](#generating-traces-from-tla-models)
   - [Running the tests against testnet](#running-the-tests-against-testnet)
-- [What's next](#whats-next)
+- [What's next: Atomkraft's immediate future](#whats-next-atomkrafts-immediate-future)
 
-## Introduction
+## Atomkraft Introduction
 
 The [Cosmos Network](https://cosmos.network) of [IBC](https://ibcprotocol.org)-connected blockchains is growing tremendously fast. There is one aspect though, which has not been fully addressed yet, namely **quality assurance**: how do we make sure that Cosmos-based blockchains are secure, and don't contain security issues that pose hazards for user funds?
 
@@ -121,7 +121,7 @@ Then you are ready to go, and execute your tests! We provide two commands for do
 
 Both of the above `atomkraft test` commands populate the `tests` directory of your project with Pytest-based tests; so executing `pytest` inside your Atomkraft project at any point in time will reproduce all of your tests. In fact, the complete Atomkraft project directory is ready at any point in time to be exported, and used as a Pytest project, for example for reproducing your tests in the CI.
 
-## What's next
+## What's next: Atomkraft's immediate future
 
 Atomkraft's functionality outlined above represents the tool MVP: please feel free to employ it in your projects, and let us know of your experience: we are always ready to assist!
 
