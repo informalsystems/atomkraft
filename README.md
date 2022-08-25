@@ -35,7 +35,7 @@ Atomkraft is likely to benefit you as a _Cosmos SDK developer_ if:
 
 ## Conceptual overview
 
-In itself, Atomkraft is nothing more that a command-line application, which is as easy to obtain for your system as executing `pip install atomkraft`; please consult the detailed [Installation Instructions](INSTALLATION.md) if needed. At the top-level, Atomkraft provides you the commands illustrated in the diagram below.
+In itself, Atomkraft is nothing more than a command-line application, which is as easy to obtain for your system as executing `pip install atomkraft`; please consult the detailed [Installation Instructions](INSTALLATION.md) if needed. At the top-level, Atomkraft provides you the commands illustrated in the diagram below.
 
 ![Atomkraft users](docs/images/atomkraft-users.svg)
 
@@ -65,7 +65,7 @@ All of the above configuration files are filled with the default configuration, 
 
 ### Local testnets
 
-With Atomkraft project created, you should be ready to go. By default, we configure local testnets to use the `gaiad` (Cosmos Hub) binary. If it is available via your `PATH`, executing `atomkraft chain testnet` should bring up a local testnet with 2 node and 3 validators. If you would like to configure any parameters differently (e.g. to run your custom blockchain binary), you can do it either via `atomkraft chain config` command, or by directly editing `chain.toml` config file. Please make sure your changes are valid by executing `atomkraft chain testnet`; we use the local testnet to run the tests.
+With Atomkraft project created, you should be ready to go. By default, we configure local testnets to use the `gaiad` (Cosmos Hub) binary. If it is available via your `PATH`, executing `atomkraft chain testnet` should bring up a local testnet with 2 nodes and 3 validators. If you would like to configure any parameters differently (e.g. to run your custom blockchain binary), you can do it either via `atomkraft chain config` command, or by directly editing `chain.toml` config file. Please make sure your changes are valid by executing `atomkraft chain testnet`; we use the local testnet to run the tests.
 
 ### Traces and reactors
 
