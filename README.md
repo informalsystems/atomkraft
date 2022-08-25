@@ -1,5 +1,7 @@
 # Atomkraft: E2E testing for Cosmos blockchains
 
+Below we describe what Atomkraft is about, and explain the concepts behind the tool. In case you would like to skip that and jump directly into action, it's worth checking out our [Cosmos SDK Token Transfer tutorial](examples/cosmos-sdk/transfer/transfer.md), or our [CosmWasm tutorial](examples/cosmwasm/counter/README.md).
+
 - [Introduction](#introduction)
 - [Conceptual overview](#conceptual-overview)
   - [Atomkraft project](#atomkraft-project)
