@@ -116,7 +116,7 @@ def _action_description_comment(action_name, variables):
     elif len(variables) == 2:
         variables_sentence = f"It additionally has access to the model (trace) state variables `{variables[0]}` and `{variables[1]}`."
     else:
-        vars_string = "".join(["\n\t\t-`" + v + "`" for v in variables])
+        vars_string = "".join([f"\n\t\t-`{v}`" for v in variables])
         variables_sentence = f"It additionally has access to the model (trace) state variables: {vars_string}."
     return f"""'''
     Implements the effects of the step {repr(action_name)}
