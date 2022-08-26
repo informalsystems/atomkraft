@@ -136,7 +136,6 @@ This requires that sampled test scenarios contain more than 3 transactions.
 Indeed, if you check the `traces` directory, you will find the `violation.itf.json` file in it.
 This file contains a test scenario satisfying the property that there are more than 3 transactions.
 
-
 While Atomkraft can generate test scenarios from the model, it would also be able to work with test scenarios created some other way (e.g., by hand).
 Furthermore, Atomkraft can generate not only one, but an arbitrary number of scenarios satisfying a desired property.
 (As a side note, for every `atomkraft` command, you can inspect all options by appending `--help`.
@@ -174,7 +173,7 @@ Our ultimate goal is to execute tests on a chain.
 Now we set up the testnet to be used with Atomkraft.
 
 If you were following along the instructions in [INSTALLATION.md](/INSTALLATION.md#blockchain-binary), you already have `simd` compiled (or installed to system).
-`simd` is the default testnet in Atomkraft. 
+`simd` is the default testnet in Atomkraft.
 
 If you have `simd` in your system path, there is nothing else to be done.
 Otherwise, you only need to set the chain binary path invoking:
@@ -198,7 +197,7 @@ Thus, we are ready to run some tests (though, trivial ones since the reactor is 
 
 <!--
 ```sh
-$ cd transfer; poetry run atomkraft test trace --trace traces/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag
+$ cd transfer; poetry run atomkraft test trace --trace traces/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag  --verbose
 ...
 Successfully executed
 ...
@@ -206,7 +205,7 @@ Successfully executed
 -->
 
 ```
-atomkraft test trace --trace traces/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag
+atomkraft test trace --trace traces/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag --verbose
 ```
 
 The output of the command contains
@@ -241,7 +240,7 @@ Finally, we can run the complete test with the completed reactor.
 
 <!--
 ```sh
-$ cd transfer; poetry run atomkraft test trace --trace traces/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag
+$ cd transfer; poetry run atomkraft test trace --trace traces/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag --verbose
 ...
 Successfully executed
 ...
@@ -249,5 +248,5 @@ Successfully executed
 -->
 
 ```
-atomkraft test trace --trace traces/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag
+atomkraft test trace --trace traces/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag --verbose
 ```
