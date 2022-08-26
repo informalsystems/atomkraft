@@ -371,7 +371,7 @@ python-versions = ">=3.5"
 
 [[package]]
 name = "modelator"
-version = "0.6.0"
+version = "0.6.1"
 description = "Framework for Model Based Testing"
 category = "main"
 optional = false
@@ -1207,8 +1207,8 @@ mnemonic = [
     {file = "mnemonic-0.20.tar.gz", hash = "sha256:7c6fb5639d779388027a77944680aee4870f0fcd09b1e42a5525ee2ce4c625f6"},
 ]
 modelator = [
-    {file = "modelator-0.6.0-py3-none-any.whl", hash = "sha256:d3876d8d44d2e67d21aae6cde47ba66d823322f4ecc1f1dd49026e148429551d"},
-    {file = "modelator-0.6.0.tar.gz", hash = "sha256:a21dc9738d215be5115c040da9785beb3a98a72e68e4ba8328536380bb4a8494"},
+    {file = "modelator-0.6.1-py3-none-any.whl", hash = "sha256:4dd8ae88c0afb01a24bb8536d86ac24aa1522bee903c8c453226aff284d44b70"},
+    {file = "modelator-0.6.1.tar.gz", hash = "sha256:f64aae060e7e480302c23e2d4617c0017767a52ca3210c7676a7e4ae16a53987"},
 ]
 modelator-py = [
     {file = "modelator_py-0.2.1-py3-none-any.whl", hash = "sha256:46c05e4a178bdfc1d01c2e6efd7c4c1efbe2571d74ad7bcd7915cd21127bb1e7"},

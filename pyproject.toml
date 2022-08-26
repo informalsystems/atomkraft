@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "atomkraft"
-version = "0.0.6"
+version = "0.0.9"
 description = "Testing for Cosmos Blockchains"
 authors = [
     "Andrey Kuprianov <andrey@informal.systems>",
