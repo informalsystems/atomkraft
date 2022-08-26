@@ -174,8 +174,9 @@ Our ultimate goal is to execute tests on a chain.
 Now we set up the testnet to be used with Atomkraft.
 
 If you were following along the instructions in [INSTALLATION.md](/INSTALLATION.md#blockchain-binary), you already have `simd` compiled (or installed to system).
-`simd` is the default testnet in Atomkraft. If you have `simd` in your system path, there is nothing else to be done.
+`simd` is the default testnet in Atomkraft. 
 
+If you have `simd` in your system path, there is nothing else to be done.
 Otherwise, you only need to set the chain binary path invoking:
 
 ```
