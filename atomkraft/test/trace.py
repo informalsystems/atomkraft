@@ -2,6 +2,8 @@ import os.path
 import shutil
 from datetime import datetime
 from os import PathLike
+from pathlib import Path
+from typing import List
 
 import pytest
 from atomkraft.utils.project import project_root
@@ -17,6 +19,14 @@ pytest_plugins = "{0}"
 def test_trace():
     print("Successfully executed trace {1}")
 """
+
+
+def copy(src_paths: List[Path], dst_path: Path):
+    for src in src_paths:
+        if src.is_dir():
+            shutil.copytree(src, dst_path / src.name)
+        else:
+            shutil.copy2(src, dst_path)
 
 
 def test_trace(trace: PathLike, reactor: PathLike, keypath: str, verbose: bool):
@@ -76,10 +86,6 @@ def test_trace(trace: PathLike, reactor: PathLike, keypath: str, verbose: bool):
 
     pytest.main(pytest_args + [test_path])
 
-    default_nodes_dir = root / ".atomkraft" / "nodes"
-    report_nodes_dir = report_dir / "nodes"
-
-    shutil.copytree(default_nodes_dir, report_nodes_dir)
-    shutil.copy(trace, report_dir)
+    copy([Path(trace), root / ".atomkraft" / "nodes"], report_dir)
 
     print(f"Test data is saved at {report_dir}")
