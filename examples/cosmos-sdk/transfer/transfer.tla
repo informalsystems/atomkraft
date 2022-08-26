@@ -19,7 +19,7 @@ Init ==
 Next ==
     \E sender \in WALLETS:
     \E receiver \in WALLETS:
-    \E amount \in 0..balances[sender]:
+    \E amount \in 1..balances[sender]:
         /\ sender /= receiver
         /\ balances' = [
             balances EXCEPT

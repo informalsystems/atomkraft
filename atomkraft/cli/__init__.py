@@ -46,7 +46,7 @@ app.add_typer(
 app.add_typer(
     chain.app,
     name="chain",
-    help="Modify or constrol Cosmos-SDK chain",
+    help="Modify or control Cosmos-SDK chain",
     no_args_is_help=True,
 )
 app.add_typer(
