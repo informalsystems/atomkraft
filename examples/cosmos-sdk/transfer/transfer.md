@@ -171,8 +171,14 @@ We will see how to extend the stub in section [Expanding reactors](#expanding-re
 Our ultimate goal is to execute tests on a chain.
 Now we set up the testnet to be used with Atomkraft.
 
-If you were following along the instructions in [INSTALLATION.md](/INSTALLATION.md), you are already have `gaiad` installed.
-Since `gaiad` is a default testnet in Atomkraft, there is nothing else to be done.
+If you were following along the instructions in [INSTALLATION.md](/INSTALLATION.md#blockchain-binary), you already have `simd` compiled (or installed to system).
+`simd` is the default testnet in Atomkraft. If you have `simd` in your system path, there is nothing else to be done.
+
+Otherwise, you only need to set the chain binary path invoking:
+
+```
+atomkraft chain config binary <path-to-the-chain-binary>
+```
 
 Working with other chains is possible too, by installing them and then invoking:
 

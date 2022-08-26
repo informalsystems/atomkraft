@@ -39,15 +39,16 @@ Install `git` following [the installation instructions](https://git-scm.com/down
 
 If you are interested in Atomkraft, you probably want to test some Cosmos SDK blockchain; so, there is a high probability you have a blockchain binary in your system already. If this is the case, feel free skip the rest of this section.
 
-In case you don't have any Cosmos SDK blockchain binary locally, it should be easy to obtain it. The simplest solution if you want just to play with the tool is probably to use [Cosmos Hub (Gaia)](https://github.com/cosmos/gaia). You may either:
+In case you don't have any Cosmos SDK blockchain binary locally, it should be easy to obtain it. The simplest solution if you want just to play with the tool is to use [Cosmos-SDK](https://github.com/cosmos/cosmos-sdk). The blockchain binary can be compiled locally executing these following commands.
 
-- download a precompiled binary for you system from [Gaia releases](https://github.com/cosmos/gaia/releases), or
-- compile the blockchain binary locally
-  ```sh
-  git clone --depth 1 --branch v7.0.3 https://github.com/cosmos/gaia.git
-  (cd gaia; make build)
-  ```
-  The blockchain binary will be at `./gaia/build/gaiad`.
+```sh
+git clone --depth 1 --branch release/v0.45.x https://github.com/cosmos/cosmos-sdk
+(cd cosmos-sdk; make build)
+```
+
+The blockchain binary will be at `./cosmos-sdk/build/simd`.
+
+You may also install the compiled binary in your system (requires [setting up Go](https://go.dev/doc/install)), executing directly `(cd cosmos-sdk; make install)` instead of `(cd cosmos-sdk; make build)`.
 
 ## Java
 
