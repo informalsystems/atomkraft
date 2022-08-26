@@ -21,12 +21,15 @@ def test_trace():
 """
 
 
-def copy(src_paths: List[Path], dst_path: Path):
+def copy_if_exists(src_paths: List[Path], dst_path: Path):
     for src in src_paths:
         if src.is_dir():
             shutil.copytree(src, dst_path / src.name)
-        else:
+        elif src.is_file():
             shutil.copy2(src, dst_path)
+        else:
+            # file does not exist
+            pass
 
 
 def test_trace(trace: PathLike, reactor: PathLike, keypath: str, verbose: bool):
@@ -83,6 +86,6 @@ def test_trace(trace: PathLike, reactor: PathLike, keypath: str, verbose: bool):
 
     pytest.main(pytest_args + [test_path])
 
-    copy([Path(trace), root / ".atomkraft" / "nodes"], report_dir)
+    copy_if_exists([Path(trace), root / ".atomkraft" / "nodes"], report_dir)
 
     print(f"Test data is saved at {report_dir}")
