@@ -1,6 +1,9 @@
 import os.path
+import shutil
 from datetime import datetime
 from os import PathLike
+from pathlib import Path
+from typing import List
 
 import pytest
 from atomkraft.utils.project import project_root
@@ -18,7 +21,15 @@ def test_trace():
 """
 
 
-def test_trace(trace: PathLike, reactor: PathLike, keypath: str):
+def copy(src_paths: List[Path], dst_path: Path):
+    for src in src_paths:
+        if src.is_dir():
+            shutil.copytree(src, dst_path / src.name)
+        else:
+            shutil.copy2(src, dst_path)
+
+
+def test_trace(trace: PathLike, reactor: PathLike, keypath: str, verbose: bool):
     """
     Test blockchain by running one trace
     """
@@ -52,4 +63,26 @@ def test_trace(trace: PathLike, reactor: PathLike, keypath: str):
             )
         )
     print(f"Executing {test_name} ...")
-    pytest.main(["-s", test_path])
+
+    report_dir = root / "reports" / test_name
+    report_dir.mkdir(parents=True)
+
+    logging_file = report_dir / "log.txt"
+
+    pytest_report_file = report_dir / "report.jsonl"
+
+    pytest_args = [
+        "--log-file-level=INFO",
+        f"--log-file={logging_file}",
+        f"--report-log={pytest_report_file}",
+    ]
+
+    if verbose:
+        pytest_args.append("-rP")
+        pytest_args.append("--log-cli-level=INFO")
+
+    pytest.main(pytest_args + [test_path])
+
+    copy([Path(trace), root / ".atomkraft" / "nodes"], report_dir)
+
+    print(f"Test data is saved at {report_dir}")

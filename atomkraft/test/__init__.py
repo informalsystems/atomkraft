@@ -27,6 +27,9 @@ def RequiredFileOption(help, default):
 def trace(
     # currently, require the trace to be present.
     # later, there will be an option to pick up the last one from the model
+    verbose: bool = typer.Option(
+        False, "--verbose", "-v", help="Output logging on console"
+    ),
     trace: typer.FileText = RequiredFileOption("trace to execute", "model"),
     reactor: typer.FileText = FileOption("reactor to interpret the trace", "reactor"),
     keypath: str = typer.Option(
@@ -39,7 +42,9 @@ def trace(
     Test blockchain by running one trace
     """
 
-    test_trace(trace.name, reactor if reactor is None else reactor.name, keypath)
+    test_trace(
+        trace.name, reactor if reactor is None else reactor.name, keypath, verbose
+    )
 
 
 @app.command()
