@@ -66,7 +66,7 @@ pycryptodome = ">=3.6,<4.0"
 pynacl = ">=1.4,<2.0"
 
 [package.extras]
-develop = ["coverage (>=5.3)", "flake8 (>=3.8)", "isort (>=5.8)", "mypy (>=0.900)", "prospector[with_pyroma,with_mypy] (>=1.7)", "pytest (>=7.0)", "pytest-cov (>=2.10)"]
+develop = ["coverage (>=5.3)", "flake8 (>=3.8)", "isort (>=5.8)", "mypy (>=0.900)", "prospector[with_mypy,with_pyroma] (>=1.7)", "pytest (>=7.0)", "pytest-cov (>=2.10)"]
 
 [[package]]
 name = "case-converter"
@@ -675,6 +675,20 @@ tomli = ">=1.0.0"
 testing = ["argcomplete", "hypothesis (>=3.56)", "mock", "nose", "pygments (>=2.7.2)", "requests", "xmlschema"]
 
 [[package]]
+name = "pytest-reportlog"
+version = "0.1.2"
+description = "Replacement for the --resultlog option, focused in simplicity and extensibility"
+category = "main"
+optional = false
+python-versions = ">=3.5"
+
+[package.dependencies]
+pytest = ">=5.2"
+
+[package.extras]
+dev = ["pre-commit", "tox"]
+
+[[package]]
 name = "pywin32"
 version = "304"
 description = "Python for Window Extensions"
@@ -875,7 +889,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "951619bad35d4ca77898db6d72acfc6a69b149ed1b5156cb2bf06d2e47376cd7"
+content-hash = "67984411096c720aaf09e85b8af69c29d09e6ad990d5330c37432a28dda1d551"
 
 [metadata.files]
 appdirs = [
@@ -1478,6 +1492,10 @@ pysha3 = [
 pytest = [
     {file = "pytest-7.1.2-py3-none-any.whl", hash = "sha256:13d0e3ccfc2b6e26be000cb6568c832ba67ba32e719443bfe725814d3c42433c"},
     {file = "pytest-7.1.2.tar.gz", hash = "sha256:a06a0425453864a270bc45e71f783330a7428defb4230fb5e6a731fde06ecd45"},
+]
+pytest-reportlog = [
+    {file = "pytest-reportlog-0.1.2.tar.gz", hash = "sha256:b1f71495699e398a40578c0ff3e73ec01b5a192d108e2bea73dbc7b3fa1f2595"},
+    {file = "pytest_reportlog-0.1.2-py3-none-any.whl", hash = "sha256:2c4cc63a8f3c7edbdb6a75fe4f3e96136729671c8923bb6604e230edb0b91d4e"},
 ]
 pywin32 = [
     {file = "pywin32-304-cp310-cp310-win32.whl", hash = "sha256:3c7bacf5e24298c86314f03fa20e16558a4e4138fc34615d7de4070c23e65af3"},
