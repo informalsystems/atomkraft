@@ -1,7 +1,7 @@
 chain_id = "cosmoshub-4"
 n_validator = 3
 n_account = 2
-binary = "gaiad"
+binary = "simd"
 prefix = "cosmos"
 denom = "stake"
 coin_type = 118
