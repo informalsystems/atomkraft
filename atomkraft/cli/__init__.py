@@ -123,7 +123,7 @@ def debug_callback(flag: bool):
 @app.callback()
 def main(
     ctx: typer.Context,
-    debug: bool = typer.Option(None, "debug", callback=debug_callback),
+    debug: bool = typer.Option(None, callback=debug_callback),
 ):
     if ctx.invoked_subcommand != "init":
         try:
