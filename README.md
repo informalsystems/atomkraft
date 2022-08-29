@@ -1,8 +1,8 @@
 # Atomkraft: E2E testing for Cosmos blockchains
 
-Below we describe what Atomkraft is about, and explain the concepts behind the tool. In case you would like to skip that, and jump directly into action, please read our [Installation guide](./INSTALLATION.md) to install the tool; afterwards it's worth following either our [Cosmos SDK Token Transfer tutorial](examples/cosmos-sdk/transfer/transfer.md), or [CosmWasm tutorial](examples/cosmwasm/counter/README.md).
+Below we describe the concepts behind the Atomkraft tool.  
 
-We cover the following topics in this file:
+Overview:
 
 - [Atomkraft Introduction](#atomkraft-introduction)
 - [Conceptual overview](#conceptual-overview)
@@ -11,29 +11,30 @@ We cover the following topics in this file:
   - [Traces and reactors](#traces-and-reactors)
   - [Generating traces from TLA+ models](#generating-traces-from-tla-models)
   - [Running the tests against testnet](#running-the-tests-against-testnet)
+- [Tutorials] (#tutorials)
 - [What's next: Atomkraft's immediate future](#whats-next-atomkrafts-immediate-future)
 
 ## Atomkraft Introduction
 
-The [Cosmos Network](https://cosmos.network) of [IBC](https://ibcprotocol.org)-connected blockchains is growing tremendously fast. There is one aspect though, which has not been fully addressed yet, namely **quality assurance**: how do we make sure that Cosmos-based blockchains are secure, and don't contain security issues that pose hazards for user funds?
+The [Cosmos Network](https://cosmos.network) of [IBC](https://ibcprotocol.org)-connected blockchains is growing tremendously fast. Our main objective is adressinf **quality assurance** issues: how do we make sure that Cosmos-based blockchains are secure, and don't contain security issues that pose hazards for user funds?
 
-**Atomkraft** is our answer to that question: it allows to generate and execute massive end-to-end (E2E) test suites for Cosmos SDK based blockchains. When designing the tool, we keep two main categories of users for it: **security auditors**, and **Cosmos SDK blockchain developers**. Those roles are abstract and non-exclusive, and they serve only to summarize some important concerns wrt. the deployed blockchains. Is Atomkraft the right tool for you? Below are some possible hints.
+**Atomkraft** allows to generate and execute massive end-to-end (E2E) test suites for Cosmos SDK based blockchains. 
+Atomkraft is likely to benefit you if:
 
-Atomkraft is likely to benefit you as a _Security auditor_ if:
+During your blockchain launch
 
-- your blockchain (or the new version of it) is about to be launched, but you are unsure whether incentivized testnets allowed you to discover all critical vulnerabilities;
-- you are on tight time schedule for the new release, and you feel that the implementation has been rushed a little, so you are unsure that all corner cases of the new functionality has been covered.
+- you are unsure whether incentivized testnets allowed you to discover all critical vulnerabilities;
+- you are unsure that all corner cases of the new functionality has been covered.
 
-Atomkraft is likely to benefit you as a _Cosmos SDK developer_ if:
+A new functionality you've implemented
 
-- the new functionality you've implemented interacts in non-trivial ways with other important modules (e.g. with [bank](https://docs.cosmos.network/master/modules/bank/), [staking](https://docs.cosmos.network/master/modules/staking/), [authz](https://docs.cosmos.network/master/modules/authz/), etc.), and you are unsure whether some important invariants of those modules are preserved;
+- interacts in non-trivial ways with other important modules (e.g. with [bank](https://docs.cosmos.network/master/modules/bank/), [staking](https://docs.cosmos.network/master/modules/staking/), [authz](https://docs.cosmos.network/master/modules/authz/), etc.), and you are unsure whether some important invariants of those modules are preserved;
 - you want to grow and maintain a regression test suite for the blockchain modules you are developing, to make sure of their correctness as your blockchain evolves;
 - you want to automate quality assurance for your blockchain modules, and integrate fast E2E testing solution that's executed on every PR.
 
-**Key Atomkraft features** that allow to address the above concerns:
+**Key Atomkraft features** that allow fully customizable trajectory from test case generation to its execution on the local testnet:
 
-- Push-button, but fully customizable, automation of local testnet creation
-- Clean, fully customizable trajectory from test case generation to its execution on the local testnet
+- Automation and fully customizable local testnet creation
 - Support for automatic generation of massive test suites from compact TLA+ models
 - Easy execution of test cases generated via other means (e.g. manual, BDD, PBT)
 - Anytime ready-to-integrate regression test suite in the form of a standard Pytest project
@@ -42,7 +43,7 @@ Atomkraft is likely to benefit you as a _Cosmos SDK developer_ if:
 
 ## Conceptual overview
 
-In itself, Atomkraft is nothing more than a command-line application, which is as easy to obtain for your system as executing `pip install atomkraft`; please consult the detailed [Installation Instructions](INSTALLATION.md) if needed. At the top-level, Atomkraft provides you the commands illustrated in the diagram below.
+Atomkraft is a command-line application, which is as easy to obtain for your system as executing `pip install atomkraft`; please consult the detailed [Installation Instructions](INSTALLATION.md) if needed. At the top-level, Atomkraft provides you the commands illustrated in the diagram below.
 
 ![Atomkraft users](docs/images/atomkraft-users.svg)
 
@@ -120,6 +121,10 @@ Then you are ready to go, and execute your tests! We provide two commands for do
 - `atomkraft test model` is a convenience shorthand that combines step 4 above (`atomkraft model sample`) with `atomkraft test trace`, and allows you to execute tests directly from a TLA+ model, sidestepping explicit trace generation.
 
 Both of the above `atomkraft test` commands populate the `tests` directory of your project with Pytest-based tests; so executing `pytest` inside your Atomkraft project at any point in time will reproduce all of your tests. In fact, the complete Atomkraft project directory is ready at any point in time to be exported, and used as a Pytest project, for example for reproducing your tests in the CI.
+
+## Tutorials
+
+Afterwards it's worth following either our [Cosmos SDK Token Transfer tutorial](examples/cosmos-sdk/transfer/transfer.md), or [CosmWasm tutorial](examples/cosmwasm/counter/README.md).
 
 ## What's next: Atomkraft's immediate future
 
