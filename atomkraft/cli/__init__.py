@@ -116,4 +116,4 @@ def main(ctx: typer.Context):
             _ = project_root()
         except RuntimeError as e:
             print(e)
-            typer.Exit(1)
+            raise typer.Exit(1)
