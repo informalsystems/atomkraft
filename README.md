@@ -1,77 +1,47 @@
 # Atomkraft: E2E testing for Cosmos blockchains
 
-Below we describe the concepts behind the Atomkraft tool.  
+**Atomkraft** is a model-based testing tool that automatically generates and executes massive end-to-end (E2E) test suites for Cosmos SDK based blockchains. 
 
-Overview:
+The [Cosmos Network](https://cosmos.network) of [IBC](https://ibcprotocol.org)-connected blockchains is growing tremendously fast and our main objective is to improve the **quality assurance** practices and detect security issues in early stages of cosmos projetcs, such as:
 
-- [Atomkraft Introduction](#atomkraft-introduction)
-- [Conceptual overview](#conceptual-overview)
-  - [Atomkraft project](#atomkraft-project)
-  - [Local testnets](#local-testnets)
-  - [Traces and reactors](#traces-and-reactors)
-  - [Generating traces from TLA+ models](#generating-traces-from-tla-models)
-  - [Running the tests against testnet](#running-the-tests-against-testnet)
-- [Tutorials] (#tutorials)
-- [What's next: Atomkraft's immediate future](#whats-next-atomkrafts-immediate-future)
-
-## Atomkraft Introduction
-
-The [Cosmos Network](https://cosmos.network) of [IBC](https://ibcprotocol.org)-connected blockchains is growing tremendously fast. Our main objective is adressinf **quality assurance** issues: how do we make sure that Cosmos-based blockchains are secure, and don't contain security issues that pose hazards for user funds?
-
-**Atomkraft** allows to generate and execute massive end-to-end (E2E) test suites for Cosmos SDK based blockchains. 
-Atomkraft is likely to benefit you if:
-
-During your blockchain launch
-
-- you are unsure whether incentivized testnets allowed you to discover all critical vulnerabilities;
-- you are unsure that all corner cases of the new functionality has been covered.
-
-A new functionality you've implemented
-
-- interacts in non-trivial ways with other important modules (e.g. with [bank](https://docs.cosmos.network/master/modules/bank/), [staking](https://docs.cosmos.network/master/modules/staking/), [authz](https://docs.cosmos.network/master/modules/authz/), etc.), and you are unsure whether some important invariants of those modules are preserved;
-- you want to grow and maintain a regression test suite for the blockchain modules you are developing, to make sure of their correctness as your blockchain evolves;
-- you want to automate quality assurance for your blockchain modules, and integrate fast E2E testing solution that's executed on every PR.
-
-**Key Atomkraft features** that allow fully customizable trajectory from test case generation to its execution on the local testnet:
-
-- Automation and fully customizable local testnet creation
-- Support for automatic generation of massive test suites from compact TLA+ models
-- Easy execution of test cases generated via other means (e.g. manual, BDD, PBT)
-- Anytime ready-to-integrate regression test suite in the form of a standard Pytest project
-- Ready-to-execute standard test suites for important Cosmos SDK modules (coming soon!)
-- Generation of reports and dashboards for presentation and analysis of testing results (coming soon!)
+- Discovering critical vulnerabilities and corner cases senarios.
+- Growing and maintaining regression test suites for SDK modules to insure invariants correctness as the project evolves;
+- Automating quality assurance by integrating an E2E testing solution that's executed on every PR.
 
 ## Conceptual overview
 
-Atomkraft is a command-line application, which is as easy to obtain for your system as executing `pip install atomkraft`; please consult the detailed [Installation Instructions](INSTALLATION.md) if needed. At the top-level, Atomkraft provides you the commands illustrated in the diagram below.
+Atomkraft is a command-line application, which is as easy to obtain for your system by executing `pip install atomkraft` (you can consult the detailed [Installation Instructions](INSTALLATION.md) for the environment set-up). It provides you the commands for the following features:
+
+- Automatic generation of test suites from compact TLA+ models of the system under test.
+- Customizable local testnet creation.
+- Easy execution of the generated test cases over the local test net.
+- Ready-to-execute standard test suites for important Cosmos SDK modules (coming soon!)
+- Pytest & poetry explanation TODO
+- Generation of reports and dashboards for presentation and analysis of testing results (coming soon!)
+
 
 ![Atomkraft users](docs/images/atomkraft-users.svg)
 
-### Atomkraft project
+### Atomkraft project creation
 
-Working with Atomkraft takes place in the scope of an _Atomkraft project_, which is initialized via `atomkraft init` command. The command will setup a new project in a given directory and install all necessary software for it, all fully automatically.
-
-The good news is that an Atomkraft project is simultaneously a [Pytest](https://docs.pytest.org/) project! At any point in time you can execute `pytest` inside your Atomkraft project, and this command will rerun all tests you've created in the scope of this project. So, when you've executed `atomkraft init`, you've also started to create your regression test suite; congratulations!
-
-More than that, an Atomkraft project is also a [Python Poetry](https://python-poetry.org) project: you can treat it just as a normal Python project, and add your custom Python tests there.
-
+After installation, the creation of an _Atomkraft project_, which is initialized via `atomkraft init` command. The command will setup a new project in a given directory and automatically install all necessary software for it.
 At the top level, an Atomkraft project contains the following:
 
-- Folders that hold the corresponding artifacts:
-  - `models` is meant to keep your TLA+ models, if you are willing to generate test cases from formal models;
-  - `traces` contain abstract test cases, represented in the form of [ITF traces](https://apalache.informal.systems/docs/adr/015adr-trace.html) (a JSON encoding of a sequence of test case steps);
+- Folders that hold the artifacts if you are willing to generate test cases from formal models;
+  - `models` is meant to keep your TLA+ models, 
+  - `traces` contain generated test cases, represented in the form of [ITF traces](https://apalache.informal.systems/docs/adr/015adr-trace.html) (a JSON encoding of a sequence of test case steps);
   - `reactors` hold Python functions that interpret ITF traces, and map trace steps to concrete blockchain transactions;
-  - in `tests` we collect all reproducible Pytest tests that are executed in the scope of this Atomkraft project;
-  - finally, `reports` hold the test reports.
-- Configuration files:
+- Folders for tests execution
+  - `tests` collects all reproducible Pytest tests;
+  - `reports` hold the test reports.
+- Configuration files with default configurations, but customization commands are available upon your needs for changes.
   - `atomkraft.toml` contains Atomkraft project configuration;
   - `chain.toml` contains the blockchain configuration parameters, such as the number of nodes or the number of validators;
   - `model.toml` contains the TLA+ model configuration parameters, used to run model checkers;
   - `pyproject.toml` contains the Poetry project configuration.
 
-All of the above configuration files are filled with the default configuration, so you don't need to worry about them, if you don't want to. On the other hand, when needed, everything is fully customizable.
 
-### Local testnets
+### Local testnet set-up
 
 With Atomkraft project created, you should be ready to go. By default, we configure local testnets to use the `gaiad` (Cosmos Hub) binary. If it is available via your `PATH`, executing `atomkraft chain testnet` should bring up a local testnet with 2 nodes and 3 validators. If you would like to configure any parameters differently (e.g. to run your custom blockchain binary), you can do it either via `atomkraft chain config` command, or by directly editing `chain.toml` config file. Please make sure your changes are valid by executing `atomkraft chain testnet`; we use the local testnet to run the tests.
 
@@ -122,9 +92,11 @@ Then you are ready to go, and execute your tests! We provide two commands for do
 
 Both of the above `atomkraft test` commands populate the `tests` directory of your project with Pytest-based tests; so executing `pytest` inside your Atomkraft project at any point in time will reproduce all of your tests. In fact, the complete Atomkraft project directory is ready at any point in time to be exported, and used as a Pytest project, for example for reproducing your tests in the CI.
 
-## Tutorials
+## Tutorials 
 
 Afterwards it's worth following either our [Cosmos SDK Token Transfer tutorial](examples/cosmos-sdk/transfer/transfer.md), or [CosmWasm tutorial](examples/cosmwasm/counter/README.md).
+
+## Atomkraft-Cosmos 
 
 ## What's next: Atomkraft's immediate future
 
