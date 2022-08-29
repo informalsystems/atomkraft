@@ -110,8 +110,21 @@ def reactor(
     generate_reactor(actions, variables, stub_file_path=path.name)
 
 
+def debug_callback(flag: bool):
+    if not flag:
+        app.pretty_exceptions_enable = False
+
+        def exception_handler(exception_type, exception, _):
+            print(f"{exception_type.__name__}: {exception}")
+
+        sys.excepthook = exception_handler
+
+
 @app.callback()
-def main(ctx: typer.Context, debug: bool = False):
+def main(
+    ctx: typer.Context,
+    debug: bool = typer.Option(None, "debug", callback=debug_callback),
+):
     if ctx.invoked_subcommand != "init":
         try:
             _ = project_root()
@@ -124,11 +137,3 @@ def main(ctx: typer.Context, debug: bool = False):
         except Exception as e:
             print(e)
             raise typer.Exit(1)
-
-    if not debug:
-        app.pretty_exceptions_enable = False
-
-        def exception_handler(exception_type, exception, _):
-            print(f"{exception_type.__name__}: {exception}")
-
-        sys.excepthook = exception_handler
