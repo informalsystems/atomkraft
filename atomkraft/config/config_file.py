@@ -22,5 +22,5 @@ class ConfigFile(object):
 
     def store(self, key, value):
         self.data[key] = value
-        self.fd.seek(0)
+        self.fd.truncate(0)
         tomlkit.dump(self.data, self.fd)
