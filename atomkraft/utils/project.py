@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 
 
-def project_root():
+def project_root() -> Path:
     cwd = Path(os.getcwd())
     while cwd != cwd.parent:
         if (
@@ -12,3 +12,4 @@ def project_root():
         ):
             return cwd
         cwd = cwd.parent
+    raise RuntimeError("Outside of Atomkraft project")
