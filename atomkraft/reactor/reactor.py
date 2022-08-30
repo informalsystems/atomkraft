@@ -123,7 +123,7 @@ def _action_description_comment(action_name, variables):
     on blockchain `testnet` and state `state`.
     {variables_sentence}
     """
-    '''
+'''
 
 
 def _action_stub(action_name: str, variables: List[str]):
