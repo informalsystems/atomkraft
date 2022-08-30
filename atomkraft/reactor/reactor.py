@@ -103,8 +103,7 @@ All step functions receive the following arguments:
 
 def _keypath_stub(keypath):
     stub = f"""
-
-{constants.KEYPATH_VAR} = {repr(keypath)}
+{constants.KEYPATH_VAR} = "{keypath}"
 """
     return stub
 
@@ -120,7 +119,7 @@ def _action_description_comment(action_name, variables):
         vars_string = "".join([f"\n\t\t-`{v}`" for v in variables])
         variables_sentence = f"It additionally has access to the model (trace) state variables: {vars_string}."
     return f'''"""
-    Implements the effects of the step {repr(action_name)}
+    Implements the effects of the step "{action_name}"
     on blockchain `testnet` and state `state`.
     {variables_sentence}
     """
@@ -131,7 +130,7 @@ def _action_stub(action_name: str, variables: List[str]):
     stub = f"""
 
 
-@step({repr(action_name)})
+@step("{action_name}")
 def {snakecase(action_name)}(testnet, state, {", ".join(variables)}):
     {_action_description_comment(action_name, variables)}
     #TODO: replace the logging stub with the effects of the action `{action_name}`
