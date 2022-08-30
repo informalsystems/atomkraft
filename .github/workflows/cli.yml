@@ -67,6 +67,8 @@ jobs:
           git clone --depth 1 --branch "$COSMOS_SDK_TAG" https://github.com/cosmos/cosmos-sdk
           cd cosmos-sdk
           make build
+      - name: Put Cosmos-SDK binary in system path
+        run: |
           echo "PATH=$PATH:$(pwd)/cosmos-sdk/build" >> $GITHUB_ENV
       - name: Run tests
         run: |
