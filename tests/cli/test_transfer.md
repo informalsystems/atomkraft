@@ -16,6 +16,7 @@ $ curl -Lo transfer/models/transfer.tla https://raw.githubusercontent.com/inform
 ...
 ```
 
+<!-- $MDX dir=transfer -->
 ```sh
 $ atomkraft model apalache info
 ...
@@ -30,7 +31,6 @@ $ rm -rf transfer/traces/*
 ```
 
 <!-- $MDX dir=transfer -->
-
 ```sh
 $ atomkraft model sample --model-path models/transfer.tla --traces-dir traces --examples Ex
 ...
@@ -54,7 +54,6 @@ $ rm -rf transfer/reactors/*
 ```
 
 <!-- $MDX dir=transfer -->
-
 ```sh
 $ atomkraft reactor --actions "Init,Transfer" --variables "action"
 ```
@@ -73,7 +72,6 @@ $ rm -rf transfer/tests/*
 ```
 
 <!-- $MDX dir=transfer -->
-
 ```sh
 $ atomkraft test trace --trace traces/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag
 ...
@@ -94,9 +92,8 @@ $ curl -Lo transfer/reactors/reactor.py https://raw.githubusercontent.com/inform
 ## Tests
 
 <!-- $MDX dir=transfer -->
-
 ```sh
-$ poetry run atomkraft test trace --trace traces/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag
+$ atomkraft test trace --trace traces/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag
 ...
 Successfully executed trace traces/violation1.itf.json
 ...
