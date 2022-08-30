@@ -7,7 +7,8 @@ class ConfigFile(object):
         self.path = path
 
     def __enter__(self):
-        self.fd = open(self.path, "w+")
+        self.fd = open(self.path, "a+")
+        self.fd.seek(0)
         self.data = tomlkit.load(self.fd)
         return self
 
@@ -21,4 +22,5 @@ class ConfigFile(object):
 
     def store(self, key, value):
         self.data[key] = value
+        self.fd.truncate(0)
         tomlkit.dump(self.data, self.fd)
