@@ -19,6 +19,8 @@ def init(testnet, action):
     testnet.oneshot()
     time.sleep(10)
 
+    logging.info("Status: Testnet launched")
+
 
 @step("Transfer")
 def transfer(testnet, action):
@@ -57,7 +59,18 @@ def transfer(testnet, action):
 
     result = lcdclient.tx.broadcast(tx)
 
-    logging.info(f"[MSG] {msg}")
-    logging.info(f"[RES] {result}")
+    logging.info(f"\tSender:    {msg.from_address}")
+    logging.info(f"\tReceiver:  {msg.to_address}")
+    logging.info(f"\tAmount:    {msg.amount}")
+
+    if result.code == 0:
+        logging.info("Status: Successful")
+    else:
+        logging.info("Status: Error")
+        logging.info(f"\tcode: {result.code}")
+        logging.info(f"\tlog:  {result.raw_log}")
+
+    logging.debug(f"[MSG] {msg}")
+    logging.debug(f"[RES] {result}")
 
     time.sleep(2)
