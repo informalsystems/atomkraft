@@ -1,10 +1,13 @@
 import os
+import sys
 from pathlib import Path
 
 import git
 import modelator
 import pytest
 import typer
+from atomkraft import __version__
+from atomkraft.utils.project import NoProjectError, project_root
 from copier import run_auto
 
 from .. import chain, test
@@ -106,3 +109,38 @@ def reactor(
         )
 
     generate_reactor(actions, variables, stub_file_path=path.name)
+
+
+@app.command()
+def version():
+    """Print version of the atomkraft executable"""
+    print(f"atomkraft {__version__}")
+
+
+def debug_callback(flag: bool):
+    if not flag:
+        app.pretty_exceptions_enable = False
+
+        def exception_handler(exception_type, exception, _):
+            print(f"{exception_type.__name__}: {exception}")
+
+        sys.excepthook = exception_handler
+
+
+@app.callback()
+def main(
+    ctx: typer.Context,
+    debug: bool = typer.Option(None, callback=debug_callback),
+):
+    if ctx.invoked_subcommand not in ["init", "version"]:
+        try:
+            _ = project_root()
+        except NoProjectError:
+            print("You are outside of Atomkraft project")
+            print(
+                "You can create an Atomkraft project using `atomkraft init <PROJECT-NAME>`"
+            )
+            raise typer.Exit(1)
+        except Exception as e:
+            print(e)
+            raise typer.Exit(1)
