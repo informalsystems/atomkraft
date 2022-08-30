@@ -70,10 +70,14 @@ jobs:
       - name: Put Cosmos-SDK binary in system path
         run: |
           echo "PATH=$PATH:$(pwd)/cosmos-sdk/build" >> $GITHUB_ENV
-      - name: Run tests
+      - name: Setup Atomkraft and Apalache
         run: |
           source .venv/bin/activate
           pip install .
+          atomkraft model apalache get
+      - name: Run tests
+        run: |
+          source .venv/bin/activate
           cd tests/cli
           eval $(opam env)
           for f in `ls *md`; do ocaml-mdx test -v "${f}"; [ ! -f "${f}.corrected" ] || (cat "${f}.corrected" && exit 1); done
