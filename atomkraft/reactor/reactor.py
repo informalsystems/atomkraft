@@ -60,7 +60,7 @@ def generate_reactor(
     imports_stub = _imports_stub()
 
     state_stub = _state_stub()
-    actions_stub = "\n".join(
+    actions_stub = "".join(
         [
             _action_stub(action_name=act, variables=variables_list)
             for act in actions_list
@@ -128,7 +128,6 @@ def _action_description_comment(action_name, variables):
 
 def _action_stub(action_name: str, variables: List[str]):
     stub = f"""
-
 
 @step("{action_name}")
 def {snakecase(action_name)}(testnet, state, {", ".join(variables)}):
