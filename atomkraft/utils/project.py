@@ -2,6 +2,11 @@ import os
 from pathlib import Path
 
 
+class NoProjectError(RuntimeError):
+    def __init__(self) -> None:
+        super().__init__("Outside of Atomkraft project")
+
+
 def project_root() -> Path:
     cwd = Path(os.getcwd())
     while cwd != cwd.parent:
@@ -12,4 +17,4 @@ def project_root() -> Path:
         ):
             return cwd
         cwd = cwd.parent
-    raise RuntimeError("Outside of Atomkraft project")
+    raise NoProjectError

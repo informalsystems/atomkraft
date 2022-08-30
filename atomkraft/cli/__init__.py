@@ -5,7 +5,7 @@ import git
 import modelator
 import pytest
 import typer
-from atomkraft.utils.project import project_root
+from atomkraft.utils.project import NoProjectError, project_root
 from copier import run_auto
 
 from .. import chain, test
@@ -114,6 +114,12 @@ def main(ctx: typer.Context):
     if ctx.invoked_subcommand != "init":
         try:
             _ = project_root()
-        except RuntimeError as e:
+        except NoProjectError:
+            print("You are outside of Atomkraft project")
+            print(
+                "You can create an Atomkraft project using `atomkraft init <PROJECT-NAME>`"
+            )
+            raise typer.Exit(1)
+        except Exception as e:
             print(e)
             raise typer.Exit(1)
