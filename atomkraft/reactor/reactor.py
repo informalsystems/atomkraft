@@ -81,7 +81,7 @@ def generate_reactor(
 
 
 def _file_comment():
-    return """'''
+    return '''"""
 The reactor file connects a test scenario described by a trace
 (obtained from a model or written by hand) with the actual execution
 of the test scenario on the testnet.
@@ -97,8 +97,8 @@ All step functions receive the following arguments:
            function in this file.
     action: object from the trace which corresponds to the parameters
             of the taken step.
-'''
 """
+'''
 
 
 def _keypath_stub(keypath):
@@ -119,12 +119,12 @@ def _action_description_comment(action_name, variables):
     else:
         vars_string = "".join([f"\n\t\t-`{v}`" for v in variables])
         variables_sentence = f"It additionally has access to the model (trace) state variables: {vars_string}."
-    return f"""'''
+    return f'''"""
     Implements the effects of the step {repr(action_name)}
     on blockchain `testnet` and state `state`.
     {variables_sentence}
-    '''
     """
+    '''
 
 
 def _action_stub(action_name: str, variables: List[str]):
@@ -141,21 +141,20 @@ def {snakecase(action_name)}(testnet, state, {", ".join(variables)}):
 
 
 def _state_stub():
-    stub = """
-
+    stub = '''
 
 @pytest.fixture
 def state():
-    '''
+    """
     Defines any additional logical state (beyond the state of the chain)
     that needs to be maintained throughout the execution. This state
     will be passed as an argument to @step functions.
-    '''
+    """
 
     #TODO: replace the empty stub object with a different state object
     # if necessary
     return {}
-"""
+'''
     return stub
 
 
