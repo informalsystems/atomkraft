@@ -76,13 +76,13 @@ def test_trace(trace: PathLike, reactor: PathLike, keypath: str, verbose: bool):
 
     pytest_args = [
         "--log-file-level=INFO",
+        "--log-cli-level=INFO",
         f"--log-file={logging_file}",
         f"--report-log={pytest_report_file}",
     ]
 
     if verbose:
         pytest_args.append("-rP")
-        pytest_args.append("--log-cli-level=INFO")
 
     pytest.main(pytest_args + [test_path])
 
