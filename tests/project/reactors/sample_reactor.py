@@ -1,3 +1,5 @@
+import logging
+
 import pytest
 from modelator.pytest.decorators import step
 
@@ -11,4 +13,4 @@ def state():
 
 @step()
 def act_step(chain_testnet, state, a):
-    print("Step: act")
+    logging.info("Step: act")
