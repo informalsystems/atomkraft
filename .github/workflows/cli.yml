@@ -20,6 +20,8 @@ jobs:
         os: ["ubuntu-latest", "macos-latest"]
         python-version: ["3.10"]
     runs-on: ${{ matrix.os }}
+    env:
+      COSMOS_SDK_TAG: v0.45.8
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
@@ -48,10 +50,24 @@ jobs:
           ocaml-compiler: 4.13.x
       - name: Install MDX
         run: opam install mdx
+      - name: Load cached simd
+        id: cached-simd
+        uses: actions/cache@v3
+        with:
+          path: cosmos-sdk/build
+          key: simd-${{ runner.os }}-${{ env.COSMOS_SDK_TAG }}
       - name: Setup Go 1.19
+        if: steps.cached-simd.outputs.cache-hit != 'true'
         uses: actions/setup-go@v3
         with:
           go-version: "^1.19"
+      - name: Compile Cosmos-SDK
+        if: steps.cached-simd.outputs.cache-hit != 'true'
+        run: |
+          git clone --depth 1 --branch "$COSMOS_SDK_TAG" https://github.com/cosmos/cosmos-sdk
+          cd cosmos-sdk
+          make build
+          echo "PATH=$PATH:$(pwd)/cosmos-sdk/build" >> $GITHUB_ENV
       - name: Run tests
         run: |
           source .venv/bin/activate
