@@ -5,18 +5,17 @@
 ```sh
 $ [ -d transfer ] || atomkraft init transfer
 ...
-$ [ -d transfer ] && echo Project directory created successfully
-Project directory created successfully
+$ cd transfer
 ```
 
 ## Model and traces
 
+<!-- $MDX dir=transfer -->
 ```sh
-$ curl -Lo transfer/models/transfer.tla https://raw.githubusercontent.com/informalsystems/atomkraft/dev/examples/cosmos-sdk/transfer/transfer.tla
+$ curl -Lo models/transfer.tla https://raw.githubusercontent.com/informalsystems/atomkraft/dev/examples/cosmos-sdk/transfer/transfer.tla
 ...
 ```
 
-<!-- $MDX dir=transfer -->
 ```sh
 $ atomkraft model apalache info
 ...
@@ -26,8 +25,9 @@ Apalache JAR file exists and its version is 0.25.10
 
 Clean `traces` directory:
 
+<!-- $MDX dir=transfer -->
 ```sh
-$ rm -rf transfer/traces/*
+$ rm -rf traces/*
 ```
 
 <!-- $MDX dir=transfer -->
@@ -40,8 +40,9 @@ $ atomkraft model sample --model-path models/transfer.tla --traces-dir traces --
 
 Check that the previous command generated a trace file:
 
+<!-- $MDX dir=transfer -->
 ```sh
-$ [ -f "transfer/traces/violation1.itf.json" ] && echo "Found trace file"
+$ [ -f "traces/violation1.itf.json" ] && echo "Found trace file"
 Found trace file
 ```
 
@@ -49,8 +50,9 @@ Found trace file
 
 Clean `reactors` directory before running `atomkraft test`:
 
+<!-- $MDX dir=transfer -->
 ```sh
-$ rm -rf transfer/reactors/*
+$ rm -rf reactors/*
 ```
 
 <!-- $MDX dir=transfer -->
@@ -60,32 +62,36 @@ $ atomkraft reactor --actions "Init,Transfer" --variables "action"
 
 Check that the reactor file was created:
 
+<!-- $MDX dir=transfer -->
 ```sh
-$ find "transfer/reactors" -type f -iname "reactor.py" -exec echo File found! \;
+$ find "reactors" -type f -iname "reactor.py" -exec echo File found! \;
 File found!
 ```
 
 Clean `tests` directory before running `atomkraft test`:
 
+<!-- $MDX dir=transfer -->
 ```sh
-$ rm -rf transfer/tests/*
+$ rm -rf tests/*
 ```
 
 <!-- $MDX dir=transfer -->
 ```sh
-$ atomkraft test trace --trace traces/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag
+$ atomkraft test trace --trace traces/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag --verbose
 ...
 ```
 
 Check that a test file was created:
 
+<!-- $MDX dir=transfer -->
 ```sh
-$ find "transfer/tests" -type f -iname "test_traces_violation1_itf_json_*.py" -exec echo File found! \;
+$ find "tests" -type f -iname "test_traces_violation1_itf_json_*.py" -exec echo File found! \;
 File found!
 ```
 
+<!-- $MDX dir=transfer -->
 ```sh
-$ curl -Lo transfer/reactors/reactor.py https://raw.githubusercontent.com/informalsystems/atomkraft/dev/examples/cosmos-sdk/transfer/reactor.py
+$ curl -Lo reactors/reactor.py https://raw.githubusercontent.com/informalsystems/atomkraft/dev/examples/cosmos-sdk/transfer/reactor.py
 ...
 ```
 
@@ -93,7 +99,7 @@ $ curl -Lo transfer/reactors/reactor.py https://raw.githubusercontent.com/inform
 
 <!-- $MDX dir=transfer -->
 ```sh
-$ atomkraft test trace --trace traces/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag
+$ atomkraft test trace --trace traces/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag --verbose
 ...
 Successfully executed trace traces/violation1.itf.json
 ...
