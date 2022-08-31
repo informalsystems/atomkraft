@@ -19,7 +19,9 @@ Atomkraft is a command-line application, which is as easy to obtain for your sys
 - Pytest & poetry explanation TODO
 - Generation of reports and dashboards for presentation and analysis of testing results (coming soon!)
 
-![Atomkraft-overview](docs/images/Atomkraft-overview.svg)
+<p align="center">
+<img src="docs/images/Atomkraft-overview.png" width="650" height="450" />
+</p>
 
 ### Atomkraft project creation
 
