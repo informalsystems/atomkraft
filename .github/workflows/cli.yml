@@ -73,7 +73,7 @@ jobs:
       - name: Setup Atomkraft and Apalache
         run: |
           source .venv/bin/activate
-          pip install .
+          poetry install --no-interaction
           atomkraft model apalache get
       - name: Run tests
         run: |
