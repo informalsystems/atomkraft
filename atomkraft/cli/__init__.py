@@ -1,14 +1,14 @@
 import os
 import sys
 from pathlib import Path
-from typing import Callable, Dict, Type
+from typing import Callable, Dict, Optional, Type
 
 import git
 import modelator
 import pytest
 import typer
 from atomkraft import __version__
-from atomkraft.utils.project import NoProjectError
+from atomkraft.utils.project import NoProjectError, project_root
 from copier import run_auto
 
 from .. import chain, test
@@ -148,22 +148,25 @@ def reactor(
         help="state variables to use as parameters for reactor stub functions.",
         show_default=False,
     ),
-    path: typer.FileTextWrite = typer.Option(
-        os.path.abspath("reactors/reactor.py"),
+    path: Optional[Path] = typer.Option(
+        None,
         help="path where to create the reactor stub",
     ),
 ):
     """
     Generate a reactor stub used to interpret test traces
     """
+    if path is None:
+        path = project_root() / "reactors" / "reactor.py"
+
     actions = [act.strip() for act in actions.split(",")]
     variables = [var.strip() for var in variables.split(",")]
 
-    if Path(path.name).is_file():
+    if path.is_file():
         typer.confirm(
             "The stub file already exists and it will be overwritten. "
             "Are you sure you want to continue?",
             abort=True,
         )
 
-    generate_reactor(actions, variables, stub_file_path=path.name)
+    generate_reactor(actions, variables, stub_file_path=path)
