@@ -19,7 +19,7 @@ def init(testnet, action):
     testnet.oneshot()
     time.sleep(10)
 
-    logging.info("Status: Testnet launched")
+    logging.info("Status: Testnet launched\n")
 
 
 @step("Transfer")
@@ -64,11 +64,11 @@ def transfer(testnet, action):
     logging.info(f"\tAmount:    {msg.amount}")
 
     if result.code == 0:
-        logging.info("Status: Successful")
+        logging.info("Status: Successful\n")
     else:
         logging.info("Status: Error")
         logging.info(f"\tcode: {result.code}")
-        logging.info(f"\tlog:  {result.raw_log}")
+        logging.info(f"\tlog:  {result.raw_log}\n")
 
     logging.debug(f"[MSG] {msg}")
     logging.debug(f"[RES] {result}")
