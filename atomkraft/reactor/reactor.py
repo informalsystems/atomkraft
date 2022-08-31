@@ -1,5 +1,6 @@
 import ast
 from os import PathLike
+from pathlib import Path
 from typing import List
 
 from atomkraft.config.atomkraft_config import AtomkraftConfig
@@ -51,9 +52,9 @@ def get_reactor() -> PathLike:
 def generate_reactor(
     actions_list: List[str],
     variables_list: List[str],
-    stub_file_path: PathLike,
+    stub_file_path: Path,
     keypath: str = "action",
-) -> PathLike:
+) -> Path:
 
     file_comment = _file_comment()
     imports_stub = _imports_stub()
@@ -74,7 +75,7 @@ def generate_reactor(
         f.write(actions_stub)
 
     with AtomkraftConfig() as config:
-        config.store(constants.REACTOR_CONFIG_KEY, stub_file_path)
+        config.store(constants.REACTOR_CONFIG_KEY, str(stub_file_path))
 
     return stub_file_path
 
