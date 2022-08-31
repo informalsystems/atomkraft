@@ -150,6 +150,8 @@ def reactor(
     ),
     path: Optional[Path] = typer.Option(
         None,
+        file_okay=True,
+        dir_okay=False,
         help="path where to create the reactor stub",
     ),
 ):
