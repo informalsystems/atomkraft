@@ -1,27 +1,85 @@
 import os
 import sys
 from pathlib import Path
+from typing import Callable, Dict, Type
 
 import git
 import modelator
 import pytest
 import typer
 from atomkraft import __version__
-from atomkraft.utils.project import NoProjectError, project_root
+from atomkraft.utils.project import NoProjectError
 from copier import run_auto
 
 from .. import chain, test
 from ..reactor.reactor import generate_reactor
 
-app = typer.Typer(
+GH_TEMPLATE = "gh:informalsystems/atomkraft"
+GH_REVISION = "dev"
+
+
+class ErrorHandlingTyper(typer.Typer):
+    error_handlers: Dict[Type[Exception], Callable[[Exception], int]] = {}
+
+    def error_handler(self, exc: Type[Exception]):
+        def decorator(f: Callable[[Exception], int]):
+            self.error_handlers[exc] = f
+            return f
+
+        return decorator
+
+    def __call__(self, *args, **kwargs):
+        try:
+            super(ErrorHandlingTyper, self).__call__(*args, **kwargs)
+        except Exception as e:
+            try:
+                callback = self.error_handlers[type(e)]
+                exit_code = callback(e)
+                raise typer.Exit(code=exit_code)
+            except typer.Exit as e:
+                sys.exit(e.exit_code)
+            except KeyError:
+                print(e)
+                raise typer.Exit(1)
+
+
+app = ErrorHandlingTyper(
     add_completion=False,
     name="atomkraft",
     no_args_is_help=True,
     rich_markup_mode="rich",
 )
 
-GH_TEMPLATE = "gh:informalsystems/atomkraft"
-GH_REVISION = "dev"
+
+def debug_callback(flag: bool):
+    if not flag:
+        app.pretty_exceptions_enable = False
+
+        def exception_handler(exception_type, exception, _):
+            print(f"{exception_type.__name__}: {exception}")
+
+        sys.excepthook = exception_handler
+
+
+@app.callback()
+def main(
+    ctx: typer.Context,
+    debug: bool = typer.Option(None, callback=debug_callback),
+):
+    pass
+
+
+@app.error_handler(NoProjectError)
+def noproject_error_handler(e) -> int:
+    print("You are outside of Atomkraft project")
+    print("You can create an Atomkraft project using `atomkraft init <PROJECT-NAME>`")
+    return 1
+
+
+@app.command()
+def version():
+    """Print version of the atomkraft executable"""
+    print(f"atomkraft {__version__}")
 
 
 @app.command(
@@ -109,38 +167,3 @@ def reactor(
         )
 
     generate_reactor(actions, variables, stub_file_path=path.name)
-
-
-@app.command()
-def version():
-    """Print version of the atomkraft executable"""
-    print(f"atomkraft {__version__}")
-
-
-def debug_callback(flag: bool):
-    if not flag:
-        app.pretty_exceptions_enable = False
-
-        def exception_handler(exception_type, exception, _):
-            print(f"{exception_type.__name__}: {exception}")
-
-        sys.excepthook = exception_handler
-
-
-@app.callback()
-def main(
-    ctx: typer.Context,
-    debug: bool = typer.Option(None, callback=debug_callback),
-):
-    if ctx.invoked_subcommand not in ["init", "version"]:
-        try:
-            _ = project_root()
-        except NoProjectError:
-            print("You are outside of Atomkraft project")
-            print(
-                "You can create an Atomkraft project using `atomkraft init <PROJECT-NAME>`"
-            )
-            raise typer.Exit(1)
-        except Exception as e:
-            print(e)
-            raise typer.Exit(1)
