@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import List
 
 from atomkraft.config.atomkraft_config import AtomkraftConfig
+from atomkraft.utils.project import get_absolute_project_path
 from caseconverter import snakecase
 
 from . import constants, utils
@@ -36,13 +37,13 @@ def check_reactor(trace: PathLike, reactor=None) -> bool:
         return all_trace_actions.issubset(v.step_functions)
 
 
-def get_reactor() -> PathLike:
+def get_reactor() -> Path:
     """
     returns the path to the current reactor from the internal config
     """
     with AtomkraftConfig() as config:
         try:
-            return config.query(constants.REACTOR_CONFIG_KEY)
+            return get_absolute_project_path(config[constants.REACTOR_CONFIG_KEY])
         except KeyError:
             raise RuntimeError(
                 "Could not find default reactor; have you ran `atomkraft reactor`?"
@@ -75,7 +76,7 @@ def generate_reactor(
         f.write(actions_stub)
 
     with AtomkraftConfig() as config:
-        config.store(constants.REACTOR_CONFIG_KEY, str(stub_file_path))
+        config[constants.REACTOR_CONFIG_KEY] = str(stub_file_path)
 
     return stub_file_path
 

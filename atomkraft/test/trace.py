@@ -1,9 +1,8 @@
 import os.path
 import shutil
 from datetime import datetime
-from os import PathLike
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 
 import pytest
 from atomkraft.utils.project import project_root
@@ -32,7 +31,7 @@ def copy_if_exists(src_paths: List[Path], dst_path: Path):
             pass
 
 
-def test_trace(trace: PathLike, reactor: PathLike, keypath: str, verbose: bool):
+def test_trace(trace: Path, reactor: Optional[Path], keypath: str, verbose: bool):
     """
     Test blockchain by running one trace
     """
