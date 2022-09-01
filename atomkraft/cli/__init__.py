@@ -19,7 +19,9 @@ GH_REVISION = "dev"
 
 
 class ErrorHandlingTyper(typer.Typer):
-    error_handlers: Dict[Type[Exception], Callable[[Exception], int]] = {}
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.error_handlers: Dict[Type[Exception], Callable[[Exception], int]] = {}
 
     def error_handler(self, exc: Type[Exception]):
         def decorator(f: Callable[[Exception], int]):
