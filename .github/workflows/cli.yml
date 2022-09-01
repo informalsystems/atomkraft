@@ -7,7 +7,7 @@ on:
       - .github/workflows/cli.yml
       - atomkraft/**
       - template/**
-      - tests/cli/**
+      - tests/cli/*.md
     branches:
       - staging
       - trying
