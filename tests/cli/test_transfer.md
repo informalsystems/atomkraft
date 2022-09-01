@@ -105,6 +105,16 @@ Successfully executed trace traces/violation1.itf.json
 ...
 ```
 
+## Lints
+
+<!-- $MDX dir=transfer -->
+```sh
+$ black . --check
+...
+$ pylama -l pyflakes,pycodestyle,isort
+...
+```
+
 ## Clean up
 
 ```
