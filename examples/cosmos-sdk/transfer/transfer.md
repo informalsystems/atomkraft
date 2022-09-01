@@ -205,7 +205,7 @@ Successfully executed
 -->
 
 ```
-atomkraft test trace --trace traces/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag --verbose
+atomkraft test trace --trace traces/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag
 ```
 
 The output of the command contains
@@ -248,5 +248,5 @@ Successfully executed
 -->
 
 ```
-atomkraft test trace --trace traces/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag --verbose
+atomkraft test trace --trace traces/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag
 ```
