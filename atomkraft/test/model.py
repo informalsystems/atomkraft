@@ -79,7 +79,15 @@ def test_model(
 
     timestamp = datetime.now().isoformat(timespec="milliseconds")
 
-    root_report_dir = root / "reports" / f"{model.stem}_{timestamp}"
+    test_group = f"{model.stem}_{timestamp}"
+    test_group = (
+        test_group.replace("/", "_")
+        .replace(".", "_")
+        .replace(":", "_")
+        .replace("-", "_")
+    )
+
+    root_report_dir = root / "reports" / test_group
 
     successul_ops = model_result.successful()
 
@@ -88,14 +96,9 @@ def test_model(
         trace_dir = Path(model_result.trace_paths(op)[0]).parent
         trace = max(trace_dir.glob("*.itf.json"), key=lambda x: x.stat().st_mtime)
         trace = get_relative_project_path(trace)
-        test_name = f"test_{model.name}_{timestamp}/test_{op}"
-        test_name = (
-            test_name.replace("/", "_")
-            .replace(".", "_")
-            .replace(":", "_")
-            .replace("-", "_")
-        )
-        test_path = (test_dir / test_name).with_suffix(".py")
+        test_name = f"test_{test_group}"
+        test_path = test_dir / test_name / f"test_{op}.py"
+        test_path.parent.mkdir(parents=True)
         with open(test_path, "w") as test:
             print(f"Writing {test_name} ...")
             test.write(
