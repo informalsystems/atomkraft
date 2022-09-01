@@ -75,6 +75,7 @@ jobs:
         run: |
           source .venv/bin/activate
           poetry install --no-interaction
+          python -m pip install pyflakes==2.4.0 black pylama[all]
           atomkraft model apalache get
       - name: Run tests
         run: |
