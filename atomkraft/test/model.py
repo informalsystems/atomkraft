@@ -70,16 +70,9 @@ def test_model(
     print(f"Generating traces for {model.name} ...")
 
     try:
-        traces_dir = generate_traces(None, model, tests)
+        model_result = generate_traces(None, model, tests)
     except Exception as e:
         raise RuntimeError(f"[Modelator] {e}")
-
-    traces = [
-        itf_json
-        for itf_json in traces_dir.glob("*.itf.json")
-        if itf_json.stat().st_mtime > timestamp
-        and not itf_json.name.startswith("violation.")
-    ]
 
     test_dir = root / "tests"
     test_dir.mkdir(exist_ok=True)
@@ -88,9 +81,14 @@ def test_model(
 
     root_report_dir = root / "reports" / f"{model.stem}_{timestamp}"
 
-    for trace in traces:
+    successul_ops = model_result.successful()
+
+    for op in successul_ops:
+        print(Path(model_result.trace_paths(op)[0]).parent)
+        trace_dir = Path(model_result.trace_paths(op)[0]).parent
+        trace = max(trace_dir.glob("*.itf.json"), key=lambda x: x.stat().st_mtime)
         trace = get_relative_project_path(trace)
-        test_name = f"test_{str(trace)}_{timestamp}"
+        test_name = f"test_{model.name}_{timestamp}/test_{op}"
         test_name = (
             test_name.replace("/", "_")
             .replace(".", "_")
@@ -127,7 +125,7 @@ def test_model(
 
         copy_if_exists([Path(trace), root / ".atomkraft" / "nodes"], report_dir)
 
-    if traces:
+    if successul_ops:
         print(f"Test data is saved at {root_report_dir}")
     else:
         print("No trace is produced.")

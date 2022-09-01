@@ -4,9 +4,9 @@ from typing import List, Optional
 from atomkraft.config.atomkraft_config import AtomkraftConfig
 from atomkraft.config.model_config import ModelConfig
 from atomkraft.utils.filesystem import last_modified_file_in
-from atomkraft.utils.project import project_root
 from modelator.itf import ITF
 from modelator.Model import Model
+from modelator.ModelResult import ModelResult
 
 
 def query_configs(key: str) -> str:
@@ -22,7 +22,7 @@ def generate_traces(
     model_config_path: Optional[Path],
     model_path: Optional[Path] = None,
     sample_operators=[],
-) -> Path:
+) -> ModelResult:
     """
     Call Modelator to get samples of the given model in `model_path`. Return the
     result of running the checker as a ModelResult.
@@ -55,8 +55,7 @@ def generate_traces(
         raise FileNotFoundError(f"File with model not found: {model_path}")
 
     model = Model.parse_file(str(model_path), init, next)
-    model.sample(traces_dir=traces_dir, examples=sample_operators)
-    return project_root() / traces_dir
+    return model.sample(traces_dir=traces_dir, examples=sample_operators)
 
 
 def last_modified_trace_path() -> str:
