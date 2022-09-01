@@ -9,6 +9,7 @@ on:
       - template/**
       - tests/cli/*.md
     branches:
+      - dev
       - staging
       - trying
 
