@@ -1,3 +1,4 @@
+import logging
 import time
 
 from modelator.pytest.decorators import step
@@ -11,17 +12,19 @@ from terra_sdk.key.mnemonic import MnemonicKey
 
 @step("Init")
 def init(testnet, action):
-    print("Step: Init")
+    logging.info("Step: Init")
     testnet.n_account = action["value"]["n_wallet"]
     testnet.verbose = True
 
     testnet.oneshot()
     time.sleep(10)
 
+    logging.info("Status: Testnet launched\n")
+
 
 @step("Transfer")
 def transfer(testnet, action):
-    print("Step: Transfer")
+    logging.info("Step: Transfer")
 
     rest_endpoint = testnet.get_validator_port(0, "lcd")
     lcdclient = LCDClient(
@@ -56,7 +59,18 @@ def transfer(testnet, action):
 
     result = lcdclient.tx.broadcast(tx)
 
-    print("[MSG]", msg)
-    print("[RES]", result)
+    logging.info(f"\tSender:    {msg.from_address}")
+    logging.info(f"\tReceiver:  {msg.to_address}")
+    logging.info(f"\tAmount:    {msg.amount}")
+
+    if result.code == 0:
+        logging.info("Status: Successful\n")
+    else:
+        logging.info("Status: Error")
+        logging.info(f"\tcode: {result.code}")
+        logging.info(f"\tlog:  {result.raw_log}\n")
+
+    logging.debug(f"[MSG] {msg}")
+    logging.debug(f"[RES] {result}")
 
     time.sleep(2)

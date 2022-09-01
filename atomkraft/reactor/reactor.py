@@ -133,8 +133,8 @@ def _action_stub(action_name: str, variables: List[str]):
 @step({repr(action_name)})
 def {snakecase(action_name)}(testnet, state, {", ".join(variables)}):
     {_action_description_comment(action_name, variables)}
-    #TODO: replace the printing stub with the effects of the action `{action_name}`
-    print("Step: {action_name}")
+    #TODO: replace the logging stub with the effects of the action `{action_name}`
+    logging.info("Step: {action_name}")
 """
     return stub
 
@@ -160,6 +160,8 @@ def state():
 
 def _imports_stub():
     stub = """
+import logging
+
 import pytest
 from modelator.pytest.decorators import step
 """
