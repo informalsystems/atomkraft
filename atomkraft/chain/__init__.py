@@ -57,7 +57,7 @@ def testnet(
     Run a testnet in background
     """
     if config is None:
-        testnet = Testnet.load_toml(project.project_root() / "chain.toml")
+        testnet = Testnet.load_toml(project.project_root() / CHAIN_CONFIG_FILE)
     else:
         testnet = Testnet.load_toml(config)
     testnet.verbose = not silent
