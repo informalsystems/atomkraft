@@ -2,18 +2,18 @@
 EXTENDS Apalache, Integers, FiniteSets
 
 VARIABLES
-    \* @type: Int -> Int;
+    \* @type: Str -> Int;
     balances,
-    \* @type: [tag: Str, value: [n_wallet: Int, sender: Int, receiver: Int, amount: Int]];
+    \* @type: [tag: Str, value: [wallets: Set(Str), sender: Str, receiver: Str, amount: Int]];
     action,
     \* @type: Int;
     step
 
-WALLETS == 0..1
+WALLETS == {"Alice", "Bob"}
 
 Init ==
     /\ balances = [wallet \in WALLETS |-> 100]
-    /\ action = [tag |-> "Init", value |-> [n_wallet |-> Cardinality(WALLETS)]]
+    /\ action = [tag |-> "Init", value |-> [wallets |-> WALLETS]]
     /\ step = 0
 
 Next ==
@@ -32,7 +32,7 @@ Next ==
 View ==
     IF action.tag = "Transfer"
     THEN action.value
-    ELSE [sender |-> -1, receiver |-> -1, amount |-> 0]
+    ELSE [sender |-> "", receiver |-> "", amount |-> 0]
 
 Ex == step > 3
 

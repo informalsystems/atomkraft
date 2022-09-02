@@ -3,7 +3,9 @@ import json
 import os
 import shutil
 from dataclasses import dataclass
+from pathlib import Path
 from subprocess import PIPE, Popen
+from typing import Any, Callable, Dict, Optional, Union
 
 import bip_utils
 import hdwallet
@@ -17,12 +19,12 @@ from .. import utils
 @dataclass
 class ConfigPort:
     title: str
-    config_file: str
+    config_file: Path
     property_path: str
 
 
 class Client:
-    def __init__(self, home_dir, binary="gaiad"):
+    def __init__(self, home_dir: Path, binary: Path):
         self.home_dir = home_dir
         self.binary = binary
 
@@ -33,60 +35,72 @@ class Coin:
     amount: int
     expoent: int
 
-    def __init__(self, amount, denom, exponent=6):
+    def __init__(self, amount: int, denom: str, exponent: int = 6):
         self.amount = amount
         self.denom = denom
         self.expoent = exponent
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"{self.amount}{self.denom}"
 
 
+AccountId = Union[int, str]
+
+
 class Account:
-    def __init__(self, name, seed=None, strength=128):
+    def __init__(
+        self,
+        name: AccountId,
+        group: Optional[str] = None,
+        seed: Optional[str] = None,
+        strength: int = 128,
+    ):
         if strength not in [128, 160, 192, 224, 256]:
             raise ValueError(
                 f"Strength should be one of the following [128, 160, 192, 224, 256], but it is not {strength}."
             )
         self.name = name
-        if seed is None:
-            seed = self.name
+        final_seed = Path(str(self.name))
+        if group:
+            final_seed /= group
+        if seed:
+            final_seed /= str(seed)
         self.entropy = (
-            np.random.default_rng(list(seed.encode())).bytes(strength // 8).hex()
+            np.random.default_rng(list(bytes(final_seed))).bytes(strength // 8).hex()
         )
         self.wallet = hdwallet.BIP44HDWallet(symbol=ATOM).from_entropy(
             entropy=self.entropy, language="english", passphrase=""
         )
 
     @property
-    def mnemonic(self):
+    def mnemonic(self) -> Optional[str]:
         return self.wallet.mnemonic()
 
-    def address(self, prefix):
+    def address(self, prefix) -> str:
         return self.bech32_address(prefix)
 
-    def validator_address(self, prefix):
+    def validator_address(self, prefix) -> str:
         return self.bech32_address(f"{prefix}valoper")
 
-    def bech32_address(self, prefix):
+    def bech32_address(self, prefix) -> str:
         return bip_utils.Bech32Encoder.Encode(prefix, bytes.fromhex(self.wallet.hash()))
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return json.dumps(self.wallet.dumps(), indent=2)
 
 
 class Node:
     def __init__(
         self,
-        moniker,
-        chain_id,
-        home_dir,
+        moniker: str,
+        chain_id: str,
+        home_dir: Path,
+        binary: Path,
         *,
-        overwrite=False,
-        keep=False,
-        binary="gaiad",
-        denom="uatom",
-        prefix="cosmos",
+        overwrite: bool = False,
+        keep: bool = False,
+        denom: str = "uatom",
+        prefix: str = "cosmos",
     ):
         self.moniker = moniker
         self.chain_id = chain_id
@@ -100,7 +114,7 @@ class Node:
         self._stdout = None
         self._stderr = None
 
-    def init(self):
+    def init(self) -> Dict["str", Any]:
         if self.overwrite and os.path.exists(self.home_dir):
             shutil.rmtree(self.home_dir)
         args = f"init {self.moniker} --chain-id {self.chain_id}".split()
@@ -142,9 +156,9 @@ class Node:
         for file in glob.glob(f"{other.home_dir}/config/genesis.json"):
             shutil.copy(file, f"{self.home_dir}/config")
 
-    def get(self, path, property_path=None):
-        with open(f"{self.home_dir}/{path}", encoding="utf-8") as f:
-            match os.path.splitext(path)[-1]:
+    def get(self, path: Path, property_path: Optional[str] = None):
+        with open(self.home_dir / path, encoding="utf-8") as f:
+            match path.suffixes[-1]:
                 case ".json":
                     data = json.load(f)
                 case ".toml":
@@ -159,9 +173,9 @@ class Node:
             port_config.property_path,
         )
 
-    def set(self, path, value, property_path=None):
+    def set(self, path: Path, value: Any, property_path: Optional[str] = None):
         if property_path is not None:
-            with open(f"{self.home_dir}/{path}", encoding="utf-8") as f:
+            with open(self.home_dir / path, encoding="utf-8") as f:
                 match os.path.splitext(path)[-1]:
                     case ".json":
                         main_data = json.load(f)
@@ -172,7 +186,7 @@ class Node:
             main_data = utils.update(main_data, property_path, value)
         else:
             main_data = value
-        with open(f"{self.home_dir}/{path}", "w", encoding="utf-8") as f:
+        with open(self.home_dir / path, "w", encoding="utf-8") as f:
             match os.path.splitext(path)[-1]:
                 case ".json":
                     json.dump(main_data, f)
@@ -181,10 +195,22 @@ class Node:
                 case _:
                     raise RuntimeError(f"Unexpected file {path}")
 
-    def update(self, path, function, property_path=None):
+    def update(
+        self,
+        path: Path,
+        function: Callable[[Any], Any],
+        property_path: Optional[str] = None,
+    ):
         self.set(path, function(self.get(path, property_path)), property_path)
 
-    def _execute(self, args, *, stdin: bytes | None = None, stdout=None, stderr=None):
+    def _execute(
+        self,
+        args,
+        *,
+        stdin: Optional[bytes] = None,
+        stdout: Optional[int] = None,
+        stderr: Optional[int] = None,
+    ):
         final_args = f"{self.binary} --home {self.home_dir}".split() + args
         # print(" ".join(final_args))
         stdin_pipe = None if stdin is None else PIPE
@@ -198,13 +224,13 @@ class Node:
     def __enter__(self):
         return self
 
-    def sign(self, account, tx_file: str):
+    def sign(self, account: Account, tx_file: Path):
         argstr = f"tx sign {tx_file} --output-document {tx_file} --chain-id {self.chain_id} --overwrite --offline --sequence 0 --account-number 0 --from {account.name} --keyring-backend test --output json"
         self._execute(argstr.split())
 
     def start(self):
-        self._stdout = open(f"{self.home_dir}/stdout.txt", "w", encoding="utf-8")
-        self._stderr = open(f"{self.home_dir}/stderr.txt", "w", encoding="utf-8")
+        self._stdout = open(self.home_dir / "stdout.txt", "w", encoding="utf-8")
+        self._stderr = open(self.home_dir / "stderr.txt", "w", encoding="utf-8")
         args = f"{self.binary} start --home {self.home_dir}".split()
         self._popen = Popen(args, stdout=self._stdout, stderr=self._stderr)
 

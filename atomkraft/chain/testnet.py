@@ -1,147 +1,208 @@
-import glob
-import time
+import asyncio
 from pathlib import Path
-from typing import Dict
+from typing import Dict, List, Optional, Union
 
-import click
 import numpy as np
 import tabulate
 import tomlkit
+from grpclib.client import Channel
+from terra_proto.cosmos.auth.v1beta1 import BaseAccount
+from terra_proto.cosmos.auth.v1beta1 import QueryStub as AuthQueryStub
+from terra_proto.cosmos.base.abci.v1beta1 import TxResponse
+from terra_proto.cosmos.tx.v1beta1 import BroadcastMode, ServiceStub
+from terra_sdk.client.lcd import LCDClient
+from terra_sdk.client.lcd.api.tx import CreateTxOptions
+from terra_sdk.core import Coins
+from terra_sdk.core.fee import Fee
+from terra_sdk.core.msg import Msg
+from terra_sdk.key.mnemonic import MnemonicKey
 
-from .node import Account, Coin, ConfigPort, Node
+from .node import Account, AccountId, Coin, ConfigPort, Node
 from .utils import get_free_ports, update_port
+
+VALIDATOR_DIR = "validator_nodes"
 
 
 class Testnet:
     def __init__(
         self,
         chain_id,
-        n_validator=2,
-        n_account=0,
-        binary="gaiad",
-        denom="uatom",
-        prefix="cosmos",
-        coin_type=118,
-        genesis_config: Dict = {},
-        node_config: Dict = {},
+        validators: Union[int, List[AccountId]],
+        accounts: Union[int, List[AccountId]],
+        binary: Union[str, Path],
+        denom: str,
+        hrp_prefix: str,
+        *,
+        seed: Optional[str] = None,
+        coin_type: int = 118,
+        config_genesis: Dict = {},
+        config_node: Dict = {},
         account_balance: int = 10**27,
         validator_balance: int = 10**21,
-        overwrite=True,
-        keep=True,
-        verbose=False,
-        data_dir=None,
+        overwrite: bool = True,
+        keep: bool = True,
+        verbose: bool = False,
+        data_dir: Optional[Union[str, Path]] = None,
     ):
-        self.chain_id = chain_id
-        self.n_validator = n_validator
-        self.n_account = n_account
-        self.binary = binary
+        self.chain_id: str = chain_id
+        self.set_accounts(accounts)
+        self.set_validators(validators)
+        self._account_seed = seed
+        self.binary: Path = Path(binary) if isinstance(binary, str) else binary
         self.denom = denom
-        self.prefix = prefix
-        self.coin_type = coin_type
-        self.genesis_config = genesis_config
-        self.node_config = node_config
-        self.account_balance = account_balance
-        self.validator_balance = validator_balance
-        self.overwrite = overwrite
+        self.hrp_prefix: str = hrp_prefix
+
+        self.coin_type: int = coin_type
+        self.config_genesis: Dict = config_genesis
+        self.config_node: Dict = config_node
+        self.account_balance: int = account_balance
+        self.validator_balance: int = validator_balance
+        self.overwrite: bool = overwrite
         self.keep = keep
         self.verbose = verbose
-        self.data_dir = Path(".atomkraft/nodes") if data_dir is None else data_dir
+        if data_dir is None:
+            data_dir = Path(".")
+        elif isinstance(data_dir, str):
+            data_dir = Path(data_dir)
+        self.data_dir = data_dir / VALIDATOR_DIR
+
+    def set_accounts(self, accounts: Union[int, List[AccountId]]):
+        if isinstance(accounts, list):
+            self._account_ids = accounts
+        elif isinstance(accounts, int):
+            self._account_ids = list(range(accounts))
+        else:
+            self._account_ids = list(accounts)
+
+    def set_validators(self, validators: Union[int, List[AccountId]]):
+        if isinstance(validators, list):
+            self._validator_ids = validators
+        elif isinstance(validators, int):
+            self._validator_ids = list(range(validators))
+        else:
+            self._validator_ids = list(validators)
+        self._lead_validator = self._validator_ids[0]
+
+    def acc_addr(self, id: AccountId) -> str:
+        return self.accounts[id].address(self.hrp_prefix)
+
+    def val_addr(self, id: AccountId, valoper: bool = False) -> str:
+        if valoper:
+            return self.accounts[id].validator_address(self.hrp_prefix)
+        else:
+            return self.accounts[id].address(self.hrp_prefix)
+
+    def finalize_accounts(self):
+        self.validators: Dict[AccountId, Account] = {
+            v: Account(v, group="val", seed=self._account_seed)
+            for v in self._validator_ids
+        }
+        self.accounts: Dict[AccountId, Account] = {
+            a: Account(a, group="acc", seed=self._account_seed)
+            for a in self._account_ids
+        }
 
     @staticmethod
-    def load_toml(path: str):
+    def load_toml(path: Path, **kwargs):
         with open(path) as f:
             data = tomlkit.load(f)
 
-        return Testnet(
-            data["chain_id"],
-            data["n_validator"],
-            data["n_account"],
-            data["binary"],
-            data["denom"],
-            data["prefix"],
-            data["coin_type"],
-            data["config"]["genesis"],
-            data["config"]["node"],
-        )
+        for (k, v) in kwargs.items():
+            data[k] = str(v)
+
+        return Testnet(**data)
 
     @staticmethod
     def ports() -> Dict[str, ConfigPort]:
         data = {}
 
         # config.toml
-        data["p2p"] = ConfigPort("P2P", "config/config.toml", "p2p.laddr")
+        data["p2p"] = ConfigPort("P2P", Path("config/config.toml"), "p2p.laddr")
         # data["p2p_ext"] = ConfigPort("P2P External", "config/config.toml", "p2p.external_address")
-        data["abci"] = ConfigPort("ABCI", "config/config.toml", "proxy_app")
+        data["abci"] = ConfigPort("ABCI", Path("config/config.toml"), "proxy_app")
         data["pprof_laddr"] = ConfigPort(
-            "PPROF", "config/config.toml", "rpc.pprof_laddr"
+            "PPROF", Path("config/config.toml"), "rpc.pprof_laddr"
         )
-        data["rpc"] = ConfigPort("RPC", "config/config.toml", "rpc.laddr")
+        data["rpc"] = ConfigPort("RPC", Path("config/config.toml"), "rpc.laddr")
         data["prometheus"] = ConfigPort(
-            "Prometheus", "config/config.toml", "instrumentation.prometheus_listen_addr"
+            "Prometheus",
+            Path("config/config.toml"),
+            "instrumentation.prometheus_listen_addr",
         )
 
         # app.toml
-        data["lcd"] = ConfigPort("LCD", "config/app.toml", "api.address")
-        data["grpc"] = ConfigPort("gRPC", "config/app.toml", "grpc.address")
-        data["grpc-web"] = ConfigPort("gRPC", "config/app.toml", "grpc-web.address")
+        data["lcd"] = ConfigPort("LCD", Path("config/app.toml"), "api.address")
+        data["grpc"] = ConfigPort("gRPC", Path("config/app.toml"), "grpc.address")
+        data["grpc-web"] = ConfigPort(
+            "gRPC", Path("config/app.toml"), "grpc-web.address"
+        )
         # dict["rosetta"] = ConfigPort("Rosetta", "config/app.toml", "rosetta.address")
         return data
 
-    def get_validator_port(self, validator_id, port_type):
+    def get_validator_port(self, validator_id: AccountId, port_type):
         return self.validator_nodes[validator_id].get_port(self.ports()[port_type])
 
+    def get_grpc_channel(self, validator_id: Optional[AccountId] = None):
+        if validator_id is None:
+            validator_id = self._lead_validator
+        grpc_ip, grpc_port = self.get_validator_port(validator_id, "grpc").split(":", 1)
+        return Channel(host=grpc_ip, port=int(grpc_port))
+
     def prepare(self):
+        self.finalize_accounts()
         self.data_dir.mkdir(parents=True, exist_ok=True)
-        self.validator_nodes = [
-            Node(
-                f"node-{i}",
+        self.validator_nodes = {
+            validator_id: Node(
+                f"node_{validator_id}",
                 self.chain_id,
-                f"{self.data_dir}/node-{i}",
+                self.data_dir / f"node_{validator_id}",
                 overwrite=self.overwrite,
                 keep=self.keep,
-                binary=self.binary,
+                binary=Path(self.binary),
                 denom=self.denom,
-                prefix=self.prefix,
+                prefix=self.hrp_prefix,
             )
-            for i in range(self.n_validator)
-        ]
-        self.validators = [Account(f"validator-{i}") for i in range(self.n_validator)]
-        self.accounts = [Account(f"account-{i}") for i in range(self.n_account)]
+            for validator_id in self.validators.keys()
+        }
 
-        for node in self.validator_nodes:
+        for node in self.validator_nodes.values():
             node.init()
 
-        for (k, v) in self.genesis_config.items():
-            self.validator_nodes[0].set("config/genesis.json", v, k)
+        for (k, v) in self.config_genesis.items():
+            self.validator_nodes[self._lead_validator].set(
+                Path("config/genesis.json"), v, k
+            )
 
-        for validator in self.validators:
-            self.validator_nodes[0].add_account(
+        for validator in self.validators.values():
+            self.validator_nodes[self._lead_validator].add_account(
                 Coin(self.account_balance, self.denom), validator
             )
 
-        for account in self.accounts:
-            self.validator_nodes[0].add_account(
+        for account in self.accounts.values():
+            self.validator_nodes[self._lead_validator].add_account(
                 Coin(self.account_balance, self.denom), account
             )
 
         for i in range(1, len(self.validator_nodes)):
-            self.validator_nodes[i].copy_genesis_from(self.validator_nodes[0])
+            self.validator_nodes[i].copy_genesis_from(
+                self.validator_nodes[self._lead_validator]
+            )
 
         # very hacky
         all_ports = np.array(
-            get_free_ports(len(self.ports()) * (self.n_validator - 1))
+            get_free_ports(len(self.ports()) * (len(self.validators) - 1))
         ).reshape((-1, len(self.ports())))
 
         all_port_data = []
 
-        for (i, node) in enumerate(self.validator_nodes):
-            for (config_file, configs) in self.node_config.items():
+        for (i, node) in enumerate(self.validator_nodes.values()):
+            for (config_file, configs) in self.config_node.items():
                 for (k, v) in configs.items():
                     if isinstance(v, str):
                         # TODO: avoid tomlkit.items.str being a list
-                        node.set(f"config/{config_file}.toml", str(v), k)
+                        node.set(Path(f"config/{config_file}.toml"), str(v), k)
                     else:
-                        node.set(f"config/{config_file}.toml", v, k)
+                        node.set(Path(f"config/{config_file}.toml"), v, k)
 
             if i > 0:
                 ports = all_ports[i - 1]
@@ -167,19 +228,25 @@ class Testnet:
 
             print(
                 tabulate.tabulate(
-                    [[validator.address(self.prefix)] for validator in self.validators],
+                    [
+                        [validator.address(self.hrp_prefix)]
+                        for validator in self.validators.values()
+                    ],
                     headers=["Validators"],
                 )
             )
 
             print(
                 tabulate.tabulate(
-                    [[account.address(self.prefix)] for account in self.accounts],
+                    [
+                        [account.address(self.hrp_prefix)]
+                        for account in self.accounts.values()
+                    ],
                     headers=["Accounts"],
                 )
             )
 
-        for (i, node) in enumerate(self.validator_nodes):
+        for (i, node) in enumerate(self.validator_nodes.values()):
             node.add_key(self.validators[i])
             p2p = self.ports()["p2p"]
             node.add_validator(
@@ -189,24 +256,24 @@ class Testnet:
             if i > 0:
                 # because this
                 # https://github.com/cosmos/cosmos-sdk/blob/88ee7fb2e9303f43c52bd32410901841cad491fb/x/staking/client/cli/tx.go#L599
-                gentx_file = glob.glob(f"{node.home_dir}/config/gentx/*json")[0]
-                gentx_file = gentx_file.removeprefix(node.home_dir)
+                gentx_file = next(node.home_dir.glob("config/gentx/*json"))
+                gentx_file = gentx_file.relative_to(node.home_dir)
                 node_p2p = node.get(p2p.config_file, p2p.property_path).rsplit(
                     ":", maxsplit=1
                 )[-1]
                 node.update(gentx_file, lambda x: update_port(x, node_p2p), "body.memo")
-                node.sign(self.validators[i], f"{node.home_dir}/{gentx_file}")
+                node.sign(self.validators[i], node.home_dir / gentx_file)
 
         for i in range(1, len(self.validator_nodes)):
             for j in range(i):
                 self.validator_nodes[i].copy_gentx_from(self.validator_nodes[j])
                 self.validator_nodes[j].copy_gentx_from(self.validator_nodes[i])
 
-        for node in self.validator_nodes:
+        for node in self.validator_nodes.values():
             node.collect_gentx()
 
     def spinup(self):
-        for node in self.validator_nodes:
+        for node in self.validator_nodes.values():
             node.start()
 
     def oneshot(self):
@@ -214,64 +281,74 @@ class Testnet:
         self.spinup()
 
     def teardown(self):
-        for node in self.validator_nodes:
+        for node in self.validator_nodes.values():
             node.close()
 
+    def broadcast_transaction(
+        self,
+        account_id: AccountId,
+        msgs: Union[Msg, List[Msg]],
+        *,
+        gas: int,
+        fee_amount: int,
+        validator_id: Optional[AccountId] = None,
+    ) -> TxResponse:
+        if validator_id is None:
+            validator_id = self._lead_validator
 
-@click.command()
-def testnet(
-    chain_id: str,
-    validator: int,
-    account: int,
-    binary: str,
-    denom: str,
-    prefix: str,
-    coin_type: int,
-    overwrite: bool,
-    keep: bool,
-    data_dir: Path,
-):
-    coin_type = 118
+        if not isinstance(msgs, list):
+            msgs = [msgs]
 
-    genesis_config = {
-        "app_state.gov.voting_params.voting_period": "600s",
-        "app_state.mint.minter.inflation": "0.300000000000000000",
-    }
+        account = self.accounts[account_id]
 
-    node_config = {
-        "app": {
-            "api.enable": True,
-            "api.swagger": True,
-            "api.enabled-unsafe-cors": True,
-            "minimum-gas-prices": f"0.10{denom}",
-            "rosetta.enable": False,
-        },
-        "config": {
-            "instrumentation.prometheus": False,
-            "p2p.addr_book_strict": False,
-            "p2p.allow_duplicate_ip": True,
-        },
-    }
+        lcdclient = LCDClient("ip", chain_id="phoenix-1")
+        lcdclient.chain_id = self.chain_id
 
-    net = Testnet(
-        chain_id,
-        n_validator=validator,
-        n_account=account,
-        binary=binary,
-        denom=denom,
-        prefix=prefix,
-        coin_type=coin_type,
-        genesis_config=genesis_config,
-        node_config=node_config,
-        account_balance=10**26,
-        validator_balance=10**16,
-        overwrite=overwrite,
-        keep=keep,
-        data_dir=data_dir,
-    )
+        if account.mnemonic is None:
+            raise ValueError(f"Account({account.name}) do not have mnemonic")
 
-    net.oneshot()
-    try:
-        time.sleep(600)
-    except KeyboardInterrupt:
-        print("\ntear-down!")
+        wallet = lcdclient.wallet(
+            MnemonicKey(
+                mnemonic=account.mnemonic,
+                coin_type=self.coin_type,
+                prefix=self.hrp_prefix,
+            )
+        )
+
+        channel = self.get_grpc_channel(validator_id=validator_id)
+
+        stub = AuthQueryStub(channel)
+        result = asyncio.run(stub.account(address=account.address(self.hrp_prefix)))
+        account_info = BaseAccount().parse(result.account.value)
+        account_number = account_info.account_number
+        sequence = account_info.sequence
+
+        tx = wallet.create_and_sign_tx(
+            CreateTxOptions(
+                msgs,
+                fee=Fee(gas, Coins(f"{fee_amount}{self.denom}")),
+                account_number=account_number,
+                sequence=sequence,
+            )
+        )
+
+        service = ServiceStub(channel)
+
+        # # BROADCAST_MODE_BLOCK defines a tx broadcasting mode where the client waits
+        # # for the tx to be committed in a block.
+        # BROADCAST_MODE_BLOCK = 1
+        # # BROADCAST_MODE_SYNC defines a tx broadcasting mode where the client waits
+        # # for a CheckTx execution response only.
+        # BROADCAST_MODE_SYNC = 2
+        # # BROADCAST_MODE_ASYNC defines a tx broadcasting mode where the client
+        # # returns immediately.
+        # BROADCAST_MODE_ASYNC = 3
+        result = asyncio.run(
+            service.broadcast_tx(
+                tx_bytes=bytes(tx.to_proto()), mode=BroadcastMode.BROADCAST_MODE_BLOCK
+            )
+        ).tx_response
+
+        channel.close()
+
+        return result

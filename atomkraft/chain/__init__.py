@@ -15,11 +15,13 @@ __all__ = ["Testnet", "Account", "Node", "ConfigPort", "Coin"]
 
 app = typer.Typer()
 
+CHAIN_CONFIG_FILE = "chain.toml"
+
 
 @app.command()
 def config(
-    property_path: str = typer.Argument(
-        ..., help="Nested keys of a config value, joined by `.`", show_default=False
+    property_path: Optional[str] = typer.Argument(
+        None, help="Nested keys of a config value, joined by `.`", show_default=False
     ),
     value: Optional[str] = typer.Argument(
         None, help="Update old value with provided value"
@@ -29,17 +31,20 @@ def config(
     Query or update chain configuration
     """
     if value is None:
-        with open(f"{project.project_root()}/chain.toml") as f:
+        with open(project.project_root() / CHAIN_CONFIG_FILE) as f:
             data = tomlkit.load(f)
-        print(json.dumps({property_path: query(data, property_path)}, indent=2))
+        if property_path is None:
+            print(json.dumps(data, indent=2))
+        else:
+            print(json.dumps({property_path: query(data, property_path)}, indent=2))
     else:
         try:
             value = eval(value)
         except (SyntaxError, NameError):
             pass
-        with open(f"{project.project_root()}/chain.toml") as f:
+        with open(project.project_root() / CHAIN_CONFIG_FILE) as f:
             data = update(tomlkit.load(f), property_path, value)
-        with open(f"{project.project_root()}/chain.toml", "w") as f:
+        with open(project.project_root() / CHAIN_CONFIG_FILE, "w") as f:
             tomlkit.dump(data, f)
 
 
@@ -52,7 +57,7 @@ def testnet(
     Run a testnet in background
     """
     if config is None:
-        testnet = Testnet.load_toml(f"{project.project_root()}/chain.toml")
+        testnet = Testnet.load_toml(project.project_root() / CHAIN_CONFIG_FILE)
     else:
         testnet = Testnet.load_toml(config)
     testnet.verbose = not silent

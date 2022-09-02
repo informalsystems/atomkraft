@@ -19,12 +19,12 @@ Before starting, make sure to install Atomkraft and its dependencies, as describ
 ## Initialize project
 
 `atomkraft init` creates a new directory and initializes a Poetry project in it.
-It auto-installs Poetry if needed and activates a new virtual environment (by running `poetry shell`).
+It auto-installs Poetry if needed and create a new virtual environment (available via `poetry shell`).
 This environment contains all necessary dependencies.
 
 <!--
 ```sh
-$ poetry run atomkraft init transfer
+$ atomkraft init transfer
 ...
 ```
  -->
@@ -32,7 +32,6 @@ $ poetry run atomkraft init transfer
 ```
 atomkraft init transfer
 cd transfer
-poetry shell
 ```
 
 Let's inspect the structure of the generated `transfer` project.
@@ -108,7 +107,7 @@ To get it, run
 
 <!--
 ```sh
-$ poetry run atomkraft model apalache get
+$ atomkraft model apalache get
 ...
 ```
 -->
@@ -154,7 +153,7 @@ We will generate a reactor stub by running
 
 <!--
 ```sh
-$ cd transfer; poetry run atomkraft reactor --actions "Init,Transfer" --variables "action"
+$ cd transfer; atomkraft reactor --actions "Init,Transfer" --variables "action"
 ...
 ```
 -->
@@ -197,7 +196,7 @@ Thus, we are ready to run some tests (though, trivial ones since the reactor is 
 
 <!--
 ```sh
-$ cd transfer; poetry run atomkraft test trace --trace traces/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag  --verbose
+$ cd transfer; atomkraft test trace --trace traces/Ex/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag  --verbose
 ...
 Successfully executed
 ...
@@ -205,13 +204,13 @@ Successfully executed
 -->
 
 ```
-atomkraft test trace --trace traces/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag
+atomkraft test trace --trace traces/Ex/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag
 ```
 
 The output of the command contains
 
 ```
-Successfully executed trace traces/violation1.itf.json
+Successfully executed trace traces/Ex/violation1.itf.json
 ```
 
 Other than that, it only names the actions executed at each step.
@@ -240,7 +239,7 @@ Finally, we can run the complete test with the completed reactor.
 
 <!--
 ```sh
-$ cd transfer; poetry run atomkraft test trace --trace traces/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag --verbose
+$ cd transfer; atomkraft test trace --trace traces/Ex/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag --verbose
 ...
 Successfully executed
 ...
@@ -248,5 +247,5 @@ Successfully executed
 -->
 
 ```
-atomkraft test trace --trace traces/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag
+atomkraft test trace --trace traces/Ex/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag
 ```

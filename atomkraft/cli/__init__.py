@@ -88,7 +88,10 @@ def version():
     no_args_is_help=True,
 )
 def init(
-    name: Path = typer.Argument(..., help="Name of new directory", show_default=False)
+    name: Path = typer.Argument(..., help="Name of new directory", show_default=False),
+    atomkraft_rev: Optional[str] = typer.Option(
+        None, help="Atomkraft Github revision for project template"
+    ),
 ):
     """
     Initialize new Atomkraft project in the given directory
@@ -97,7 +100,9 @@ def init(
         git.Repo(os.getcwd(), search_parent_directories=True)
     except git.InvalidGitRepositoryError:
         git.Repo.init(name)
-    run_auto(GH_TEMPLATE, name, vcs_ref=GH_REVISION)
+    if atomkraft_rev is None:
+        atomkraft_rev = GH_REVISION
+    run_auto(GH_TEMPLATE, name, vcs_ref=atomkraft_rev)
 
 
 app.add_typer(
@@ -131,9 +136,9 @@ def smoke_test():
 
 
 # run with:
-# poetry run atomkraft reactor --actions-list=act1,act2,act3 --variables-list=x,y,z --reactor-stub-file=path/to/the/file
+# atomkraft reactor --actions-list=act1,act2,act3 --variables-list=x,y,z --reactor-stub-file=path/to/the/file
 # or
-# poetry run atomkraft reactor --actions-list="act1, act2, act3" --variables-list="x, y, z" --reactor-stub-file="path/to/the/file"
+# atomkraft reactor --actions-list="act1, act2, act3" --variables-list="x, y, z" --reactor-stub-file="path/to/the/file"
 
 
 @app.command(
