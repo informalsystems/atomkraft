@@ -1,10 +1,9 @@
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 
 from atomkraft.config.atomkraft_config import AtomkraftConfig
 from atomkraft.config.model_config import ModelConfig
 from atomkraft.utils.filesystem import last_modified_file_in
-from modelator.cli.model_config_file import load_config_file
 from modelator.itf import ITF
 from modelator.Model import Model
 from modelator.ModelResult import ModelResult
@@ -14,13 +13,15 @@ def query_configs(key: str) -> str:
     with AtomkraftConfig() as atomkraft_config:
         with ModelConfig() as model_config:
             try:
-                return model_config.query(key) or atomkraft_config.query(key)
+                return model_config[key] or atomkraft_config[key]
             except KeyError:
                 raise FileNotFoundError
 
 
 def generate_traces(
-    model_config_path=None, model_path=None, sample_operators=[]
+    model_config_path: Optional[Path],
+    model_path: Optional[Path] = None,
+    sample_operators=[],
 ) -> ModelResult:
     """
     Call Modelator to get samples of the given model in `model_path`. Return the
@@ -34,21 +35,27 @@ def generate_traces(
     """
     init = "Init"
     next = "Next"
-    if model_config_path:
-        model_config = load_config_file(model_config_path)
-        model_path = model_config["model_path"]
-        init = model_config["init"] or init
-        next = model_config["next"] or next
-        sample_operators = list(set(model_config["examples"] + sample_operators))
+    traces_dir = "traces"
+    with ModelConfig(model_config_path) as model_config:
+        model_path = model_path or Path(model_config["model_path"])
+        init = model_config.try_get("init", init)
+        next = model_config.try_get("next", next)
+        sample_operators = list(
+            set(model_config.try_get("examples", []) + sample_operators)
+        )
+        traces_dir = model_config.try_get("traces_dir", traces_dir)
 
-    if not model_path:
-        raise ValueError("No model path given.")
+        model_config["model_path"] = str(model_path)
+        model_config["init"] = init
+        model_config["next"] = next
+        model_config["examples"] = sample_operators
+        model_config["traces_dir"] = traces_dir
 
-    if not Path(model_path).is_file():
+    if not model_path.is_file():
         raise FileNotFoundError(f"File with model not found: {model_path}")
 
-    model = Model.parse_file(model_path, init, next)
-    return model.sample(examples=sample_operators)
+    model = Model.parse_file(str(model_path), init, next)
+    return model.sample(traces_dir=traces_dir, examples=sample_operators)
 
 
 def last_modified_trace_path() -> str:

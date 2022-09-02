@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from typing import Optional
 
 from atomkraft.config.config_file import ConfigFile
@@ -8,11 +9,11 @@ MODEL_CONFIG_PATH = "model.toml"
 
 
 class ModelConfig(ConfigFile):
-    def __init__(self, path: Optional[str] = None):
+    def __init__(self, path: Optional[Path] = None):
         if not path:
             if "PROJECT_ROOT" in os.environ:
-                root = os.environ["PROJECT_ROOT"]
+                root = Path(os.environ["PROJECT_ROOT"])
             else:
                 root = project_root()
-            path = os.path.join(root, MODEL_CONFIG_PATH)
+            path = root / MODEL_CONFIG_PATH
         super().__init__(path)
