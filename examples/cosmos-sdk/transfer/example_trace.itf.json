@@ -2,9 +2,13 @@
   "#meta": {
     "format": "ITF",
     "format-description": "https://apalache.informal.systems/docs/adr/015adr-trace.html",
-    "description": "Created by Apalache on Wed Aug 24 12:22:20 CEST 2022"
+    "description": "Created by Apalache on Fri Sep 02 14:25:36 CEST 2022"
   },
-  "vars": ["balances", "action", "step"],
+  "vars": [
+    "balances",
+    "action",
+    "step"
+  ],
   "states": [
     {
       "#meta": {
@@ -13,13 +17,24 @@
       "action": {
         "tag": "Init",
         "value": {
-          "n_wallet": 2
+          "wallets": {
+            "#set": [
+              "Alice",
+              "Bob"
+            ]
+          }
         }
       },
       "balances": {
         "#map": [
-          [0, 100],
-          [1, 100]
+          [
+            "Alice",
+            100
+          ],
+          [
+            "Bob",
+            100
+          ]
         ]
       },
       "step": 0
@@ -31,15 +46,21 @@
       "action": {
         "tag": "Transfer",
         "value": {
-          "amount": 5,
-          "receiver": 0,
-          "sender": 1
+          "amount": 3,
+          "receiver": "Alice",
+          "sender": "Bob"
         }
       },
       "balances": {
         "#map": [
-          [0, 105],
-          [1, 95]
+          [
+            "Alice",
+            103
+          ],
+          [
+            "Bob",
+            97
+          ]
         ]
       },
       "step": 1
@@ -51,15 +72,21 @@
       "action": {
         "tag": "Transfer",
         "value": {
-          "amount": 3,
-          "receiver": 1,
-          "sender": 0
+          "amount": 1,
+          "receiver": "Bob",
+          "sender": "Alice"
         }
       },
       "balances": {
         "#map": [
-          [0, 102],
-          [1, 98]
+          [
+            "Alice",
+            102
+          ],
+          [
+            "Bob",
+            98
+          ]
         ]
       },
       "step": 2
@@ -72,14 +99,20 @@
         "tag": "Transfer",
         "value": {
           "amount": 1,
-          "receiver": 1,
-          "sender": 0
+          "receiver": "Bob",
+          "sender": "Alice"
         }
       },
       "balances": {
         "#map": [
-          [0, 101],
-          [1, 99]
+          [
+            "Alice",
+            101
+          ],
+          [
+            "Bob",
+            99
+          ]
         ]
       },
       "step": 3
@@ -92,137 +125,23 @@
         "tag": "Transfer",
         "value": {
           "amount": 1,
-          "receiver": 1,
-          "sender": 0
+          "receiver": "Bob",
+          "sender": "Alice"
         }
       },
       "balances": {
         "#map": [
-          [0, 100],
-          [1, 100]
+          [
+            "Alice",
+            100
+          ],
+          [
+            "Bob",
+            100
+          ]
         ]
       },
       "step": 4
-    },
-    {
-      "#meta": {
-        "index": 5
-      },
-      "action": {
-        "tag": "Transfer",
-        "value": {
-          "amount": 0,
-          "receiver": 1,
-          "sender": 0
-        }
-      },
-      "balances": {
-        "#map": [
-          [0, 100],
-          [1, 100]
-        ]
-      },
-      "step": 5
-    },
-    {
-      "#meta": {
-        "index": 6
-      },
-      "action": {
-        "tag": "Transfer",
-        "value": {
-          "amount": 1,
-          "receiver": 1,
-          "sender": 0
-        }
-      },
-      "balances": {
-        "#map": [
-          [0, 99],
-          [1, 101]
-        ]
-      },
-      "step": 6
-    },
-    {
-      "#meta": {
-        "index": 7
-      },
-      "action": {
-        "tag": "Transfer",
-        "value": {
-          "amount": 2,
-          "receiver": 1,
-          "sender": 0
-        }
-      },
-      "balances": {
-        "#map": [
-          [0, 97],
-          [1, 103]
-        ]
-      },
-      "step": 7
-    },
-    {
-      "#meta": {
-        "index": 8
-      },
-      "action": {
-        "tag": "Transfer",
-        "value": {
-          "amount": 1,
-          "receiver": 1,
-          "sender": 0
-        }
-      },
-      "balances": {
-        "#map": [
-          [0, 96],
-          [1, 104]
-        ]
-      },
-      "step": 8
-    },
-    {
-      "#meta": {
-        "index": 9
-      },
-      "action": {
-        "tag": "Transfer",
-        "value": {
-          "amount": 4,
-          "receiver": 0,
-          "sender": 1
-        }
-      },
-      "balances": {
-        "#map": [
-          [0, 100],
-          [1, 100]
-        ]
-      },
-      "step": 9
-    },
-    {
-      "#meta": {
-        "index": 10
-      },
-      "action": {
-        "tag": "Transfer",
-        "value": {
-          "amount": 1,
-          "receiver": 1,
-          "sender": 0
-        }
-      },
-      "balances": {
-        "#map": [
-          [0, 99],
-          [1, 101]
-        ]
-      },
-      "step": 10
     }
   ]
 }
