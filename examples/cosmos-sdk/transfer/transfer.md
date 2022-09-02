@@ -197,7 +197,7 @@ Thus, we are ready to run some tests (though, trivial ones since the reactor is 
 
 <!--
 ```sh
-$ cd transfer; poetry run atomkraft test trace --trace traces/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag  --verbose
+$ cd transfer; poetry run atomkraft test trace --trace traces/Ex/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag  --verbose
 ...
 Successfully executed
 ...
@@ -205,13 +205,13 @@ Successfully executed
 -->
 
 ```
-atomkraft test trace --trace traces/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag
+atomkraft test trace --trace traces/Ex/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag
 ```
 
 The output of the command contains
 
 ```
-Successfully executed trace traces/violation1.itf.json
+Successfully executed trace traces/Ex/violation1.itf.json
 ```
 
 Other than that, it only names the actions executed at each step.
@@ -240,7 +240,7 @@ Finally, we can run the complete test with the completed reactor.
 
 <!--
 ```sh
-$ cd transfer; poetry run atomkraft test trace --trace traces/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag --verbose
+$ cd transfer; poetry run atomkraft test trace --trace traces/Ex/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag --verbose
 ...
 Successfully executed
 ...
@@ -248,5 +248,5 @@ Successfully executed
 -->
 
 ```
-atomkraft test trace --trace traces/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag
+atomkraft test trace --trace traces/Ex/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag
 ```
