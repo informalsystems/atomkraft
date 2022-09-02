@@ -7,5 +7,4 @@ _tasks:
   - "{{ _copier_python }} -m poetry --version >/dev/null 2>&1 || {{ _copier_python }} -m pip install poetry"
   - "{{ _copier_python }} -m poetry init -n"
   - "{{ _copier_python }} -m poetry add atomkraft"
-  - "{{ _copier_python }} -m poetry add git+https://github.com/informalsystems/terra.py#poetry"
   - "{{ _copier_python }} -m poetry run python -m pytest .atomkraft/smoke_tests || true"
