@@ -4,7 +4,4 @@ _exclude:
   - ".gitkeep"
 
 _tasks:
-  - "{{ _copier_python }} -m poetry --version >/dev/null 2>&1 || {{ _copier_python }} -m pip install poetry"
-  - "{{ _copier_python }} -m poetry init -n"
-  - "{{ _copier_python }} -m poetry add atomkraft"
-  - "{{ _copier_python }} -m poetry run python -m pytest .atomkraft/smoke_tests || true"
+  - "echo 'Atomkraft project is ready: {{ project_name }}'"
