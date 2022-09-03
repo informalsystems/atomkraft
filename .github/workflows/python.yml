@@ -8,6 +8,8 @@ on:
       - atomkraft/**
       - template/**
       - tests/**
+      - pyproject.toml
+      - poetry.lock
 
 jobs:
   linting:
