@@ -139,10 +139,10 @@ class Testnet:
         # dict["rosetta"] = ConfigPort("Rosetta", "config/app.toml", "rosetta.address")
         return data
 
-    def get_validator_port(self, validator_id: AccountId, port_type):
+    def get_validator_port(self, validator_id: AccountId, port_type: str):
         return self.validator_nodes[validator_id].get_port(self.ports()[port_type])
 
-    def get_grpc_channel(self, validator_id: Optional[AccountId] = None):
+    def get_grpc_channel(self, validator_id: Optional[AccountId] = None) -> Channel:
         if validator_id is None:
             validator_id = self._lead_validator
         grpc_ip, grpc_port = self.get_validator_port(validator_id, "grpc").split(":", 1)
