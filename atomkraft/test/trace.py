@@ -1,3 +1,4 @@
+import json
 import os.path
 import shutil
 from datetime import datetime
@@ -11,10 +12,10 @@ from ..reactor.reactor import get_reactor
 
 TRACE_TEST_STUB = """from modelator.pytest.decorators import itf
 
-pytest_plugins = "{0}"
+pytest_plugins = {0}
 
 
-@itf("{1}", keypath="{2}")
+@itf({1}, keypath={2})
 def test_trace():
     print("Successfully executed trace {1}")
 """
@@ -61,7 +62,9 @@ def test_trace(trace: Path, reactor: Optional[Path], keypath: str, verbose: bool
         print(f"Writing {test_name} ...")
         test.write(
             TRACE_TEST_STUB.format(
-                str(reactor).replace("/", ".").removesuffix(".py"), trace, keypath
+                json.dumps(str(reactor).replace("/", ".").removesuffix(".py")),
+                json.dumps(trace),
+                json.dumps(keypath),
             )
         )
     print(f"Executing {test_name} ...")

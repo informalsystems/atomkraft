@@ -1,3 +1,4 @@
+import json
 import shutil
 import time
 from datetime import datetime
@@ -103,7 +104,9 @@ def test_model(
             print(f"Writing {test_name} ...")
             test.write(
                 TRACE_TEST_STUB.format(
-                    str(reactor).replace("/", ".").removesuffix(".py"), trace, keypath
+                    json.dumps(str(reactor).replace("/", ".").removesuffix(".py")),
+                    json.dumps(trace),
+                    json.dumps(keypath),
                 )
             )
 
