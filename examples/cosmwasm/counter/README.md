@@ -49,14 +49,14 @@ ls wasmd/build/wasmd
 ```
 atomkraft chain config chain_id test-cosmos
 atomkraft chain config binary ./wasmd/build/wasmd
-atomkraft chain config prefix wasm
+atomkraft chain config hrp_prefix wasm
 atomkraft chain config coin_type 118
 
-atomkraft chain config n_account 3
-atomkraft chain config n_validator 2
+atomkraft chain config accounts 3
+atomkraft chain config validators 2
 
 atomkraft chain config denom stake
-atomkraft chain config config.node.app.minimum-gas-prices 0.10stake
+atomkraft chain config config_node.app.minimum-gas-prices 0.10stake
 ```
 
 ## Finally run the tests
