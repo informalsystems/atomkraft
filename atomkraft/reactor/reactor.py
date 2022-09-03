@@ -131,7 +131,7 @@ def _action_stub(action_name: str, variables: List[str]):
     stub = f"""
 
 @step("{action_name}")
-def {snakecase(action_name)}(testnet, state, {", ".join(variables)}):
+def {snakecase(action_name)}(testnet: Testnet, state: Dict, {", ".join(variables)}):
     {_action_description_comment(action_name, variables)}
     # TODO: replace the logging stub with the effects of the action `{action_name}`
     logging.info("Step: {action_name}")
@@ -160,8 +160,10 @@ def state():
 def _imports_stub():
     stub = """
 import logging
+from typing import Dict
 
 import pytest
+from atomkraft.chain import Testnet
 from modelator.pytest.decorators import step
 """
     return stub
