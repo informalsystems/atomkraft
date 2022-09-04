@@ -103,7 +103,7 @@ All step functions receive the following arguments:
 '''
 
 
-def _keypath_stub(keypath):
+def _keypath_stub(keypath: str):
     stub = f"""
 {constants.KEYPATH_VAR} = {json.dumps(keypath)}
 """
