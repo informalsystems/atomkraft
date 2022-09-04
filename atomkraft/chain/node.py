@@ -100,14 +100,14 @@ class Node:
         overwrite: bool = False,
         keep: bool = False,
         denom: str = "uatom",
-        prefix: str = "cosmos",
+        hrp_prefix: str = "cosmos",
     ):
         self.moniker = moniker
         self.chain_id = chain_id
         self.home_dir = home_dir
         self.binary = binary
         self.denom = denom
-        self.prefix = prefix
+        self.hrp_prefix = hrp_prefix
         self.overwrite = overwrite
         self.keep = keep
         self._popen = None
@@ -136,7 +136,7 @@ class Node:
         return json.loads(stderr.decode())
 
     def add_account(self, coin: Coin, account: Account):
-        argstr = f"add-genesis-account {account.address(self.prefix)} {coin} --keyring-backend test --output json"
+        argstr = f"add-genesis-account {account.address(self.hrp_prefix)} {coin} --keyring-backend test --output json"
         self._execute(argstr.split())
 
     def add_validator(self, coin: Coin, account: Account):

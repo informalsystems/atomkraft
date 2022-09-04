@@ -160,7 +160,7 @@ class Testnet:
                 keep=self.keep,
                 binary=Path(self.binary),
                 denom=self.denom,
-                prefix=self.hrp_prefix,
+                hrp_prefix=self.hrp_prefix,
             )
             for validator_id in self.validators.keys()
         }
