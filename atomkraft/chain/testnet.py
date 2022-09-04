@@ -314,7 +314,6 @@ class Testnet:
             MnemonicKey(
                 mnemonic=account.mnemonic,
                 coin_type=self.coin_type,
-                prefix=self.hrp_prefix,
             )
         )
 
