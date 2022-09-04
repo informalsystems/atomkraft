@@ -105,7 +105,7 @@ def test_model(
             test.write(
                 TRACE_TEST_STUB.format(
                     json.dumps(str(reactor).replace("/", ".").removesuffix(".py")),
-                    json.dumps(trace),
+                    json.dumps(str(trace)),
                     json.dumps(keypath),
                 )
             )

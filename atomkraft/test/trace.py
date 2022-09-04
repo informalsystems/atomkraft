@@ -63,7 +63,7 @@ def test_trace(trace: Path, reactor: Optional[Path], keypath: str, verbose: bool
         test.write(
             TRACE_TEST_STUB.format(
                 json.dumps(str(reactor).replace("/", ".").removesuffix(".py")),
-                json.dumps(trace),
+                json.dumps(str(trace)),
                 json.dumps(keypath),
             )
         )
