@@ -43,7 +43,7 @@ def generate_traces(
         sample_operators = list(
             set(model_config.try_get("examples", []) + sample_operators)
         )
-        traces_dir = model_config.try_get("traces_dir", traces_dir)
+        traces_dir = str(Path(model_config.try_get("traces_dir", traces_dir)))
 
         model_config["model_path"] = str(model_path)
         model_config["init"] = init
