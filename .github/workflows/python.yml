@@ -8,6 +8,8 @@ on:
       - atomkraft/**
       - template/**
       - tests/**
+      - pyproject.toml
+      - poetry.lock
 
 jobs:
   linting:
@@ -37,7 +39,7 @@ jobs:
       fail-fast: true
       matrix:
         os: ["ubuntu-latest", "macos-latest"]
-        python-version: ["3.10.4", "3.10.5", "3.10.6"]
+        python-version: ["3.10", "3.10.6"]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Check out repository

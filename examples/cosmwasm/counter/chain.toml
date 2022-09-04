@@ -1,22 +1,22 @@
 chain_id = "test-cosmos"
-n_validator = 2
-n_account = 3
+validators = 2
+accounts = 3
 binary = "./wasmd/build/wasmd"
-prefix = "wasm"
+hrp_prefix = "wasm"
 denom = "stake"
 coin_type = 118
 
-[config.node.app]
+[config_node.app]
 minimum-gas-prices = "0.10stake"
 api = { enable = true, swagger = true, enabled-unsafe-cors = true }
 rosetta = { enable = false }
 
-[config.node.config]
+[config_node.config]
 instrumentation = { prometheus = false }
 p2p = { addr_book_strict = false, allow_duplicate_ip = true }
 
-[config.genesis.app_state.gov]
+[config_genesis.app_state.gov]
 voting_params = { voting_period = "600s" }
 
-[config.genesis.app_state.mint]
+[config_genesis.app_state.mint]
 minter = { inflation = "0.300000000000000000" }

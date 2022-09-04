@@ -24,7 +24,7 @@ def init_project(tmpdir_factory, runner):
 config_tests = [
     ("chain_id", "cosmoshub-4", "juno-1"),
     ("coin_type", 118, 529),
-    ("config.node.app.api.enable", True, False),
+    ("config_node.app.api.enable", True, False),
 ]
 
 

@@ -42,7 +42,7 @@ Check that the previous command generated a trace file:
 
 <!-- $MDX dir=transfer -->
 ```sh
-$ [ -f "traces/violation1.itf.json" ] && echo "Found trace file"
+$ [ -f "traces/Ex/violation1.itf.json" ] && echo "Found trace file"
 Found trace file
 ```
 
@@ -77,7 +77,7 @@ $ rm -rf tests/*
 
 <!-- $MDX dir=transfer -->
 ```sh
-$ atomkraft test trace --trace traces/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag --verbose
+$ atomkraft test trace --trace traces/Ex/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag --verbose
 ...
 ```
 
@@ -99,9 +99,9 @@ $ curl -Lo reactors/reactor.py https://raw.githubusercontent.com/informalsystems
 
 <!-- $MDX dir=transfer -->
 ```sh
-$ atomkraft test trace --trace traces/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag --verbose
+$ atomkraft test trace --trace traces/Ex/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag --verbose
 ...
-Successfully executed trace traces/violation1.itf.json
+Successfully executed trace traces/Ex/violation1.itf.json
 ...
 ```
 

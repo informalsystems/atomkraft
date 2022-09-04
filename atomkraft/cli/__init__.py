@@ -102,7 +102,7 @@ def init(
         git.Repo.init(name)
     if atomkraft_rev is None:
         atomkraft_rev = GH_REVISION
-    run_auto(GH_TEMPLATE, name, vcs_ref=atomkraft_rev)
+    run_auto(GH_TEMPLATE, name, vcs_ref=atomkraft_rev, data={"project_name": name})
 
 
 app.add_typer(
