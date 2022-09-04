@@ -10,14 +10,16 @@ from atomkraft.utils.project import project_root
 
 from ..reactor.reactor import get_reactor
 
-TRACE_TEST_STUB = """from modelator.pytest.decorators import itf
+TRACE_TEST_STUB = """import logging
+
+from modelator.pytest.decorators import itf
 
 pytest_plugins = {0}
 
 
 @itf({1}, keypath={2})
 def test_trace():
-    print("Successfully executed trace {1}")
+    logging.info("Successfully executed trace " + {1})
 """
 
 
