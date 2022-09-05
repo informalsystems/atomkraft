@@ -49,7 +49,7 @@ def test_model(
     reactor: Optional[Path],
     keypath: str,
     verbose: bool,
-):
+) -> int:
     """
     Test blockchain by running one trace
     """
@@ -92,6 +92,8 @@ def test_model(
 
     successul_ops = model_result.successful()
 
+    exit_codes = []
+
     for op in successul_ops:
         print(Path(model_result.trace_paths(op)[0]).parent)
         trace_dir = Path(model_result.trace_paths(op)[0]).parent
@@ -127,7 +129,7 @@ def test_model(
         if verbose:
             pytest_args.append("-rP")
 
-        pytest.main(pytest_args + [str(test_path)])
+        exit_codes.append(pytest.main(pytest_args + [str(test_path)]))
 
         copy_if_exists([Path(trace), root / ".atomkraft" / "nodes"], report_dir)
 
@@ -135,3 +137,5 @@ def test_model(
         print(f"Test data is saved at {root_report_dir}")
     else:
         print("No trace is produced.")
+
+    return max(int(e) for e in exit_codes)

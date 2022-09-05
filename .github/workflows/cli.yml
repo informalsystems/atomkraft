@@ -10,10 +10,6 @@ on:
       - tests/cli/*.md
       - pyproject.toml
       - poetry.lock
-    branches:
-      - dev
-      - staging
-      - trying
 
 jobs:
   mdx:
@@ -84,4 +80,4 @@ jobs:
           source .venv/bin/activate
           cd tests/cli
           eval $(opam env)
-          for f in `ls *md`; do ocaml-mdx test -v "${f}"; [ ! -f "${f}.corrected" ] || (cat "${f}.corrected" && exit 1); done
+          for f in `ls *md`; do ocaml-mdx test -v "${f}"; [ ! -f "${f}.corrected" ] || (diff -u "${f}" "${f}.corrected" && exit 1); done

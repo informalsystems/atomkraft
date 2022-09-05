@@ -51,7 +51,9 @@ def trace(
     Test blockchain by running one trace
     """
 
-    test_trace(trace, reactor, keypath, verbose)
+    exit_code = test_trace(trace, reactor, keypath, verbose)
+
+    raise typer.Exit(exit_code)
 
 
 @app.command()
@@ -78,8 +80,10 @@ def model(
     """
     tests = [t.strip() for ts in test for t in ts.split(",")]
 
-    test_model(model, tests, reactor, keypath, verbose)
+    exit_code = test_model(model, tests, reactor, keypath, verbose)
 
     if model:
         with AtomkraftConfig() as c:
             c[MODEL_CONFIG_KEY] = str(model)
+
+    raise typer.Exit(exit_code)

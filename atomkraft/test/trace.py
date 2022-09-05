@@ -34,7 +34,9 @@ def copy_if_exists(src_paths: List[Path], dst_path: Path):
             pass
 
 
-def test_trace(trace: Path, reactor: Optional[Path], keypath: str, verbose: bool):
+def test_trace(
+    trace: Path, reactor: Optional[Path], keypath: str, verbose: bool
+) -> int:
     """
     Test blockchain by running one trace
     """
@@ -88,8 +90,10 @@ def test_trace(trace: Path, reactor: Optional[Path], keypath: str, verbose: bool
     if verbose:
         pytest_args.append("-rP")
 
-    pytest.main(pytest_args + [test_path])
+    exit_code = pytest.main(pytest_args + [test_path])
 
     copy_if_exists([Path(trace), root / ".atomkraft" / "nodes"], report_dir)
 
     print(f"Test data is saved at {report_dir}")
+
+    return int(exit_code)
