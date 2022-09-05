@@ -3,6 +3,7 @@ from typing import List, Optional
 
 import typer
 from atomkraft.config.atomkraft_config import AtomkraftConfig
+from atomkraft.utils.project import get_relative_project_path
 
 from .model import MODEL_CONFIG_KEY, test_model
 from .trace import TRACE_CONFIG_KEY, test_all_trace, test_trace
@@ -66,7 +67,7 @@ def trace(
 
     if trace:
         with AtomkraftConfig() as c:
-            c[TRACE_CONFIG_KEY] = str(model)
+            c[TRACE_CONFIG_KEY] = str(get_relative_project_path(trace))
 
     raise typer.Exit(exit_code)
 
@@ -102,6 +103,6 @@ def model(
 
     if model:
         with AtomkraftConfig() as c:
-            c[MODEL_CONFIG_KEY] = str(model)
+            c[MODEL_CONFIG_KEY] = str(get_relative_project_path(model))
 
     raise typer.Exit(exit_code)
