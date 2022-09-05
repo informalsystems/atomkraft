@@ -88,9 +88,9 @@ class Testnet:
 
     def val_addr(self, id: AccountId, valoper: bool = False) -> str:
         if valoper:
-            return self.accounts[id].validator_address(self.hrp_prefix)
+            return self.validators[id].validator_address(self.hrp_prefix)
         else:
-            return self.accounts[id].address(self.hrp_prefix)
+            return self.validators[id].address(self.hrp_prefix)
 
     def finalize_accounts(self):
         self.validators: Dict[AccountId, Account] = {
