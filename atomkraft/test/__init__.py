@@ -71,6 +71,9 @@ def model(
         show_default=True,
         help="Path to key used as step name, extracted from ITF states",
     ),
+    max_traces: Optional[int] = typer.Option(
+        None, show_default=False, help="Maximum number of traces to generate"
+    ),
     verbose: bool = typer.Option(
         False, "--verbose", "-v", help="Output logging on console"
     ),
@@ -80,7 +83,7 @@ def model(
     """
     tests = [t.strip() for ts in test for t in ts.split(",")]
 
-    exit_code = test_model(model, tests, reactor, keypath, verbose)
+    exit_code = test_model(model, tests, reactor, keypath, max_traces, verbose)
 
     if model:
         with AtomkraftConfig() as c:

@@ -17,7 +17,7 @@ from atomkraft.utils.project import (
 from ..reactor.reactor import get_reactor
 from .trace import TRACE_TEST_STUB
 
-# a key for the model path inside internal config
+# a key for the last used model path inside internal config
 MODEL_CONFIG_KEY = "model"
 
 
@@ -48,6 +48,7 @@ def test_model(
     tests: List[str],
     reactor: Optional[Path],
     keypath: str,
+    max_traces: Optional[int],
     verbose: bool,
 ) -> int:
     """
@@ -71,7 +72,7 @@ def test_model(
     print(f"Generating traces for {model.name} ...")
 
     try:
-        model_result = generate_traces(None, model, tests)
+        model_result = generate_traces(None, model, tests, max_traces=max_traces)
     except Exception as e:
         raise RuntimeError(f"[Modelator] {e}")
 
@@ -95,47 +96,53 @@ def test_model(
     exit_codes = []
 
     for op in successul_ops:
-        print(Path(model_result.trace_paths(op)[0]).parent)
-        trace_dir = Path(model_result.trace_paths(op)[0]).parent
-        trace = max(trace_dir.glob("*.itf.json"), key=lambda x: x.stat().st_mtime)
-        trace = get_relative_project_path(trace)
-        test_name = f"test_{test_group}"
-        test_path = test_dir / test_name / f"test_{op}.py"
-        test_path.parent.mkdir(parents=True)
-        with open(test_path, "w") as test:
-            print(f"Writing {test_name} ...")
-            test.write(
-                TRACE_TEST_STUB.format(
-                    json.dumps(str(reactor).replace("/", ".").removesuffix(".py")),
-                    json.dumps(str(trace)),
-                    json.dumps(keypath),
+        print(f"Testing {op} ...")
+        for trace_path in model_result.trace_paths(op):
+            trace = Path(trace_path)
+            if all(not c.isdigit() for c in trace.name):
+                continue
+
+            trace_name = trace.name.removesuffix(".itf.json")
+
+            print(trace)
+            trace = get_relative_project_path(trace)
+            test_name = f"test_{test_group}"
+            test_path = test_dir / test_name / f"test_{op}_{trace_name}.py"
+            test_path.parent.mkdir(parents=True, exist_ok=True)
+            with open(test_path, "w") as test:
+                print(f"Writing {test_name} ...")
+                test.write(
+                    TRACE_TEST_STUB.format(
+                        json.dumps(str(reactor).replace("/", ".").removesuffix(".py")),
+                        json.dumps(str(trace)),
+                        json.dumps(keypath),
+                    )
                 )
-            )
 
-        report_dir = root_report_dir / test_path.stem
-        report_dir.mkdir(parents=True)
+            report_dir = root_report_dir / test_path.stem
+            report_dir.mkdir(parents=True, exist_ok=True)
 
-        logging_file = report_dir / "log.txt"
+            logging_file = report_dir / "log.txt"
 
-        pytest_report_file = report_dir / "report.jsonl"
+            pytest_report_file = report_dir / "report.jsonl"
 
-        pytest_args = [
-            "--log-file-level=INFO",
-            "--log-cli-level=INFO",
-            f"--log-file={logging_file}",
-            f"--report-log={pytest_report_file}",
-        ]
+            pytest_args = [
+                "--log-file-level=INFO",
+                "--log-cli-level=INFO",
+                f"--log-file={logging_file}",
+                f"--report-log={pytest_report_file}",
+            ]
 
-        if verbose:
-            pytest_args.append("-rP")
+            if verbose:
+                pytest_args.append("-rP")
 
-        exit_codes.append(pytest.main(pytest_args + [str(test_path)]))
+            exit_codes.append(pytest.main(pytest_args + [str(test_path)]))
 
-        copy_if_exists([Path(trace), root / ".atomkraft" / "nodes"], report_dir)
+            copy_if_exists([Path(trace), root / ".atomkraft" / "nodes"], report_dir)
 
     if successul_ops:
         print(f"Test data is saved at {root_report_dir}")
+        return max(int(e) for e in exit_codes)
     else:
         print("No trace is produced.")
-
-    return max(int(e) for e in exit_codes)
+        return 0
