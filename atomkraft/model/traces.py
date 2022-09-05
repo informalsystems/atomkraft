@@ -22,7 +22,7 @@ def generate_traces(
     model_config_path: Optional[Path],
     model_path: Optional[Path] = None,
     sample_operators=[],
-    max_traces: Optional[int] = None,
+    max_trace: Optional[int] = None,
 ) -> ModelResult:
     """
     Call Modelator to get samples of the given model in `model_path`. Return the
@@ -56,8 +56,8 @@ def generate_traces(
         raise FileNotFoundError(f"File with model not found: {model_path}")
 
     checker_params = dict()
-    if max_traces:
-        checker_params["max_error"] = str(max_traces)
+    if max_trace:
+        checker_params["max_error"] = str(max_trace)
 
     model = Model.parse_file(str(model_path), init, next)
     return model.sample(

@@ -48,7 +48,7 @@ def test_model(
     tests: List[str],
     reactor: Optional[Path],
     keypath: str,
-    max_traces: Optional[int],
+    max_trace: Optional[int],
     verbose: bool,
 ) -> int:
     """
@@ -72,7 +72,7 @@ def test_model(
     print(f"Generating traces for {model.name} ...")
 
     try:
-        model_result = generate_traces(None, model, tests, max_traces=max_traces)
+        model_result = generate_traces(None, model, tests, max_trace=max_trace)
     except Exception as e:
         raise RuntimeError(f"[Modelator] {e}")
 
