@@ -85,7 +85,7 @@ Check that a test file was created:
 
 <!-- $MDX dir=transfer -->
 ```sh
-$ find "tests" -type f -iname "test_traces_violation1_itf_json_*.py" -exec echo File found! \;
+$ find "tests" -type f -iname "test_traces_Ex_violation1_itf_json_*.py" -exec echo File found! \;
 File found!
 ```
 
@@ -95,13 +95,22 @@ $ curl -Lo reactors/reactor.py https://raw.githubusercontent.com/informalsystems
 ...
 ```
 
-## Tests
+## Test 
+
+### Trace
 
 <!-- $MDX dir=transfer -->
 ```sh
-$ atomkraft test trace --trace traces/Ex/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag --verbose
+$ atomkraft test trace --trace traces/Ex/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag
 ...
-Successfully executed trace traces/Ex/violation1.itf.json
+```
+
+### Model
+
+<!-- $MDX dir=transfer -->
+```sh
+$ rm -rf traces/*
+$ atomkraft test model --model models/transfer.tla --test Ex --reactor reactors/reactor.py --keypath action.tag
 ...
 ```
 

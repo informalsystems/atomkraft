@@ -90,9 +90,9 @@ class Testnet:
 
     def val_addr(self, id: AccountId, valoper: bool = False) -> str:
         if valoper:
-            return self.accounts[id].validator_address(self.hrp_prefix)
+            return self.validators[id].validator_address(self.hrp_prefix)
         else:
-            return self.accounts[id].address(self.hrp_prefix)
+            return self.validators[id].address(self.hrp_prefix)
 
     def finalize_accounts(self):
         self.validators: Dict[AccountId, Account] = {
@@ -162,7 +162,7 @@ class Testnet:
                 keep=self.keep,
                 binary=Path(self.binary),
                 denom=self.denom,
-                prefix=self.hrp_prefix,
+                hrp_prefix=self.hrp_prefix,
             )
             for validator_id in self.validators.keys()
         }
@@ -185,19 +185,22 @@ class Testnet:
                 Coin(self.account_balance, self.denom), account
             )
 
-        for i in range(1, len(self.validator_nodes)):
-            self.validator_nodes[i].copy_genesis_from(
-                self.validator_nodes[self._lead_validator]
-            )
+        for node_id, node in self.validator_nodes.items():
+            if node_id != self._lead_validator:
+                self.validator_nodes[node_id].copy_genesis_from(
+                    self.validator_nodes[self._lead_validator]
+                )
 
         # very hacky
-        all_ports = np.array(
-            get_free_ports(len(self.ports()) * (len(self.validators) - 1))
-        ).reshape((-1, len(self.ports())))
+        all_ports = (
+            np.array(get_free_ports(len(self.ports()) * (len(self.validators) - 1)))
+            .reshape((-1, len(self.ports())))
+            .tolist()
+        )
 
         all_port_data = []
 
-        for (i, node) in enumerate(self.validator_nodes.values()):
+        for (node_id, node) in self.validator_nodes.items():
             for (config_file, configs) in self.config_node.items():
                 for (k, v) in configs.items():
                     if isinstance(v, str):
@@ -206,9 +209,9 @@ class Testnet:
                     else:
                         node.set(Path(f"config/{config_file}.toml"), v, k)
 
-            if i > 0:
-                ports = all_ports[i - 1]
-                for (j, (key, e_port)) in enumerate(self.ports().items()):
+            if node_id != self._lead_validator:
+                ports = all_ports.pop()
+                for (j, e_port) in enumerate(self.ports().values()):
                     node.update(
                         e_port.config_file,
                         lambda x: update_port(x, ports[j]),
@@ -216,7 +219,7 @@ class Testnet:
                     )
 
             port_data = [node.moniker]
-            for (j, e_port) in enumerate(self.ports().values()):
+            for e_port in self.ports().values():
                 port_data.append(node.get(e_port.config_file, e_port.property_path))
             all_port_data.append(port_data)
 
@@ -248,14 +251,14 @@ class Testnet:
                 )
             )
 
-        for (i, node) in enumerate(self.validator_nodes.values()):
-            node.add_key(self.validators[i])
+        for (node_id, node) in self.validator_nodes.items():
+            node.add_key(self.validators[node_id])
             p2p = self.ports()["p2p"]
             node.add_validator(
-                Coin(self.validator_balance, self.denom), self.validators[i]
+                Coin(self.validator_balance, self.denom), self.validators[node_id]
             )
 
-            if i > 0:
+            if node_id != self._lead_validator:
                 # because this
                 # https://github.com/cosmos/cosmos-sdk/blob/88ee7fb2e9303f43c52bd32410901841cad491fb/x/staking/client/cli/tx.go#L599
                 gentx_file = next(node.home_dir.glob("config/gentx/*json"))
@@ -264,12 +267,12 @@ class Testnet:
                     ":", maxsplit=1
                 )[-1]
                 node.update(gentx_file, lambda x: update_port(x, node_p2p), "body.memo")
-                node.sign(self.validators[i], node.home_dir / gentx_file)
+                node.sign(self.validators[node_id], node.home_dir / gentx_file)
 
-        for i in range(1, len(self.validator_nodes)):
-            for j in range(i):
-                self.validator_nodes[i].copy_gentx_from(self.validator_nodes[j])
-                self.validator_nodes[j].copy_gentx_from(self.validator_nodes[i])
+        for (id_a, node_a) in self.validator_nodes.items():
+            for (id_b, node_b) in self.validator_nodes.items():
+                if id_a != id_b:
+                    node_a.copy_gentx_from(node_b)
 
         for node in self.validator_nodes.values():
             node.collect_gentx()
@@ -330,7 +333,6 @@ class Testnet:
             MnemonicKey(
                 mnemonic=account.mnemonic,
                 coin_type=self.coin_type,
-                prefix=self.hrp_prefix,
             )
         )
 
