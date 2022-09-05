@@ -280,7 +280,7 @@ class Testnet:
     def spinup(self):
         for node in self.validator_nodes.values():
             node.start()
-        for (i, node) in enumerate(self.validator_nodes):
+        for node in self.validator_nodes.values():
             while True:
                 try:
                     addr = node.get(
