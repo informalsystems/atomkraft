@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "atomkraft"
-version = "0.0.9"
+version = "0.0.10"
 description = "Testing for Cosmos Blockchains"
 authors = [
     "Andrey Kuprianov <andrey@informal.systems>",
@@ -55,3 +55,20 @@ src_paths = ["atomkraft", "test", "examples"]
 [tool.pytest.ini_options]
 pythonpath = "."
 norecursedirs = "examples/*"
+
+[tool.semantic_release]
+version_variable = [
+    "atomkraft/_version.py:__version__"
+]
+version_toml = [
+    "pyproject.toml:tool.poetry.version"
+]
+version_pattern = [
+    "template/pyproject.toml.jinja:atomkraft = \"\\^{version}\""
+]
+major_on_zero = true
+branch = "dev"
+upload_to_pypi = false
+upload_to_release = false
+upload_to_repository = false
+build_command = "poetry build"
