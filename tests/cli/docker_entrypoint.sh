@@ -24,6 +24,7 @@ trap cleanup EXIT
 
 for f in `ls *md`; do
     echo "testing ${f} ..."
+    [ -f "${f}.corrected" ] && rm "${f}.corrected"
     ocaml-mdx test -v "${f}"
     [ ! -f "${f}.corrected" ] || (diff -u "${f}" "${f}.corrected" && exit 1)
 done
