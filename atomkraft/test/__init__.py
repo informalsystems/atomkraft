@@ -5,7 +5,7 @@ import typer
 from atomkraft.config.atomkraft_config import AtomkraftConfig
 
 from .model import MODEL_CONFIG_KEY, test_model
-from .trace import test_trace
+from .trace import TRACE_CONFIG_KEY, test_all_trace, test_trace
 
 app = typer.Typer(rich_markup_mode="rich", add_completion=False)
 
@@ -36,12 +36,17 @@ def RequiredFileOption(help, default):
 def trace(
     # currently, require the trace to be present.
     # later, there will be an option to pick up the last one from the model
-    trace: Path = RequiredFileOption("trace to execute", "model"),
+    trace: Optional[Path] = FileOption("trace to execute", "model"),
     reactor: Optional[Path] = FileOption("reactor to interpret the trace", "reactor"),
     keypath: str = typer.Option(
         "action",
         show_default=True,
         help="Path to key used as step name, extracted from ITF states",
+    ),
+    all: bool = typer.Option(
+        False,
+        show_default=False,
+        help="Recursively find and execute traces from default trace directory",
     ),
     verbose: bool = typer.Option(
         False, "--verbose", "-v", help="Output logging on console"
@@ -51,7 +56,17 @@ def trace(
     Test blockchain by running one trace
     """
 
-    exit_code = test_trace(trace, reactor, keypath, verbose)
+    if all and trace is not None:
+        raise RuntimeError("--trace and --all can not be used together.")
+
+    if all:
+        exit_code = test_all_trace(reactor, keypath, verbose)
+    else:
+        exit_code = test_trace(trace, reactor, keypath, verbose)
+
+    if trace:
+        with AtomkraftConfig() as c:
+            c[TRACE_CONFIG_KEY] = str(model)
 
     raise typer.Exit(exit_code)
 
