@@ -149,10 +149,9 @@ def test_all_trace(reactor: Optional[Path], keypath: str, verbose: bool):
         .replace("-", "_")
     )
 
-    root_report_dir = root / "reports" / test_group
     root_test_dir = root / "tests" / test_group
 
-    exit_codes = []
+    test_list = []
 
     for trace in traces:
         if all(not c.isdigit() for c in trace.name):
@@ -177,31 +176,35 @@ def test_all_trace(reactor: Optional[Path], keypath: str, verbose: bool):
                     json.dumps(keypath),
                 )
             )
+        test_list.append((trace, test_path))
 
-        report_dir = root_report_dir / test_path.stem
-        report_dir.mkdir(parents=True, exist_ok=True)
+    report_dir = root / "reports" / test_group
+    report_dir.mkdir(parents=True, exist_ok=True)
 
-        logging_file = report_dir / "log.txt"
+    logging_file = report_dir / "log.txt"
 
-        pytest_report_file = report_dir / "report.jsonl"
+    pytest_report_file = report_dir / "report.jsonl"
 
-        pytest_args = [
-            "--log-file-level=INFO",
-            "--log-cli-level=INFO",
-            f"--log-file={logging_file}",
-            f"--report-log={pytest_report_file}",
-        ]
+    pytest_args = [
+        "--log-file-level=INFO",
+        "--log-cli-level=INFO",
+        f"--log-file={logging_file}",
+        f"--report-log={pytest_report_file}",
+    ]
 
-        if verbose:
-            pytest_args.append("-rP")
+    if verbose:
+        pytest_args.append("-rP")
 
-        exit_codes.append(pytest.main(pytest_args + [str(test_path)]))
+    exit_code = pytest.main(
+        pytest_args + [str(test_file) for (_, test_file) in test_list]
+    )
 
+    for (trace, _) in test_list:
         copy_if_exists([Path(trace), root / ".atomkraft" / "nodes"], report_dir)
 
     if traces:
-        print(f"Test data is saved at {root_report_dir}")
-        return max(int(e) for e in exit_codes)
+        print(f"Test data is saved at {report_dir}")
     else:
-        print("No trace is present.")
-        return 0
+        print("No trace is produced.")
+
+    return int(exit_code)
