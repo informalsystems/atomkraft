@@ -91,28 +91,26 @@ def test_model(
         .replace("-", "_")
     )
 
-    root_report_dir = root / "reports" / test_group
+    test_name = f"test_{test_group}"
 
     successul_ops = model_result.successful()
 
-    exit_codes = []
+    test_list = []
 
     for op in successul_ops:
-        print(f"Testing {op} ...")
+        print(f"Preparing test for {op} ...")
         for trace_path in model_result.trace_paths(op):
             trace = Path(trace_path)
             if all(not c.isdigit() for c in trace.name):
                 continue
 
             trace_name = trace.name.removesuffix(".itf.json")
-
-            print(trace)
+            print(f"Using {trace} ...")
             trace = get_relative_project_path(trace)
-            test_name = f"test_{test_group}"
             test_path = test_dir / test_name / f"test_{op}_{trace_name}.py"
             test_path.parent.mkdir(parents=True, exist_ok=True)
             with open(test_path, "w") as test:
-                print(f"Writing {test_name} ...")
+                print(f"Writing {test_path.name} ...")
                 test.write(
                     TRACE_TEST_STUB.format(
                         json.dumps(str(reactor).replace("/", ".").removesuffix(".py")),
@@ -120,31 +118,35 @@ def test_model(
                         json.dumps(keypath),
                     )
                 )
+            test_list.append((trace, test_path))
 
-            report_dir = root_report_dir / test_path.stem
-            report_dir.mkdir(parents=True, exist_ok=True)
+    report_dir = root / "reports" / test_name
+    report_dir.mkdir(parents=True, exist_ok=True)
 
-            logging_file = report_dir / "log.txt"
+    logging_file = report_dir / "log.txt"
 
-            pytest_report_file = report_dir / "report.jsonl"
+    pytest_report_file = report_dir / "report.jsonl"
 
-            pytest_args = [
-                "--log-file-level=INFO",
-                "--log-cli-level=INFO",
-                f"--log-file={logging_file}",
-                f"--report-log={pytest_report_file}",
-            ]
+    pytest_args = [
+        "--log-file-level=INFO",
+        "--log-cli-level=INFO",
+        f"--log-file={logging_file}",
+        f"--report-log={pytest_report_file}",
+    ]
 
-            if verbose:
-                pytest_args.append("-rP")
+    if verbose:
+        pytest_args.append("-rP")
 
-            exit_codes.append(pytest.main(pytest_args + [str(test_path)]))
+    exit_code = pytest.main(
+        pytest_args + [str(test_file) for (_, test_file) in test_list]
+    )
 
-            copy_if_exists([Path(trace), root / ".atomkraft" / "nodes"], report_dir)
+    for (trace, _) in test_list:
+        copy_if_exists([Path(trace), root / ".atomkraft" / "nodes"], report_dir)
 
     if successul_ops:
-        print(f"Test data is saved at {root_report_dir}")
-        return max(int(e) for e in exit_codes)
+        print(f"Test data is saved at {report_dir}")
     else:
         print("No trace is produced.")
-        return 0
+
+    return int(exit_code)
