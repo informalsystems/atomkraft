@@ -94,12 +94,12 @@ File found!
 <!-- $MDX dir=transfer -->
 ```sh
 $ rm -rf tests/*
-$ atomkraft test trace --trace traces/Ex/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag --verbose | grep PASSED | wc -l
+$ atomkraft test trace --trace traces/Ex/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag --verbose | grep PASSED | wc -l | xargs
 1
 $ rm -rf traces/*
-$ atomkraft test model --model models/transfer.tla --test Ex --max-trace 25 --view View --reactor reactors/reactor.py --keypath action.tag | grep PASSED | wc -l
+$ atomkraft test model --model models/transfer.tla --test Ex --max-trace 25 --view View --reactor reactors/reactor.py --keypath action.tag | grep PASSED | wc -l | xargs
 25
-$ atomkraft test trace --reactor reactors/reactor.py --keypath action.tag --all --verbose | grep PASSED | wc -l
+$ atomkraft test trace --reactor reactors/reactor.py --keypath action.tag --all --verbose | grep PASSED | wc -l | xargs
 25
 ```
 
