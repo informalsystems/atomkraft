@@ -90,6 +90,11 @@ def model(
     max_trace: Optional[int] = typer.Option(
         None, show_default=False, help="Maximum number of traces to generate"
     ),
+    view: Optional[str] = typer.Option(
+        None,
+        show_default=False,
+        help="View projector to generate only interesting traces",
+    ),
     verbose: bool = typer.Option(
         False, "--verbose", "-v", help="Output logging on console"
     ),
@@ -99,7 +104,14 @@ def model(
     """
     tests = [t.strip() for ts in test for t in ts.split(",")]
 
-    exit_code = test_model(model, tests, reactor, keypath, max_trace, verbose)
+    checker_args = dict()
+
+    if max_trace:
+        checker_args["max_error"] = str(max_trace)
+    if view:
+        checker_args["view"] = view
+
+    exit_code = test_model(model, tests, reactor, keypath, checker_args, verbose)
 
     if model:
         with AtomkraftConfig() as c:

@@ -3,7 +3,7 @@ import shutil
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 import pytest
 from atomkraft.config.atomkraft_config import AtomkraftConfig
@@ -48,7 +48,7 @@ def test_model(
     tests: List[str],
     reactor: Optional[Path],
     keypath: str,
-    max_trace: Optional[int],
+    checker_params: Dict[str, str],
     verbose: bool,
 ) -> int:
     """
@@ -72,7 +72,9 @@ def test_model(
     print(f"Generating traces for {model.name} ...")
 
     try:
-        model_result = generate_traces(None, model, tests, max_trace=max_trace)
+        model_result = generate_traces(
+            None, model, tests, checker_params=checker_params
+        )
     except Exception as e:
         raise RuntimeError(f"[Modelator] {e}")
 
