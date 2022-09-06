@@ -89,13 +89,27 @@ $ find "tests" -type f -iname "test_traces_Ex_violation1_itf_json_*.py" -exec ec
 File found!
 ```
 
+## Count
+
+<!-- $MDX dir=transfer -->
+```sh
+$ rm -rf tests/*
+$ atomkraft test trace --trace traces/Ex/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag --verbose | grep PASSED | wc -l
+1
+$ rm -rf traces/*
+$ atomkraft test model --model models/transfer.tla --test Ex --max-trace 25 --view View --reactor reactors/reactor.py --keypath action.tag | grep PASSED | wc -l
+25
+$ atomkraft test trace --reactor reactors/reactor.py --keypath action.tag --all --verbose | grep PASSED | wc -l
+25
+```
+
 <!-- $MDX dir=transfer -->
 ```sh
 $ curl -Lo reactors/reactor.py https://raw.githubusercontent.com/informalsystems/atomkraft/dev/examples/cosmos-sdk/transfer/reactor.py
 ...
 ```
 
-## Test 
+## Test
 
 ### Trace
 
@@ -110,7 +124,7 @@ $ atomkraft test trace --trace traces/Ex/violation1.itf.json --reactor reactors/
 <!-- $MDX dir=transfer -->
 ```sh
 $ rm -rf traces/*
-$ atomkraft test model --model models/transfer.tla --test Ex --reactor reactors/reactor.py --keypath action.tag
+$ atomkraft test model --model models/transfer.tla --test Ex --max-trace 3 --view View --reactor reactors/reactor.py --keypath action.tag
 ...
 ```
 
