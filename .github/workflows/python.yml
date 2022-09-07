@@ -20,20 +20,18 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - uses: marian-code/python-lint-annotate@v3
         with:
+          python-root-list: "atomkraft/ examples/ tests/"
+          use-black: true
+          use-isort: true
+          use-mypy: false
+          use-pycodestyle: true
+          use-pydocstyle: false
+          use-pylint: false
+          use-flake8: true
+          use-vulture: false
           python-version: ${{ matrix.python-version }}
-      - uses: actions/cache@v3
-        id: pip-cache
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip
-      - name: Install dependencies
-        run: python -m pip install pyflakes==2.4.0 black pylama[all]
-      - name: Run linters
-        run: |
-          black . --check
-          pylama -l pyflakes,pycodestyle,isort
   test:
     strategy:
       fail-fast: true
