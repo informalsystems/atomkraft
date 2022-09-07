@@ -3,9 +3,10 @@ from typing import List, Optional
 
 import typer
 from atomkraft.config.atomkraft_config import AtomkraftConfig
+from atomkraft.utils.project import get_relative_project_path
 
 from .model import MODEL_CONFIG_KEY, test_model
-from .trace import test_trace
+from .trace import TRACE_CONFIG_KEY, test_all_trace, test_trace
 
 app = typer.Typer(rich_markup_mode="rich", add_completion=False)
 
@@ -36,12 +37,17 @@ def RequiredFileOption(help, default):
 def trace(
     # currently, require the trace to be present.
     # later, there will be an option to pick up the last one from the model
-    trace: Path = RequiredFileOption("trace to execute", "model"),
+    trace: Optional[Path] = FileOption("trace to execute", "model"),
     reactor: Optional[Path] = FileOption("reactor to interpret the trace", "reactor"),
     keypath: str = typer.Option(
         "action",
         show_default=True,
         help="Path to key used as step name, extracted from ITF states",
+    ),
+    all: bool = typer.Option(
+        False,
+        show_default=False,
+        help="Recursively find and execute traces from default trace directory",
     ),
     verbose: bool = typer.Option(
         False, "--verbose", "-v", help="Output logging on console"
@@ -51,7 +57,17 @@ def trace(
     Test blockchain by running one trace
     """
 
-    exit_code = test_trace(trace, reactor, keypath, verbose)
+    if all and trace is not None:
+        raise RuntimeError("--trace and --all can not be used together.")
+
+    if all:
+        exit_code = test_all_trace(reactor, keypath, verbose)
+    else:
+        exit_code = test_trace(trace, reactor, keypath, verbose)
+
+    if trace:
+        with AtomkraftConfig() as c:
+            c[TRACE_CONFIG_KEY] = str(get_relative_project_path(trace))
 
     raise typer.Exit(exit_code)
 
@@ -71,6 +87,14 @@ def model(
         show_default=True,
         help="Path to key used as step name, extracted from ITF states",
     ),
+    max_trace: Optional[int] = typer.Option(
+        None, show_default=False, help="Maximum number of traces to generate"
+    ),
+    view: Optional[str] = typer.Option(
+        None,
+        show_default=False,
+        help="View projector to generate only interesting traces",
+    ),
     verbose: bool = typer.Option(
         False, "--verbose", "-v", help="Output logging on console"
     ),
@@ -80,10 +104,17 @@ def model(
     """
     tests = [t.strip() for ts in test for t in ts.split(",")]
 
-    exit_code = test_model(model, tests, reactor, keypath, verbose)
+    checker_args = dict()
+
+    if max_trace:
+        checker_args["max_error"] = str(max_trace)
+    if view:
+        checker_args["view"] = view
+
+    exit_code = test_model(model, tests, reactor, keypath, checker_args, verbose)
 
     if model:
         with AtomkraftConfig() as c:
-            c[MODEL_CONFIG_KEY] = str(model)
+            c[MODEL_CONFIG_KEY] = str(get_relative_project_path(model))
 
     raise typer.Exit(exit_code)

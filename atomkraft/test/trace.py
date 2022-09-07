@@ -6,9 +6,18 @@ from pathlib import Path
 from typing import List, Optional
 
 import pytest
-from atomkraft.utils.project import project_root
+from atomkraft.config.atomkraft_config import AtomkraftConfig
+from atomkraft.config.model_config import ModelConfig
+from atomkraft.utils.project import (
+    get_absolute_project_path,
+    get_relative_project_path,
+    project_root,
+)
 
 from ..reactor.reactor import get_reactor
+
+# a key for the last used trace path inside internal config
+TRACE_CONFIG_KEY = "trace"
 
 TRACE_TEST_STUB = """import logging
 
@@ -23,6 +32,17 @@ def test_trace():
 """
 
 
+def get_trace() -> Path:
+    """
+    returns the path to the current trace from the internal config
+    """
+    with AtomkraftConfig() as config:
+        try:
+            return get_absolute_project_path(config[TRACE_CONFIG_KEY])
+        except KeyError:
+            raise RuntimeError("Could not find any last used trace.")
+
+
 def copy_if_exists(src_paths: List[Path], dst_path: Path):
     for src in src_paths:
         if src.is_dir():
@@ -35,20 +55,23 @@ def copy_if_exists(src_paths: List[Path], dst_path: Path):
 
 
 def test_trace(
-    trace: Path, reactor: Optional[Path], keypath: str, verbose: bool
-) -> int:
+    trace: Optional[Path], reactor: Optional[Path], keypath: str, verbose: bool
+):
     """
     Test blockchain by running one trace
     """
-
-    if reactor is None:
-        reactor = get_reactor()
 
     root = project_root()
     if not root:
         raise RuntimeError(
             "could not find Atomkraft project: are you in the right directory?"
         )
+
+    if trace is None:
+        trace = get_trace()
+
+    if reactor is None:
+        reactor = get_relative_project_path(get_reactor())
 
     tests = root / "tests"
     tests.mkdir(exist_ok=True)
@@ -95,5 +118,93 @@ def test_trace(
     copy_if_exists([Path(trace), root / ".atomkraft" / "nodes"], report_dir)
 
     print(f"Test data is saved at {report_dir}")
+
+    return int(exit_code)
+
+
+def test_all_trace(reactor: Optional[Path], keypath: str, verbose: bool):
+    """
+    Test blockchain by running all available traces
+    """
+
+    root = project_root()
+    if not root:
+        raise RuntimeError(
+            "could not find Atomkraft project: are you in the right directory?"
+        )
+
+    with ModelConfig() as config:
+        traces_dir = get_absolute_project_path(config["traces_dir"])
+        traces = list(traces_dir.glob("**/*.itf.json"))
+
+    if reactor is None:
+        reactor = get_relative_project_path(get_reactor())
+
+    timestamp = datetime.now().isoformat(timespec="milliseconds")
+
+    test_group = (
+        f"all_{timestamp}".replace("/", "_")
+        .replace(".", "_")
+        .replace(":", "_")
+        .replace("-", "_")
+    )
+
+    root_test_dir = root / "tests" / test_group
+
+    test_list = []
+
+    for trace in traces:
+        if all(not c.isdigit() for c in trace.name):
+            continue
+        trace = get_relative_project_path(trace)
+        trace_name = (
+            str(trace)
+            .replace("/", "_")
+            .replace(".", "_")
+            .replace(":", "_")
+            .replace("-", "_")
+        )
+        test_file_name = f"test_{trace_name}.py"
+        test_path = root_test_dir / test_file_name
+        test_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(test_path, "w") as test:
+            print(f"Writing {test_file_name} ...")
+            test.write(
+                TRACE_TEST_STUB.format(
+                    json.dumps(str(reactor).replace("/", ".").removesuffix(".py")),
+                    json.dumps(str(trace)),
+                    json.dumps(keypath),
+                )
+            )
+        test_list.append((trace, test_path))
+
+    report_dir = root / "reports" / test_group
+    report_dir.mkdir(parents=True, exist_ok=True)
+
+    logging_file = report_dir / "log.txt"
+
+    pytest_report_file = report_dir / "report.jsonl"
+
+    pytest_args = [
+        "--log-file-level=INFO",
+        "--log-cli-level=INFO",
+        f"--log-file={logging_file}",
+        f"--report-log={pytest_report_file}",
+    ]
+
+    if verbose:
+        pytest_args.append("-rP")
+
+    exit_code = pytest.main(
+        pytest_args + [str(test_file) for (_, test_file) in test_list]
+    )
+
+    for (trace, _) in test_list:
+        copy_if_exists([Path(trace), root / ".atomkraft" / "nodes"], report_dir)
+
+    if traces:
+        print(f"Test data is saved at {report_dir}")
+    else:
+        print("No trace is produced.")
 
     return int(exit_code)

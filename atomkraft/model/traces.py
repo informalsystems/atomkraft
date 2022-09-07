@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 from atomkraft.config.atomkraft_config import AtomkraftConfig
 from atomkraft.config.model_config import ModelConfig
@@ -22,6 +22,7 @@ def generate_traces(
     model_config_path: Optional[Path],
     model_path: Optional[Path] = None,
     sample_operators=[],
+    checker_params: Optional[Dict[str, str]] = None,
 ) -> ModelResult:
     """
     Call Modelator to get samples of the given model in `model_path`. Return the
@@ -54,8 +55,13 @@ def generate_traces(
     if not model_path.is_file():
         raise FileNotFoundError(f"File with model not found: {model_path}")
 
+    if checker_params is None:
+        checker_params = dict()
+
     model = Model.parse_file(str(model_path), init, next)
-    return model.sample(traces_dir=traces_dir, examples=sample_operators)
+    return model.sample(
+        traces_dir=traces_dir, examples=sample_operators, checker_params=checker_params
+    )
 
 
 def last_modified_trace_path() -> str:
