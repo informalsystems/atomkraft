@@ -130,7 +130,10 @@ def test_model(
     if verbose:
         pytest_args.append("-rP")
 
-    shutil.rmtree(root / ATOMKRAFT_INTERNAL_DIR / VALIDATOR_DIR)
+    val_root_dir = root / ATOMKRAFT_INTERNAL_DIR / VALIDATOR_DIR
+
+    if val_root_dir.exists():
+        shutil.rmtree(val_root_dir)
 
     exit_code = pytest.main(
         pytest_args + [str(test_file) for (_, test_file) in test_list]
@@ -145,7 +148,11 @@ def test_model(
     vals_dirs.sort(key=lambda k: k.stat().st_mtime)
 
     for ((trace, _), vals_dir) in zip(test_list, vals_dirs):
-        copy_if_exists([Path(trace), vals_dir], report_dir / snakecase(str(trace)))
+        copy_if_exists(
+            [Path(trace), vals_dir],
+            report_dir
+            / snakecase(str(trace).removesuffix(".itf.json"), delimiters="./"),
+        )
 
     if successul_ops:
         print(f"Test data is saved at {report_dir}")
