@@ -2,6 +2,8 @@ import os
 from pathlib import Path
 from typing import Union
 
+from atomkraft.config.atomkraft_config import ATOMKRAFT_INTERNAL_DIR
+
 
 class NoProjectError(RuntimeError):
     def __init__(self) -> None:
@@ -14,7 +16,7 @@ def project_root() -> Path:
         if (
             (cwd / "pyproject.toml").exists()
             and (cwd / "atomkraft.toml").exists()
-            and (cwd / ".atomkraft" / "config.toml").exists()
+            and (cwd / ATOMKRAFT_INTERNAL_DIR / "config.toml").exists()
         ):
             return cwd
         cwd = cwd.parent

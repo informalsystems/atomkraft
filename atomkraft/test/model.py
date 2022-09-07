@@ -6,7 +6,8 @@ from pathlib import Path
 from typing import Dict, List, Optional
 
 import pytest
-from atomkraft.config.atomkraft_config import AtomkraftConfig
+from atomkraft.chain.testnet import VALIDATOR_DIR
+from atomkraft.config.atomkraft_config import ATOMKRAFT_INTERNAL_DIR, AtomkraftConfig
 from atomkraft.model.traces import generate_traces
 from atomkraft.utils.project import (
     get_absolute_project_path,
@@ -142,7 +143,9 @@ def test_model(
     )
 
     for (trace, _) in test_list:
-        copy_if_exists([Path(trace), root / ".atomkraft" / "nodes"], report_dir)
+        copy_if_exists(
+            [Path(trace), root / ATOMKRAFT_INTERNAL_DIR / VALIDATOR_DIR], report_dir
+        )
 
     if successul_ops:
         print(f"Test data is saved at {report_dir}")

@@ -6,7 +6,8 @@ from pathlib import Path
 from typing import List, Optional
 
 import pytest
-from atomkraft.config.atomkraft_config import AtomkraftConfig
+from atomkraft.chain.testnet import VALIDATOR_DIR
+from atomkraft.config.atomkraft_config import ATOMKRAFT_INTERNAL_DIR, AtomkraftConfig
 from atomkraft.config.model_config import ModelConfig
 from atomkraft.utils.project import (
     get_absolute_project_path,
@@ -115,7 +116,9 @@ def test_trace(
 
     exit_code = pytest.main(pytest_args + [test_path])
 
-    copy_if_exists([Path(trace), root / ".atomkraft" / "nodes"], report_dir)
+    copy_if_exists(
+        [Path(trace), root / ATOMKRAFT_INTERNAL_DIR / VALIDATOR_DIR], report_dir
+    )
 
     print(f"Test data is saved at {report_dir}")
 
@@ -200,11 +203,13 @@ def test_all_trace(reactor: Optional[Path], keypath: str, verbose: bool):
     )
 
     for (trace, _) in test_list:
-        copy_if_exists([Path(trace), root / ".atomkraft" / "nodes"], report_dir)
+        copy_if_exists(
+            [Path(trace), root / ATOMKRAFT_INTERNAL_DIR / VALIDATOR_DIR], report_dir
+        )
 
     if traces:
         print(f"Test data is saved at {report_dir}")
     else:
-        print("No trace is produced.")
+        print("No trace is present.")
 
     return int(exit_code)
