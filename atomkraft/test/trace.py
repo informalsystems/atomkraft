@@ -11,6 +11,7 @@ from atomkraft.config.atomkraft_config import AtomkraftConfig
 from atomkraft.config.model_config import ModelConfig
 from atomkraft.utils.project import (
     ATOMKRAFT_INTERNAL_DIR,
+    ATOMKRAFT_VAL_DIR_PREFIX,
     get_absolute_project_path,
     get_relative_project_path,
     project_root,
@@ -48,6 +49,7 @@ def get_trace() -> Path:
 def copy_if_exists(srcs: Union[Path, List[Path]], dst_path: Path):
     if isinstance(srcs, Path):
         srcs = [srcs]
+    dst_path.mkdir(parents=True, exist_ok=True)
     for src in srcs:
         if src.is_dir():
             shutil.copytree(src, dst_path / src.name)
@@ -201,14 +203,22 @@ def test_all_trace(reactor: Optional[Path], keypath: str, verbose: bool):
     if verbose:
         pytest_args.append("-rP")
 
+    shutil.rmtree(root / ATOMKRAFT_INTERNAL_DIR / VALIDATOR_DIR)
+
     exit_code = pytest.main(
         pytest_args + [str(test_file) for (_, test_file) in test_list]
     )
 
-    copy_if_exists(root / ATOMKRAFT_INTERNAL_DIR / VALIDATOR_DIR, report_dir)
+    vals_dirs = list(
+        (root / ATOMKRAFT_INTERNAL_DIR / VALIDATOR_DIR).glob(
+            f"{ATOMKRAFT_VAL_DIR_PREFIX}*"
+        )
+    )
 
-    for (trace, _) in test_list:
-        copy_if_exists(Path(trace), report_dir)
+    vals_dirs.sort(key=lambda k: k.stat().st_mtime)
+
+    for ((trace, _), vals_dir) in zip(test_list, vals_dirs):
+        copy_if_exists([Path(trace), vals_dir], report_dir / trace.name)
 
     if traces:
         print(f"Test data is saved at {report_dir}")

@@ -1,4 +1,5 @@
 import json
+import shutil
 import time
 from datetime import datetime
 from pathlib import Path
@@ -10,6 +11,7 @@ from atomkraft.config.atomkraft_config import AtomkraftConfig
 from atomkraft.model.traces import generate_traces
 from atomkraft.utils.project import (
     ATOMKRAFT_INTERNAL_DIR,
+    ATOMKRAFT_VAL_DIR_PREFIX,
     get_absolute_project_path,
     get_relative_project_path,
     project_root,
@@ -127,14 +129,22 @@ def test_model(
     if verbose:
         pytest_args.append("-rP")
 
+    shutil.rmtree(root / ATOMKRAFT_INTERNAL_DIR / VALIDATOR_DIR)
+
     exit_code = pytest.main(
         pytest_args + [str(test_file) for (_, test_file) in test_list]
     )
 
-    copy_if_exists(root / ATOMKRAFT_INTERNAL_DIR / VALIDATOR_DIR, report_dir)
+    vals_dirs = list(
+        (root / ATOMKRAFT_INTERNAL_DIR / VALIDATOR_DIR).glob(
+            f"{ATOMKRAFT_VAL_DIR_PREFIX}*"
+        )
+    )
 
-    for (trace, _) in test_list:
-        copy_if_exists(Path(trace), report_dir)
+    vals_dirs.sort(key=lambda k: k.stat().st_mtime)
+
+    for ((trace, _), vals_dir) in zip(test_list, vals_dirs):
+        copy_if_exists([Path(trace), vals_dir], report_dir / trace.name)
 
     if successul_ops:
         print(f"Test data is saved at {report_dir}")

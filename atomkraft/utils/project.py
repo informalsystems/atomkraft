@@ -4,6 +4,8 @@ from typing import Union
 
 ATOMKRAFT_INTERNAL_DIR = ".atomkraft"
 
+ATOMKRAFT_VAL_DIR_PREFIX = "val_"
+
 
 class NoProjectError(RuntimeError):
     def __init__(self) -> None:
