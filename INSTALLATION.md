@@ -9,7 +9,7 @@ check the [TL;DR section](#tldr).
 
 ## Installing Atomkraft
 
-Installing Atomkraft requires [Python](https://www.python.org) 3.10.
+Installing Atomkraft requires [Python](https://www.python.org) 3.10, `git` and [`java` 17 or newer](https://apalache.informal.systems/docs/apalache/installation/jvm.html).
 
 If you don't have Python 3.10 already installed, please consult the [installation instructions](https://realpython.com/installing-python/) for different installation options.
 One quick way for installing and managing different Python options for your system is by using [pyenv](https://github.com/pyenv/pyenv) and running
