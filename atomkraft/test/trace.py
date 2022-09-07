@@ -16,6 +16,7 @@ from atomkraft.utils.project import (
     get_relative_project_path,
     project_root,
 )
+from caseconverter import snakecase
 
 from ..reactor.reactor import get_reactor
 
@@ -218,7 +219,7 @@ def test_all_trace(reactor: Optional[Path], keypath: str, verbose: bool):
     vals_dirs.sort(key=lambda k: k.stat().st_mtime)
 
     for ((trace, _), vals_dir) in zip(test_list, vals_dirs):
-        copy_if_exists([Path(trace), vals_dir], report_dir / trace.name)
+        copy_if_exists([Path(trace), vals_dir], report_dir / snakecase(str(trace)))
 
     if traces:
         print(f"Test data is saved at {report_dir}")
