@@ -6,7 +6,7 @@ from atomkraft.config.atomkraft_config import AtomkraftConfig
 from atomkraft.utils.project import get_relative_project_path, project_root
 
 from .model import MODEL_CONFIG_KEY, test_model
-from .trace import TRACE_CONFIG_KEY, test_all_trace, test_trace
+from .trace import TRACE_CONFIG_KEY, test_trace, test_trace_dir
 
 app = typer.Typer(rich_markup_mode="rich", add_completion=False)
 
@@ -74,7 +74,7 @@ def trace(
     if all_ or (trace is not None and trace.is_dir()):
         if trace is None:
             trace = project_root() / "traces"
-        exit_code = test_all_trace(trace, reactor, keypath, verbose)
+        exit_code = test_trace_dir(trace, reactor, keypath, verbose)
     elif trace is None or trace.is_file():
         exit_code = test_trace(trace, reactor, keypath, verbose)
     else:

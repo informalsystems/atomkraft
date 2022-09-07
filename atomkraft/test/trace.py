@@ -121,7 +121,7 @@ def test_trace(
     return int(exit_code)
 
 
-def test_all_trace(
+def test_trace_dir(
     trace_dir: Path, reactor: Optional[Path], keypath: str, verbose: bool
 ):
     """
