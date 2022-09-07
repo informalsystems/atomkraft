@@ -7,7 +7,6 @@ from typing import List, Optional
 
 import pytest
 from atomkraft.config.atomkraft_config import AtomkraftConfig
-from atomkraft.config.model_config import ModelConfig
 from atomkraft.utils.project import (
     get_absolute_project_path,
     get_relative_project_path,
@@ -122,7 +121,9 @@ def test_trace(
     return int(exit_code)
 
 
-def test_all_trace(reactor: Optional[Path], keypath: str, verbose: bool):
+def test_all_trace(
+    trace_dir: Path, reactor: Optional[Path], keypath: str, verbose: bool
+):
     """
     Test blockchain by running all available traces
     """
@@ -133,9 +134,7 @@ def test_all_trace(reactor: Optional[Path], keypath: str, verbose: bool):
             "could not find Atomkraft project: are you in the right directory?"
         )
 
-    with ModelConfig() as config:
-        traces_dir = get_absolute_project_path(config["traces_dir"])
-        traces = list(traces_dir.glob("**/*.itf.json"))
+    traces = list(trace_dir.glob("**/*.itf.json"))
 
     if reactor is None:
         reactor = get_relative_project_path(get_reactor())

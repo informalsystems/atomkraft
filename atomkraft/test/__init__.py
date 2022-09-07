@@ -3,7 +3,7 @@ from typing import List, Optional
 
 import typer
 from atomkraft.config.atomkraft_config import AtomkraftConfig
-from atomkraft.utils.project import get_relative_project_path
+from atomkraft.utils.project import get_relative_project_path, project_root
 
 from .model import MODEL_CONFIG_KEY, test_model
 from .trace import TRACE_CONFIG_KEY, test_all_trace, test_trace
@@ -17,6 +17,17 @@ def FileOption(help, default):
         exists=True,
         file_okay=True,
         dir_okay=False,
+        show_default=False,
+        help=f"{help} [grey30][default: set via [bold cyan]atomkraft {default}[/bold cyan]][/grey30]",
+    )
+
+
+def PathOption(help, default):
+    return typer.Option(
+        None,
+        exists=True,
+        file_okay=True,
+        dir_okay=True,
         show_default=False,
         help=f"{help} [grey30][default: set via [bold cyan]atomkraft {default}[/bold cyan]][/grey30]",
     )
@@ -37,7 +48,9 @@ def RequiredFileOption(help, default):
 def trace(
     # currently, require the trace to be present.
     # later, there will be an option to pick up the last one from the model
-    trace: Optional[Path] = FileOption("trace to execute", "model"),
+    trace: Optional[Path] = PathOption(
+        "trace or directory of traces to execute", "model"
+    ),
     reactor: Optional[Path] = FileOption("reactor to interpret the trace", "reactor"),
     keypath: str = typer.Option(
         "action",
@@ -57,15 +70,16 @@ def trace(
     Test blockchain by running one trace
     """
 
-    if all and trace is not None:
+    if all or (trace is not None and trace.is_dir()):
+        if trace is None:
+            trace = project_root() / "traces"
+        exit_code = test_all_trace(trace, reactor, keypath, verbose)
+    elif trace is None or trace.is_file():
+        exit_code = test_trace(trace, reactor, keypath, verbose)
+    else:
         raise RuntimeError("--trace and --all can not be used together.")
 
-    if all:
-        exit_code = test_all_trace(reactor, keypath, verbose)
-    else:
-        exit_code = test_trace(trace, reactor, keypath, verbose)
-
-    if trace:
+    if trace and trace.is_file():
         with AtomkraftConfig() as c:
             c[TRACE_CONFIG_KEY] = str(get_relative_project_path(trace))
 
