@@ -7,6 +7,7 @@ from typing import Dict, List, Optional, Union
 import numpy as np
 import tabulate
 import tomlkit
+from atomkraft.config.atomkraft_config import ATOMKRAFT_INTERNAL_DIR
 from grpclib.client import Channel
 from terra_proto.cosmos.auth.v1beta1 import BaseAccount
 from terra_proto.cosmos.auth.v1beta1 import QueryStub as AuthQueryStub
@@ -63,7 +64,7 @@ class Testnet:
         self.keep = keep
         self.verbose = verbose
         if data_dir is None:
-            data_dir = Path(".")
+            data_dir = Path(ATOMKRAFT_INTERNAL_DIR)
         elif isinstance(data_dir, str):
             data_dir = Path(data_dir)
         self.data_dir = data_dir / VALIDATOR_DIR
