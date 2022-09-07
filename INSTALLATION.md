@@ -15,11 +15,11 @@ If you don't have Python 3.10 already installed, please consult the [installatio
 One quick way for installing and managing different Python options for your system is by using [pyenv](https://github.com/pyenv/pyenv) and running
 
 ```
-pyenv install 3.10.5
-pyenv global 3.10.5
+pyenv install 3.10.6
+pyenv global 3.10.6
 ```
 
-These two commands set the `python` version to `3.10.5`.
+These two commands set the `python` version to `3.10.6`.
 If you want to go back to your old Python version, run `pyenv global system`.
 
 Once Python 3.10 installed, install Atomkraft with `pip install atomkraft`.
@@ -73,8 +73,8 @@ git clone --depth 1 --branch v7.0.3 https://github.com/cosmos/gaia.git
 
 ```
 brew install pyenv git go java
-pyenv install 3.10.5
-pyenv global 3.10.5
+pyenv install 3.10.6
+pyenv global 3.10.6
 pip install --upgrade atomkraft
 git clone --depth 1 --branch v7.0.3 https://github.com/cosmos/gaia.git
 (cd gaia; make build)
