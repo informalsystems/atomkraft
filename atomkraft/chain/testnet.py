@@ -21,10 +21,12 @@ from terra_sdk.core.fee import Fee
 from terra_sdk.core.msg import Msg
 from terra_sdk.key.mnemonic import MnemonicKey
 
-from .node import Account, AccountId, Coin, ConfigPort, Node
+from .node import Account, AccountId, ConfigPort, Node
 from .utils import get_free_ports, update_port
 
 VALIDATOR_DIR = "validator_nodes"
+
+Bank = Dict[AccountId, Dict[str, int]]
 
 
 class Testnet:
@@ -41,8 +43,8 @@ class Testnet:
         coin_type: int = 118,
         config_genesis: Dict = {},
         config_node: Dict = {},
-        account_balance: int = 10**27,
-        validator_balance: int = 10**21,
+        account_balance: Union[int, Bank] = 10**10,
+        validator_balance: Union[int, Bank] = 10**10,
         overwrite: bool = True,
         keep: bool = True,
         verbose: bool = False,
@@ -59,8 +61,20 @@ class Testnet:
         self.coin_type: int = coin_type
         self.config_genesis: Dict = config_genesis
         self.config_node: Dict = config_node
-        self.account_balance: int = account_balance
-        self.validator_balance: int = validator_balance
+        if isinstance(account_balance, int):
+            account_balance_d = dict()
+            for e in self._account_ids:
+                account_balance_d[e] = dict()
+                account_balance_d[e][self.denom] = account_balance
+            account_balance = account_balance_d
+        self.set_account_balances(account_balance)
+        if isinstance(validator_balance, int):
+            validator_balance_d = dict()
+            for e in self._validator_ids:
+                validator_balance_d[e] = dict()
+                validator_balance_d[e][self.denom] = validator_balance
+            validator_balance = validator_balance_d
+        self.set_validator_balances(validator_balance)
         self.overwrite: bool = overwrite
         self.keep = keep
         self.verbose = verbose
@@ -69,6 +83,12 @@ class Testnet:
         elif isinstance(data_dir, str):
             data_dir = Path(data_dir)
         self.data_dir = data_dir / VALIDATOR_DIR
+
+    def set_account_balances(self, balances: Bank):
+        self.account_balances = balances
+
+    def set_validator_balances(self, balances: Bank):
+        self.validator_balances = balances
 
     def set_accounts(self, accounts: Union[int, List[AccountId]]):
         if isinstance(accounts, list):
@@ -180,14 +200,14 @@ class Testnet:
                 Path("config/genesis.json"), v, k
             )
 
-        for validator in self.validators.values():
+        for (v_id, validator) in self.validators.items():
             self.validator_nodes[self._lead_validator].add_account(
-                Coin(self.account_balance, self.denom), validator
+                validator, self.validator_balances[v_id]
             )
 
-        for account in self.accounts.values():
+        for (a_id, account) in self.accounts.items():
             self.validator_nodes[self._lead_validator].add_account(
-                Coin(self.account_balance, self.denom), account
+                account, self.account_balances[a_id]
             )
 
         for node_id, node in self.validator_nodes.items():
@@ -260,7 +280,7 @@ class Testnet:
             node.add_key(self.validators[node_id])
             p2p = self.ports()["p2p"]
             node.add_validator(
-                Coin(self.validator_balance, self.denom), self.validators[node_id]
+                self.validators[node_id], self.validator_balances[node_id][self.denom]
             )
 
             if node_id != self._lead_validator:
