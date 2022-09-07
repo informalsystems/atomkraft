@@ -17,6 +17,7 @@ from terra_sdk.client.lcd.api.tx import CreateTxOptions
 from terra_sdk.core import Coins
 from terra_sdk.core.fee import Fee
 from terra_sdk.core.msg import Msg
+from terra_sdk.core.tx import Tx
 from terra_sdk.key.mnemonic import MnemonicKey
 
 from .node import Account, AccountId, Coin, ConfigPort, Node
@@ -314,7 +315,7 @@ class Testnet:
         gas: int,
         fee_amount: int,
         validator_id: Optional[AccountId] = None,
-    ) -> TxResponse:
+    ) -> (Tx, TxResponse):
         if validator_id is None:
             validator_id = self._lead_validator
 
@@ -372,4 +373,4 @@ class Testnet:
 
         channel.close()
 
-        return result
+        return (tx, result)
