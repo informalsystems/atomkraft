@@ -101,6 +101,8 @@ $ atomkraft test model --model models/transfer.tla --test Ex --max-trace 25 --vi
 25
 $ atomkraft test trace --reactor reactors/reactor.py --keypath action.tag --all --verbose | grep PASSED | wc -l | xargs
 25
+$ atomkraft test trace --reactor reactors/reactor.py --keypath action.tag --trace traces/Ex --verbose | grep PASSED | wc -l | xargs
+25
 ```
 
 <!-- $MDX dir=transfer -->
