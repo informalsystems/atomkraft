@@ -7,9 +7,10 @@ from typing import Dict, List, Optional
 
 import pytest
 from atomkraft.chain.testnet import VALIDATOR_DIR
-from atomkraft.config.atomkraft_config import ATOMKRAFT_INTERNAL_DIR, AtomkraftConfig
+from atomkraft.config.atomkraft_config import AtomkraftConfig
 from atomkraft.model.traces import generate_traces
 from atomkraft.utils.project import (
+    ATOMKRAFT_INTERNAL_DIR,
     get_absolute_project_path,
     get_relative_project_path,
     project_root,

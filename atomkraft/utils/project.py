@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 from typing import Union
 
-from atomkraft.config.atomkraft_config import ATOMKRAFT_INTERNAL_DIR
+ATOMKRAFT_INTERNAL_DIR = ".atomkraft"
 
 
 class NoProjectError(RuntimeError):

@@ -7,9 +7,10 @@ from typing import List, Optional
 
 import pytest
 from atomkraft.chain.testnet import VALIDATOR_DIR
-from atomkraft.config.atomkraft_config import ATOMKRAFT_INTERNAL_DIR, AtomkraftConfig
+from atomkraft.config.atomkraft_config import AtomkraftConfig
 from atomkraft.config.model_config import ModelConfig
 from atomkraft.utils.project import (
+    ATOMKRAFT_INTERNAL_DIR,
     get_absolute_project_path,
     get_relative_project_path,
     project_root,

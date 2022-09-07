@@ -1,7 +1,6 @@
 import pytest
-from atomkraft.config.atomkraft_config import ATOMKRAFT_INTERNAL_DIR
 
-from ..utils.project import project_root
+from ..utils.project import ATOMKRAFT_INTERNAL_DIR, project_root
 from . import CHAIN_CONFIG_FILE
 from .testnet import Testnet
 

@@ -2,9 +2,7 @@ import os
 from typing import Optional
 
 from atomkraft.config.config_file import ConfigFile
-from atomkraft.utils.project import project_root
-
-ATOMKRAFT_INTERNAL_DIR = ".atomkraft"
+from atomkraft.utils.project import ATOMKRAFT_INTERNAL_DIR, project_root
 
 # the file that contains internal configurations for atomkraft
 ATOMKRAFT_INTERNAL_CONFIG = "config.toml"
