@@ -57,8 +57,9 @@ def trace(
         show_default=True,
         help="Path to key used as step name, extracted from ITF states",
     ),
-    all: bool = typer.Option(
+    all_: bool = typer.Option(
         False,
+        "--all",
         show_default=False,
         help="Recursively find and execute traces from default trace directory",
     ),
@@ -70,7 +71,7 @@ def trace(
     Test blockchain by running one trace
     """
 
-    if all or (trace is not None and trace.is_dir()):
+    if all_ or (trace is not None and trace.is_dir()):
         if trace is None:
             trace = project_root() / "traces"
         exit_code = test_all_trace(trace, reactor, keypath, verbose)
