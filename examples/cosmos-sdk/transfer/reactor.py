@@ -7,9 +7,10 @@ from terra_sdk.core.bank import MsgSend
 
 
 @step("Init")
-def init(testnet: Testnet, action):
+def init(testnet: Testnet, action, balances):
     logging.info("Step: Init")
     testnet.set_accounts(action.value.wallets)
+    testnet.set_account_balances(balances)
     testnet.verbose = True
     testnet.oneshot()
     time.sleep(10)

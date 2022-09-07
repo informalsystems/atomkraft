@@ -5,7 +5,7 @@ import shutil
 from dataclasses import dataclass
 from pathlib import Path
 from subprocess import PIPE, Popen
-from typing import Any, Callable, Dict, Optional, Union
+from typing import Any, Callable, Dict, List, Optional, Union
 
 import bip_utils
 import hdwallet
@@ -135,8 +135,8 @@ class Node:
             return json.loads(stdout.decode())
         return json.loads(stderr.decode())
 
-    def add_account(self, coin: Coin, account: Account):
-        argstr = f"add-genesis-account {account.address(self.hrp_prefix)} {coin} --keyring-backend test --output json"
+    def add_account(self, coins: List[Coin], account: Account):
+        argstr = f"add-genesis-account {account.address(self.hrp_prefix)} {','.join(coins)} --keyring-backend test --output json"
         self._execute(argstr.split())
 
     def add_validator(self, coin: Coin, account: Account):
