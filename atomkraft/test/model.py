@@ -1,5 +1,4 @@
 import json
-import shutil
 import time
 from datetime import datetime
 from pathlib import Path
@@ -17,7 +16,7 @@ from atomkraft.utils.project import (
 )
 
 from ..reactor.reactor import get_reactor
-from .trace import TRACE_TEST_STUB
+from .trace import TRACE_TEST_STUB, copy_if_exists
 
 # a key for the last used model path inside internal config
 MODEL_CONFIG_KEY = "model"
@@ -32,17 +31,6 @@ def get_model() -> Path:
             return get_absolute_project_path(config[MODEL_CONFIG_KEY])
         except KeyError:
             raise RuntimeError("Could not find any last used model.")
-
-
-def copy_if_exists(src_paths: List[Path], dst_path: Path):
-    for src in src_paths:
-        if src.is_dir():
-            shutil.copytree(src, dst_path / src.name)
-        elif src.is_file():
-            shutil.copy2(src, dst_path)
-        else:
-            # file does not exist
-            pass
 
 
 def test_model(
@@ -143,10 +131,10 @@ def test_model(
         pytest_args + [str(test_file) for (_, test_file) in test_list]
     )
 
+    copy_if_exists(root / ATOMKRAFT_INTERNAL_DIR / VALIDATOR_DIR, report_dir)
+
     for (trace, _) in test_list:
-        copy_if_exists(
-            [Path(trace), root / ATOMKRAFT_INTERNAL_DIR / VALIDATOR_DIR], report_dir
-        )
+        copy_if_exists(Path(trace), report_dir)
 
     if successul_ops:
         print(f"Test data is saved at {report_dir}")
