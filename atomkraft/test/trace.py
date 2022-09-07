@@ -3,7 +3,7 @@ import os.path
 import shutil
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
+from typing import List, Optional, Union
 
 import pytest
 from atomkraft.chain.testnet import VALIDATOR_DIR
@@ -45,14 +45,17 @@ def get_trace() -> Path:
             raise RuntimeError("Could not find any last used trace.")
 
 
-def copy_if_exists(src: Path, dst_path: Path):
-    if src.is_dir():
-        shutil.copytree(src, dst_path / src.name)
-    elif src.is_file():
-        shutil.copy2(src, dst_path)
-    else:
-        # file does not exist
-        pass
+def copy_if_exists(srcs: Union[Path, List[Path]], dst_path: Path):
+    if isinstance(srcs, Path):
+        srcs = [srcs]
+    for src in srcs:
+        if src.is_dir():
+            shutil.copytree(src, dst_path / src.name)
+        elif src.is_file():
+            shutil.copy2(src, dst_path)
+        else:
+            # file does not exist
+            pass
 
 
 def test_trace(
