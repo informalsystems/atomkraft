@@ -48,7 +48,7 @@ def RequiredFileOption(help, default):
 def trace(
     # currently, require the trace to be present.
     # later, there will be an option to pick up the last one from the model
-    trace: Optional[Path] = PathOption(
+    path: Optional[Path] = PathOption(
         "trace or directory of traces to execute", "model"
     ),
     reactor: Optional[Path] = FileOption("reactor to interpret the trace", "reactor"),
@@ -71,18 +71,18 @@ def trace(
     Test blockchain by running one trace
     """
 
-    if all_ or (trace is not None and trace.is_dir()):
-        if trace is None:
-            trace = project_root() / "traces"
-        exit_code = test_trace_dir(trace, reactor, keypath, verbose)
-    elif trace is None or trace.is_file():
-        exit_code = test_trace(trace, reactor, keypath, verbose)
+    if all_ or (path is not None and path.is_dir()):
+        if path is None:
+            path = project_root() / "traces"
+        exit_code = test_trace_dir(path, reactor, keypath, verbose)
+    elif path is None or path.is_file():
+        exit_code = test_trace(path, reactor, keypath, verbose)
     else:
         raise RuntimeError("--trace and --all can not be used together.")
 
-    if trace and trace.is_file():
+    if path and path.is_file():
         with AtomkraftConfig() as c:
-            c[TRACE_CONFIG_KEY] = str(get_relative_project_path(trace))
+            c[TRACE_CONFIG_KEY] = str(get_relative_project_path(path))
 
     raise typer.Exit(exit_code)
 
