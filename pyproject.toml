@@ -36,6 +36,7 @@ case-converter = "^1.1.0"
 pytest-reportlog = "^0.1.2"
 terra-sdk = "^3.0.1"
 terra-proto = "^2.1.0"
+setuptools = "^65.3.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0", "setuptools>=42"]
