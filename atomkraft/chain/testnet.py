@@ -108,9 +108,13 @@ class Testnet:
         self._lead_validator = self._validator_ids[0]
 
     def acc_addr(self, id: AccountId) -> str:
+        if id not in self.accounts:
+            self.accounts[id] = Account(id, group="acc", seed=self._account_seed)
         return self.accounts[id].address(self.hrp_prefix)
 
     def val_addr(self, id: AccountId, valoper: bool = False) -> str:
+        if id not in self.validators:
+            self.validators[id] = Account(id, group="val", seed=self._account_seed)
         if valoper:
             return self.validators[id].validator_address(self.hrp_prefix)
         else:
