@@ -341,8 +341,8 @@ class Testnet:
         account_id: AccountId,
         msgs: Union[Msg, List[Msg]],
         *,
-        gas: int,
-        fee_amount: int,
+        gas: int = 200_000,
+        fee_amount: int = 0,
         validator_id: Optional[AccountId] = None,
     ) -> TxResponse:
         if validator_id is None:
