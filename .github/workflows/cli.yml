@@ -80,4 +80,5 @@ jobs:
           source .venv/bin/activate
           cd tests/cli
           eval $(opam env)
+          sed -i.bu "s|/dev/|/${{ github.ref_name }}/|g" *md
           for f in `ls *md`; do ocaml-mdx test -v "${f}"; [ ! -f "${f}.corrected" ] || (diff -u "${f}" "${f}.corrected" && exit 1); done

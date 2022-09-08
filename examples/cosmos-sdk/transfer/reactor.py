@@ -7,9 +7,10 @@ from terra_sdk.core.bank import MsgSend
 
 
 @step("Init")
-def init(testnet: Testnet, action):
+def init(testnet: Testnet, action, balances):
     logging.info("Step: Init")
     testnet.set_accounts(action.value.wallets)
+    testnet.set_account_balances(balances)
     testnet.verbose = True
     testnet.oneshot()
     time.sleep(10)
@@ -30,7 +31,7 @@ def transfer(testnet: Testnet, action):
 
     msg = MsgSend(sender_addr, receiver_addr, f"{amount}{testnet.denom}")
 
-    result = testnet.broadcast_transaction(sender_id, msg, gas=200000, fee_amount=20000)
+    result = testnet.broadcast_transaction(sender_id, msg, gas=200_000, fee_amount=20)
 
     logging.info(f"\tSender:    {sender_id} ({sender_addr})")
     logging.info(f"\tReceiver:  {receiver_id} ({receiver_addr})")

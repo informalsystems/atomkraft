@@ -2,6 +2,7 @@ import asyncio
 import socket
 import tempfile
 import time
+from contextlib import closing
 from pathlib import Path
 from typing import Dict, List, Optional, Union
 
@@ -21,10 +22,12 @@ from terra_sdk.core.fee import Fee
 from terra_sdk.core.msg import Msg
 from terra_sdk.key.mnemonic import MnemonicKey
 
-from .node import Account, AccountId, Coin, ConfigPort, Node
+from .node import Account, AccountId, ConfigPort, Node
 from .utils import get_free_ports, update_port
 
 VALIDATOR_DIR = "validator_nodes"
+
+Bank = Dict[AccountId, Dict[str, int]]
 
 
 class Testnet:
@@ -41,8 +44,8 @@ class Testnet:
         coin_type: int = 118,
         config_genesis: Dict = {},
         config_node: Dict = {},
-        account_balance: int = 10**27,
-        validator_balance: int = 10**21,
+        account_balance: Union[int, Bank] = 10**10,
+        validator_balance: Union[int, Bank] = 10**10,
         overwrite: bool = True,
         keep: bool = True,
         verbose: bool = False,
@@ -59,8 +62,20 @@ class Testnet:
         self.coin_type: int = coin_type
         self.config_genesis: Dict = config_genesis
         self.config_node: Dict = config_node
-        self.account_balance: int = account_balance
-        self.validator_balance: int = validator_balance
+        if isinstance(account_balance, int):
+            account_balance_d = dict()
+            for e in self._account_ids:
+                account_balance_d[e] = dict()
+                account_balance_d[e][self.denom] = account_balance
+            account_balance = account_balance_d
+        self.set_account_balances(account_balance)
+        if isinstance(validator_balance, int):
+            validator_balance_d = dict()
+            for e in self._validator_ids:
+                validator_balance_d[e] = dict()
+                validator_balance_d[e][self.denom] = validator_balance
+            validator_balance = validator_balance_d
+        self.set_validator_balances(validator_balance)
         self.overwrite: bool = overwrite
         self.keep = keep
         self.verbose = verbose
@@ -69,6 +84,12 @@ class Testnet:
         elif isinstance(data_dir, str):
             data_dir = Path(data_dir)
         self.data_dir = data_dir / VALIDATOR_DIR
+
+    def set_account_balances(self, balances: Bank):
+        self.account_balances = balances
+
+    def set_validator_balances(self, balances: Bank):
+        self.validator_balances = balances
 
     def set_accounts(self, accounts: Union[int, List[AccountId]]):
         if isinstance(accounts, list):
@@ -88,9 +109,13 @@ class Testnet:
         self._lead_validator = self._validator_ids[0]
 
     def acc_addr(self, id: AccountId) -> str:
+        if id not in self.accounts:
+            self.accounts[id] = Account(id, group="acc", seed=self._account_seed)
         return self.accounts[id].address(self.hrp_prefix)
 
     def val_addr(self, id: AccountId, valoper: bool = False) -> str:
+        if id not in self.validators:
+            self.validators[id] = Account(id, group="val", seed=self._account_seed)
         if valoper:
             return self.validators[id].validator_address(self.hrp_prefix)
         else:
@@ -180,14 +205,14 @@ class Testnet:
                 Path("config/genesis.json"), v, k
             )
 
-        for validator in self.validators.values():
+        for (v_id, validator) in self.validators.items():
             self.validator_nodes[self._lead_validator].add_account(
-                Coin(self.account_balance, self.denom), validator
+                validator, self.validator_balances[v_id]
             )
 
-        for account in self.accounts.values():
+        for (a_id, account) in self.accounts.items():
             self.validator_nodes[self._lead_validator].add_account(
-                Coin(self.account_balance, self.denom), account
+                account, self.account_balances[a_id]
             )
 
         for node_id, node in self.validator_nodes.items():
@@ -260,7 +285,7 @@ class Testnet:
             node.add_key(self.validators[node_id])
             p2p = self.ports()["p2p"]
             node.add_validator(
-                Coin(self.validator_balance, self.denom), self.validators[node_id]
+                self.validators[node_id], self.validator_balances[node_id][self.denom]
             )
 
             if node_id != self._lead_validator:
@@ -316,8 +341,8 @@ class Testnet:
         account_id: AccountId,
         msgs: Union[Msg, List[Msg]],
         *,
-        gas: int,
-        fee_amount: int,
+        gas: int = 200_000,
+        fee_amount: int = 0,
         validator_id: Optional[AccountId] = None,
     ) -> TxResponse:
         if validator_id is None:
@@ -341,40 +366,38 @@ class Testnet:
             )
         )
 
-        channel = self.get_grpc_channel(validator_id=validator_id)
+        with closing(self.get_grpc_channel(validator_id=validator_id)) as channel:
+            stub = AuthQueryStub(channel)
+            result = asyncio.run(stub.account(address=account.address(self.hrp_prefix)))
+            account_info = BaseAccount().parse(result.account.value)
+            account_number = account_info.account_number
+            sequence = account_info.sequence
 
-        stub = AuthQueryStub(channel)
-        result = asyncio.run(stub.account(address=account.address(self.hrp_prefix)))
-        account_info = BaseAccount().parse(result.account.value)
-        account_number = account_info.account_number
-        sequence = account_info.sequence
-
-        tx = wallet.create_and_sign_tx(
-            CreateTxOptions(
-                msgs,
-                fee=Fee(gas, Coins(f"{fee_amount}{self.denom}")),
-                account_number=account_number,
-                sequence=sequence,
+            tx = wallet.create_and_sign_tx(
+                CreateTxOptions(
+                    msgs,
+                    fee=Fee(gas, Coins(f"{fee_amount}{self.denom}")),
+                    account_number=account_number,
+                    sequence=sequence,
+                )
             )
-        )
 
-        service = ServiceStub(channel)
+            service = ServiceStub(channel)
 
-        # # BROADCAST_MODE_BLOCK defines a tx broadcasting mode where the client waits
-        # # for the tx to be committed in a block.
-        # BROADCAST_MODE_BLOCK = 1
-        # # BROADCAST_MODE_SYNC defines a tx broadcasting mode where the client waits
-        # # for a CheckTx execution response only.
-        # BROADCAST_MODE_SYNC = 2
-        # # BROADCAST_MODE_ASYNC defines a tx broadcasting mode where the client
-        # # returns immediately.
-        # BROADCAST_MODE_ASYNC = 3
-        result = asyncio.run(
-            service.broadcast_tx(
-                tx_bytes=bytes(tx.to_proto()), mode=BroadcastMode.BROADCAST_MODE_BLOCK
-            )
-        ).tx_response
-
-        channel.close()
+            # # BROADCAST_MODE_BLOCK defines a tx broadcasting mode where the client waits
+            # # for the tx to be committed in a block.
+            # BROADCAST_MODE_BLOCK = 1
+            # # BROADCAST_MODE_SYNC defines a tx broadcasting mode where the client waits
+            # # for a CheckTx execution response only.
+            # BROADCAST_MODE_SYNC = 2
+            # # BROADCAST_MODE_ASYNC defines a tx broadcasting mode where the client
+            # # returns immediately.
+            # BROADCAST_MODE_ASYNC = 3
+            result = asyncio.run(
+                service.broadcast_tx(
+                    tx_bytes=bytes(tx.to_proto()),
+                    mode=BroadcastMode.BROADCAST_MODE_BLOCK,
+                )
+            ).tx_response
 
         return result
