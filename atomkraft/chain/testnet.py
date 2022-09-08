@@ -2,6 +2,7 @@ import asyncio
 import socket
 import tempfile
 import time
+from contextlib import closing
 from pathlib import Path
 from typing import Dict, List, Optional, Union
 
@@ -365,40 +366,38 @@ class Testnet:
             )
         )
 
-        channel = self.get_grpc_channel(validator_id=validator_id)
+        with closing(self.get_grpc_channel(validator_id=validator_id)) as channel:
+            stub = AuthQueryStub(channel)
+            result = asyncio.run(stub.account(address=account.address(self.hrp_prefix)))
+            account_info = BaseAccount().parse(result.account.value)
+            account_number = account_info.account_number
+            sequence = account_info.sequence
 
-        stub = AuthQueryStub(channel)
-        result = asyncio.run(stub.account(address=account.address(self.hrp_prefix)))
-        account_info = BaseAccount().parse(result.account.value)
-        account_number = account_info.account_number
-        sequence = account_info.sequence
-
-        tx = wallet.create_and_sign_tx(
-            CreateTxOptions(
-                msgs,
-                fee=Fee(gas, Coins(f"{fee_amount}{self.denom}")),
-                account_number=account_number,
-                sequence=sequence,
+            tx = wallet.create_and_sign_tx(
+                CreateTxOptions(
+                    msgs,
+                    fee=Fee(gas, Coins(f"{fee_amount}{self.denom}")),
+                    account_number=account_number,
+                    sequence=sequence,
+                )
             )
-        )
 
-        service = ServiceStub(channel)
+            service = ServiceStub(channel)
 
-        # # BROADCAST_MODE_BLOCK defines a tx broadcasting mode where the client waits
-        # # for the tx to be committed in a block.
-        # BROADCAST_MODE_BLOCK = 1
-        # # BROADCAST_MODE_SYNC defines a tx broadcasting mode where the client waits
-        # # for a CheckTx execution response only.
-        # BROADCAST_MODE_SYNC = 2
-        # # BROADCAST_MODE_ASYNC defines a tx broadcasting mode where the client
-        # # returns immediately.
-        # BROADCAST_MODE_ASYNC = 3
-        result = asyncio.run(
-            service.broadcast_tx(
-                tx_bytes=bytes(tx.to_proto()), mode=BroadcastMode.BROADCAST_MODE_BLOCK
-            )
-        ).tx_response
-
-        channel.close()
+            # # BROADCAST_MODE_BLOCK defines a tx broadcasting mode where the client waits
+            # # for the tx to be committed in a block.
+            # BROADCAST_MODE_BLOCK = 1
+            # # BROADCAST_MODE_SYNC defines a tx broadcasting mode where the client waits
+            # # for a CheckTx execution response only.
+            # BROADCAST_MODE_SYNC = 2
+            # # BROADCAST_MODE_ASYNC defines a tx broadcasting mode where the client
+            # # returns immediately.
+            # BROADCAST_MODE_ASYNC = 3
+            result = asyncio.run(
+                service.broadcast_tx(
+                    tx_bytes=bytes(tx.to_proto()),
+                    mode=BroadcastMode.BROADCAST_MODE_BLOCK,
+                )
+            ).tx_response
 
         return result
