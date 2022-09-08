@@ -3,16 +3,20 @@ import os.path
 import shutil
 from datetime import datetime
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Union
 
 import pytest
+from atomkraft.chain.testnet import VALIDATOR_DIR
 from atomkraft.config.atomkraft_config import AtomkraftConfig
 from atomkraft.config.model_config import ModelConfig
 from atomkraft.utils.project import (
+    ATOMKRAFT_INTERNAL_DIR,
+    ATOMKRAFT_VAL_DIR_PREFIX,
     get_absolute_project_path,
     get_relative_project_path,
     project_root,
 )
+from caseconverter import snakecase
 
 from ..reactor.reactor import get_reactor
 
@@ -43,8 +47,11 @@ def get_trace() -> Path:
             raise RuntimeError("Could not find any last used trace.")
 
 
-def copy_if_exists(src_paths: List[Path], dst_path: Path):
-    for src in src_paths:
+def copy_if_exists(srcs: Union[Path, List[Path]], dst_path: Path):
+    if isinstance(srcs, Path):
+        srcs = [srcs]
+    dst_path.mkdir(parents=True, exist_ok=True)
+    for src in srcs:
         if src.is_dir():
             shutil.copytree(src, dst_path / src.name)
         elif src.is_file():
@@ -115,7 +122,9 @@ def test_trace(
 
     exit_code = pytest.main(pytest_args + [test_path])
 
-    copy_if_exists([Path(trace), root / ".atomkraft" / "nodes"], report_dir)
+    copy_if_exists(
+        [Path(trace), root / ATOMKRAFT_INTERNAL_DIR / VALIDATOR_DIR], report_dir
+    )
 
     print(f"Test data is saved at {report_dir}")
 
@@ -195,16 +204,29 @@ def test_all_trace(reactor: Optional[Path], keypath: str, verbose: bool):
     if verbose:
         pytest_args.append("-rP")
 
+    val_root_dir = root / ATOMKRAFT_INTERNAL_DIR / VALIDATOR_DIR
+
+    if val_root_dir.exists():
+        shutil.rmtree(val_root_dir)
+
     exit_code = pytest.main(
         pytest_args + [str(test_file) for (_, test_file) in test_list]
     )
 
-    for (trace, _) in test_list:
-        copy_if_exists([Path(trace), root / ".atomkraft" / "nodes"], report_dir)
+    vals_dirs = list((val_root_dir).glob(f"{ATOMKRAFT_VAL_DIR_PREFIX}*"))
+
+    vals_dirs.sort(key=lambda k: k.stat().st_mtime)
+
+    for ((trace, _), vals_dir) in zip(test_list, vals_dirs):
+        copy_if_exists(
+            [Path(trace), vals_dir],
+            report_dir
+            / snakecase(str(trace).removesuffix(".itf.json"), delimiters="./"),
+        )
 
     if traces:
         print(f"Test data is saved at {report_dir}")
     else:
-        print("No trace is produced.")
+        print("No trace is present.")
 
     return int(exit_code)

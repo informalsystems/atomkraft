@@ -1,5 +1,6 @@
 import asyncio
 import socket
+import tempfile
 import time
 from pathlib import Path
 from typing import Dict, List, Optional, Union
@@ -7,6 +8,7 @@ from typing import Dict, List, Optional, Union
 import numpy as np
 import tabulate
 import tomlkit
+from atomkraft.utils.project import ATOMKRAFT_INTERNAL_DIR, ATOMKRAFT_VAL_DIR_PREFIX
 from grpclib.client import Channel
 from terra_proto.cosmos.auth.v1beta1 import BaseAccount
 from terra_proto.cosmos.auth.v1beta1 import QueryStub as AuthQueryStub
@@ -63,7 +65,7 @@ class Testnet:
         self.keep = keep
         self.verbose = verbose
         if data_dir is None:
-            data_dir = Path(".")
+            data_dir = Path(ATOMKRAFT_INTERNAL_DIR)
         elif isinstance(data_dir, str):
             data_dir = Path(data_dir)
         self.data_dir = data_dir / VALIDATOR_DIR
@@ -153,6 +155,9 @@ class Testnet:
     def prepare(self):
         self.finalize_accounts()
         self.data_dir.mkdir(parents=True, exist_ok=True)
+        self.data_dir = Path(
+            tempfile.mkdtemp(prefix=ATOMKRAFT_VAL_DIR_PREFIX, dir=str(self.data_dir))
+        )
         self.validator_nodes = {
             validator_id: Node(
                 f"node_{validator_id}",
