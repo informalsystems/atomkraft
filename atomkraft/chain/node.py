@@ -135,7 +135,9 @@ class Node:
             return json.loads(stdout.decode())
         return json.loads(stderr.decode())
 
-    def add_account(self, account: Account, coins: Dict[str, int]):
+    def add_account(self, account: Account, coins: Union[Dict[str, int], int]):
+        if isinstance(coins, int):
+            coins = {self.denom: coins}
         coins_str = ",".join(f"{amount}{denom}" for (denom, amount) in coins.items())
         argstr = f"add-genesis-account {account.address(self.hrp_prefix)} {coins_str} --keyring-backend test --output json"
         self._execute(argstr.split())
