@@ -77,7 +77,7 @@ $ rm -rf tests/*
 
 <!-- $MDX dir=transfer -->
 ```sh
-$ atomkraft test trace --trace traces/Ex/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag --verbose
+$ atomkraft test trace --path traces/Ex/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag --verbose
 ...
 ```
 
@@ -94,14 +94,14 @@ File found!
 <!-- $MDX dir=transfer -->
 ```sh
 $ rm -rf tests/*
-$ atomkraft test trace --trace traces/Ex/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag --verbose | grep PASSED | wc -l | xargs
+$ atomkraft test trace --path traces/Ex/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag --verbose | grep PASSED | wc -l | xargs
 1
 $ rm -rf traces/*
 $ atomkraft test model --model models/transfer.tla --test Ex --max-trace 25 --view View --reactor reactors/reactor.py --keypath action.tag | grep PASSED | wc -l | xargs
 25
 $ atomkraft test trace --reactor reactors/reactor.py --keypath action.tag --all --verbose | grep PASSED | wc -l | xargs
 25
-$ atomkraft test trace --reactor reactors/reactor.py --keypath action.tag --trace traces/Ex --verbose | grep PASSED | wc -l | xargs
+$ atomkraft test trace --path traces/Ex --reactor reactors/reactor.py --keypath action.tag --verbose | grep PASSED | wc -l | xargs
 25
 ```
 
@@ -117,7 +117,7 @@ $ curl -Lo reactors/reactor.py https://raw.githubusercontent.com/informalsystems
 
 <!-- $MDX dir=transfer -->
 ```sh
-$ atomkraft test trace --trace traces/Ex/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag
+$ atomkraft test trace --path traces/Ex/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag
 ...
 ```
 
