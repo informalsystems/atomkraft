@@ -100,10 +100,10 @@ The good news is that we have done a thorough work in making user's life as easy
 The most important command in the scope of test case generation is `atomkraft model sample`. E.g. the command below (assuming you are in the Atomkraft project)
 
 ```sh
-atomkraft model sample --model-path models/transfer.tla --traces-dir traces --examples Ex
+atomkraft model sample --model-path models/transfer.tla --traces-dir traces --tests Ex
 ```
 
-will generate an abstract trace from the [transfer.tla](examples/cosmos-sdk/transfer/transfer.tla) model, and store the generated trace in the `traces` directory of your Atomkraft project.
+will generate an abstract trace from the [transfer.tla](examples/cosmos-sdk/transfer/transfer.tla) model and the test predicate `Ex`, and store the generated trace in the `traces` directory of your Atomkraft project.
 
 ### Running the tests against testnet
 
