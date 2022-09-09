@@ -132,7 +132,7 @@ atomkraft model sample --model-path models/transfer.tla --traces-dir traces --ex
 If you inspect the `transfer.tla` file, you will find that the predicate `Ex` was defined as `step > 3`.
 This requires that sampled test scenarios contain more than 3 transactions.
 
-Indeed, if you check the `traces` directory, you will find the `violation.itf.json` file in it.
+Indeed, if you check the `traces/Ex` directory, you will find the `violation1.itf.json` file in it.
 This file contains a test scenario satisfying the property that there are more than 3 transactions.
 
 While Atomkraft can generate test scenarios from the model, it would also be able to work with test scenarios created some other way (e.g., by hand).
@@ -204,7 +204,7 @@ Successfully executed
 -->
 
 ```
-atomkraft test trace --trace traces/Ex/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag
+atomkraft test trace --path traces/Ex/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag
 ```
 
 The output of the command contains
@@ -247,5 +247,5 @@ Successfully executed
 -->
 
 ```
-atomkraft test trace --trace traces/Ex/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag
+atomkraft test trace --path traces/Ex/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag
 ```
