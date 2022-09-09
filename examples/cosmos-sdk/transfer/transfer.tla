@@ -34,6 +34,6 @@ View ==
     THEN action.value
     ELSE [sender |-> "", receiver |-> "", amount |-> 0]
 
-Ex == step > 3
+TestAliceZero == balances["Alice"] = 0
 
 ====
