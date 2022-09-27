@@ -38,6 +38,29 @@ Let's inspect the structure of the generated `transfer` project.
 Two directories deserve special attention: those are `models` and `reactors`.
 In those two directories we will put files which specify what kind of tests we want to generate.
 
+## Setting up chains
+
+Our ultimate goal is to execute tests on a chain.
+Now we set up the testnet to be used with Atomkraft.
+
+If you were following along the instructions in [INSTALLATION.md](/INSTALLATION.md#blockchain-binary), you already have `simd` compiled (or installed to system).
+`simd` is the default testnet in Atomkraft.
+
+If you have `simd` in your system path, there is nothing else to be done.
+Otherwise, you only need to set the chain binary path invoking:
+
+```
+atomkraft chain config binary <path-to-the-chain-binary>
+```
+
+Working with other chains is possible too, by installing them and then invoking:
+
+```
+atomkraft chain config chain_id <name_of_the_chain>
+atomkraft chain config binary <path-to-the-chain-binary>
+atomkraft chain config prefix <prefix?>
+```
+
 ## Create a model specification
 
 We will model a simple token transfer between two users.
@@ -165,29 +188,6 @@ atomkraft reactor --actions "Init,Transfer" --variables "action"
 Inspect the `reactors` directory now: it contains a generator stub named `reactor.py`.
 For the moment, `reactor.py` is a stub, which will for every step of the test scenario simply print the information about the action.
 We will see how to extend the stub in section [Expanding reactors](#expanding-reactors).
-
-## Setting up chains
-
-Our ultimate goal is to execute tests on a chain.
-Now we set up the testnet to be used with Atomkraft.
-
-If you were following along the instructions in [INSTALLATION.md](/INSTALLATION.md#blockchain-binary), you already have `simd` compiled (or installed to system).
-`simd` is the default testnet in Atomkraft.
-
-If you have `simd` in your system path, there is nothing else to be done.
-Otherwise, you only need to set the chain binary path invoking:
-
-```
-atomkraft chain config binary <path-to-the-chain-binary>
-```
-
-Working with other chains is possible too, by installing them and then invoking:
-
-```
-atomkraft chain config chain_id <name_of_the_chain>
-atomkraft chain config binary <path-to-the-chain-binary>
-atomkraft chain config prefix <prefix?>
-```
 
 ## Executing tests
 
