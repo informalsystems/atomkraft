@@ -12,6 +12,7 @@ We cover the following topics in this file:
   - [Generating traces from TLA+ models](#generating-traces-from-tla-models)
   - [Running the tests against testnet](#running-the-tests-against-testnet)
 - [What's next: Atomkraft's immediate future](#whats-next-atomkrafts-immediate-future)
+- [Introductory video](#introductory-video)
 
 ## Atomkraft Introduction
 
@@ -135,3 +136,9 @@ There are many more features that are planned or are already being implemented; 
   - for the latter, we will provide the built-in blockchain explorer, and integrate into it the capabilities to trace back and forth between abstract trace steps and concrete blockchain transactions.
 - **Test reports and dashboards**: we plan to implement the functionality for generation of test reports as well as live dashboards that would provide an easy-to-grasp overview and categorization of executed and running tests.
 - **Exhaustiveness**: we plan to implement certain coverage metrics (e.g. transaction sequences up to specified length), and to help user achieving full coverage according to those metrics to provide confidence in the code in case no bugs are discovered.
+
+## Introductory video
+
+We have recorded a short video illustrating the basic Atomkraft usage:
+
+[![Atomkraft Introduction](https://img.youtube.com/vi/EBPypESyzqo/0.jpg)](https://www.youtube.com/watch?v=EBPypESyzqo)
