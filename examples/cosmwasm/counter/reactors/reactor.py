@@ -41,13 +41,21 @@ def store_contract(testnet: Testnet, state: Dict, last_msg):
         last_msg.sender, msg, gas=20000000, fee_amount=2000000
     )
 
-    logging.info(str("Contract is uploaded"))
-    logging.info(str(result))
+    if result.code == 0:
+        logging.info("Status: Successful\n")
+    else:
+        logging.info("Status: Error")
+        logging.info("\tcode: %s", result.code)
+        logging.info("\tlog:  %s\n", result.raw_log)
 
     for event in result.logs[0].events:
         if event.type == "store_code":
-            assert event.attributes[0].key == "code_id"
-            code_id = event.attributes[0].value
+            for e in event.attributes:
+                if e.key == "code_id":
+                    code_id = e.value
+                    break
+            else:
+                continue
             break
     else:
         raise RuntimeError("Did not find code_id of the uploaded contract")
@@ -74,8 +82,12 @@ def instantiate(testnet: Testnet, state: Dict, last_msg):
         last_msg.sender, msg, gas=20000000, fee_amount=2000000
     )
 
-    logging.info(str(msg))
-    logging.info(str(result))
+    if result.code == 0:
+        logging.info("Status: Successful\n")
+    else:
+        logging.info("Status: Error")
+        logging.info("\tcode: %s", result.code)
+        logging.info("\tlog:  %s\n", result.raw_log)
 
     for event in result.logs[0].events:
         if event.type == "instantiate":
@@ -86,8 +98,6 @@ def instantiate(testnet: Testnet, state: Dict, last_msg):
         raise RuntimeError("Did not find contract_address of the uploaded code")
 
     state["contract_address"] = contract_address
-
-    time.sleep(0.5)
 
 
 @step("reset")
@@ -107,10 +117,12 @@ def reset(testnet: Testnet, state: Dict, last_msg):
         last_msg.sender, msg, gas=20000000, fee_amount=2000000
     )
 
-    logging.info(str(msg))
-    logging.info(str(result))
-
-    time.sleep(0.5)
+    if result.code == 0:
+        logging.info("Status: Successful\n")
+    else:
+        logging.info("Status: Error")
+        logging.info("\tcode: %s", result.code)
+        logging.info("\tlog:  %s\n", result.raw_log)
 
 
 @step("increment")
@@ -130,10 +142,12 @@ def increment(testnet: Testnet, state: Dict, last_msg):
         last_msg.sender, msg, gas=20000000, fee_amount=2000000
     )
 
-    logging.info(str(msg))
-    logging.info(str(result))
-
-    time.sleep(0.5)
+    if result.code == 0:
+        logging.info("Status: Successful\n")
+    else:
+        logging.info("Status: Error")
+        logging.info("\tcode: %s", result.code)
+        logging.info("\tlog:  %s\n", result.raw_log)
 
 
 @step("get_count")
@@ -151,10 +165,8 @@ def get_count(testnet: Testnet, state: Dict, count):
             )
         )
 
-    logging.info(str(result))
+    logging.info("Response: %s\n", json.loads(result.data.decode()))
 
     data = json.loads(result.data.decode())
 
     assert data["count"] == count
-
-    time.sleep(0.5)
