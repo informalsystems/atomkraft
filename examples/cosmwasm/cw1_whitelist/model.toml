@@ -1,0 +1,11 @@
+# model_path = "path/to/model.tla"
+# init = "Init"
+# next = "Next"
+# config_path = "path/to/module.cfg"
+# invariants = ["Inv1", "Inv2"]
+# examples = ["Ex1", "Ex2"]
+
+# n = 42
+# foo = "bar"
+
+traces_dir = "traces/"

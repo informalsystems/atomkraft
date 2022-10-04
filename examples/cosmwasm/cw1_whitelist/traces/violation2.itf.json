@@ -1,0 +1,556 @@
+{
+    "#meta": {
+      "format": "ITF",
+      "format-description": "https://apalache.informal.systems/docs/adr/015adr-trace.html",
+      "description": "Created by Apalache on Wed Oct 05 16:49:17 CEST 2022"
+    },
+    "vars": [
+      "instantiated",
+      "messages",
+      "admins",
+      "last_msg",
+      "stored",
+      "stepCount",
+      "mutable",
+      "adminLen"
+    ],
+    "states": [
+      {
+        "#meta": {
+          "index": 0
+        },
+        "adminLen": 0,
+        "admins": {
+          "#set": [
+            
+          ]
+        },
+        "instantiated": false,
+        "last_msg": {
+          "name": "idle"
+        },
+        "messages": [
+          
+        ],
+        "mutable": false,
+        "stepCount": 1,
+        "stored": false
+      },
+      {
+        "#meta": {
+          "index": 1
+        },
+        "adminLen": 1,
+        "admins": {
+          "#set": [
+            1
+          ]
+        },
+        "instantiated": false,
+        "last_msg": {
+          "name": "idle"
+        },
+        "messages": [
+          
+        ],
+        "mutable": false,
+        "stepCount": 1,
+        "stored": false
+      },
+      {
+        "#meta": {
+          "index": 2
+        },
+        "adminLen": 2,
+        "admins": {
+          "#set": [
+            1,
+            19
+          ]
+        },
+        "instantiated": false,
+        "last_msg": {
+          "name": "idle"
+        },
+        "messages": [
+          
+        ],
+        "mutable": false,
+        "stepCount": 1,
+        "stored": false
+      },
+      {
+        "#meta": {
+          "index": 3
+        },
+        "adminLen": 3,
+        "admins": {
+          "#set": [
+            1,
+            19,
+            3
+          ]
+        },
+        "instantiated": false,
+        "last_msg": {
+          "name": "idle"
+        },
+        "messages": [
+          
+        ],
+        "mutable": false,
+        "stepCount": 1,
+        "stored": false
+      },
+      {
+        "#meta": {
+          "index": 4
+        },
+        "adminLen": 4,
+        "admins": {
+          "#set": [
+            1,
+            19,
+            3,
+            9
+          ]
+        },
+        "instantiated": false,
+        "last_msg": {
+          "name": "idle"
+        },
+        "messages": [
+          
+        ],
+        "mutable": false,
+        "stepCount": 1,
+        "stored": false
+      },
+      {
+        "#meta": {
+          "index": 5
+        },
+        "adminLen": 5,
+        "admins": {
+          "#set": [
+            1,
+            19,
+            3,
+            7,
+            9
+          ]
+        },
+        "instantiated": false,
+        "last_msg": {
+          "name": "idle"
+        },
+        "messages": [
+          
+        ],
+        "mutable": false,
+        "stepCount": 1,
+        "stored": false
+      },
+      {
+        "#meta": {
+          "index": 6
+        },
+        "adminLen": 6,
+        "admins": {
+          "#set": [
+            1,
+            19,
+            3,
+            5,
+            7,
+            9
+          ]
+        },
+        "instantiated": false,
+        "last_msg": {
+          "name": "idle"
+        },
+        "messages": [
+          
+        ],
+        "mutable": false,
+        "stepCount": 1,
+        "stored": false
+      },
+      {
+        "#meta": {
+          "index": 7
+        },
+        "adminLen": 7,
+        "admins": {
+          "#set": [
+            1,
+            17,
+            19,
+            3,
+            5,
+            7,
+            9
+          ]
+        },
+        "instantiated": false,
+        "last_msg": {
+          "name": "idle"
+        },
+        "messages": [
+          
+        ],
+        "mutable": false,
+        "stepCount": 1,
+        "stored": false
+      },
+      {
+        "#meta": {
+          "index": 8
+        },
+        "adminLen": 8,
+        "admins": {
+          "#set": [
+            1,
+            15,
+            17,
+            19,
+            3,
+            5,
+            7,
+            9
+          ]
+        },
+        "instantiated": false,
+        "last_msg": {
+          "name": "idle"
+        },
+        "messages": [
+          
+        ],
+        "mutable": false,
+        "stepCount": 1,
+        "stored": false
+      },
+      {
+        "#meta": {
+          "index": 9
+        },
+        "adminLen": 9,
+        "admins": {
+          "#set": [
+            1,
+            13,
+            15,
+            17,
+            19,
+            3,
+            5,
+            7,
+            9
+          ]
+        },
+        "instantiated": false,
+        "last_msg": {
+          "name": "idle"
+        },
+        "messages": [
+          
+        ],
+        "mutable": false,
+        "stepCount": 1,
+        "stored": false
+      },
+      {
+        "#meta": {
+          "index": 10
+        },
+        "adminLen": 10,
+        "admins": {
+          "#set": [
+            1,
+            11,
+            13,
+            15,
+            17,
+            19,
+            3,
+            5,
+            7,
+            9
+          ]
+        },
+        "instantiated": false,
+        "last_msg": {
+          "name": "idle"
+        },
+        "messages": [
+          
+        ],
+        "mutable": false,
+        "stepCount": 1,
+        "stored": false
+      },
+      {
+        "#meta": {
+          "index": 11
+        },
+        "adminLen": 10,
+        "admins": {
+          "#set": [
+            1,
+            11,
+            13,
+            15,
+            17,
+            19,
+            3,
+            5,
+            7,
+            9
+          ]
+        },
+        "instantiated": false,
+        "last_msg": {
+          "name": "store_cw_contract",
+          "sender": 20
+        },
+        "messages": [
+          {
+            "name": "idle"
+          }
+        ],
+        "mutable": false,
+        "stepCount": 2,
+        "stored": true
+      },
+      {
+        "#meta": {
+          "index": 12
+        },
+        "adminLen": 10,
+        "admins": {
+          "#set": [
+            1,
+            11,
+            13,
+            15,
+            17,
+            19,
+            3,
+            5,
+            7,
+            9
+          ]
+        },
+        "instantiated": true,
+        "last_msg": {
+          "admins": {
+            "#set": [
+              1,
+              11,
+              13,
+              15,
+              17,
+              19,
+              3,
+              5,
+              7,
+              9
+            ]
+          },
+          "mutable": true,
+          "name": "instantiate"
+        },
+        "messages": [
+          {
+            "name": "idle"
+          },
+          {
+            "name": "store_cw_contract",
+            "sender": 20
+          }
+        ],
+        "mutable": true,
+        "stepCount": 3,
+        "stored": true
+      },
+      {
+        "#meta": {
+          "index": 13
+        },
+        "adminLen": 10,
+        "admins": {
+          "#set": [
+            1,
+            11,
+            13,
+            15,
+            17,
+            19,
+            3,
+            5,
+            7,
+            9
+          ]
+        },
+        "instantiated": true,
+        "last_msg": {
+          "name": "execute",
+          "sender": 15
+        },
+        "messages": [
+          {
+            "name": "idle"
+          },
+          {
+            "name": "store_cw_contract",
+            "sender": 20
+          },
+          {
+            "admins": {
+              "#set": [
+                1,
+                11,
+                13,
+                15,
+                17,
+                19,
+                3,
+                5,
+                7,
+                9
+              ]
+            },
+            "mutable": true,
+            "name": "instantiate"
+          }
+        ],
+        "mutable": true,
+        "stepCount": 4,
+        "stored": true
+      },
+      {
+        "#meta": {
+          "index": 14
+        },
+        "adminLen": 10,
+        "admins": {
+          "#set": [
+            1,
+            11,
+            13,
+            15,
+            17,
+            19,
+            3,
+            5,
+            7,
+            9
+          ]
+        },
+        "instantiated": true,
+        "last_msg": {
+          "name": "freeze",
+          "sender": 17
+        },
+        "messages": [
+          {
+            "name": "idle"
+          },
+          {
+            "name": "store_cw_contract",
+            "sender": 20
+          },
+          {
+            "admins": {
+              "#set": [
+                1,
+                11,
+                13,
+                15,
+                17,
+                19,
+                3,
+                5,
+                7,
+                9
+              ]
+            },
+            "mutable": true,
+            "name": "instantiate"
+          },
+          {
+            "name": "execute",
+            "sender": 15
+          }
+        ],
+        "mutable": true,
+        "stepCount": 5,
+        "stored": true
+      },
+      {
+        "#meta": {
+          "index": 15
+        },
+        "adminLen": 10,
+        "admins": {
+          "#set": [
+            1,
+            11,
+            13,
+            15,
+            17,
+            19,
+            3,
+            5,
+            7,
+            9
+          ]
+        },
+        "instantiated": true,
+        "last_msg": {
+          "name": "execute",
+          "sender": 19
+        },
+        "messages": [
+          {
+            "name": "idle"
+          },
+          {
+            "name": "store_cw_contract",
+            "sender": 20
+          },
+          {
+            "admins": {
+              "#set": [
+                1,
+                11,
+                13,
+                15,
+                17,
+                19,
+                3,
+                5,
+                7,
+                9
+              ]
+            },
+            "mutable": true,
+            "name": "instantiate"
+          },
+          {
+            "name": "execute",
+            "sender": 15
+          },
+          {
+            "name": "freeze",
+            "sender": 17
+          }
+        ],
+        "mutable": true,
+        "stepCount": 6,
+        "stored": true
+      }
+    ]
+  }

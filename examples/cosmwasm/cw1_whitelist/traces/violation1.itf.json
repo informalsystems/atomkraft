@@ -1,0 +1,1764 @@
+{
+  "#meta": {
+    "format": "ITF",
+    "format-description": "https://apalache.informal.systems/docs/adr/015adr-trace.html",
+    "description": "Created by Apalache on Thu Oct 06 09:07:55 CEST 2022"
+  },
+  "vars": [
+    "instantiated",
+    "messages",
+    "admins",
+    "last_msg",
+    "stored",
+    "stepCount",
+    "mutable",
+    "adminLen"
+  ],
+  "states": [
+    {
+      "#meta": {
+        "index": 0
+      },
+      "adminLen": 0,
+      "admins": {
+        "#set": [
+          
+        ]
+      },
+      "instantiated": false,
+      "last_msg": {
+        "name": "idle"
+      },
+      "messages": [
+        
+      ],
+      "mutable": false,
+      "stepCount": 1,
+      "stored": false
+    },
+    {
+      "#meta": {
+        "index": 1
+      },
+      "adminLen": 1,
+      "admins": {
+        "#set": [
+          16
+        ]
+      },
+      "instantiated": false,
+      "last_msg": {
+        "name": "idle"
+      },
+      "messages": [
+        
+      ],
+      "mutable": false,
+      "stepCount": 1,
+      "stored": false
+    },
+    {
+      "#meta": {
+        "index": 2
+      },
+      "adminLen": 2,
+      "admins": {
+        "#set": [
+          16,
+          4
+        ]
+      },
+      "instantiated": false,
+      "last_msg": {
+        "name": "idle"
+      },
+      "messages": [
+        
+      ],
+      "mutable": false,
+      "stepCount": 1,
+      "stored": false
+    },
+    {
+      "#meta": {
+        "index": 3
+      },
+      "adminLen": 3,
+      "admins": {
+        "#set": [
+          16,
+          4,
+          7
+        ]
+      },
+      "instantiated": false,
+      "last_msg": {
+        "name": "idle"
+      },
+      "messages": [
+        
+      ],
+      "mutable": false,
+      "stepCount": 1,
+      "stored": false
+    },
+    {
+      "#meta": {
+        "index": 4
+      },
+      "adminLen": 4,
+      "admins": {
+        "#set": [
+          16,
+          2,
+          4,
+          7
+        ]
+      },
+      "instantiated": false,
+      "last_msg": {
+        "name": "idle"
+      },
+      "messages": [
+        
+      ],
+      "mutable": false,
+      "stepCount": 1,
+      "stored": false
+    },
+    {
+      "#meta": {
+        "index": 5
+      },
+      "adminLen": 5,
+      "admins": {
+        "#set": [
+          11,
+          16,
+          2,
+          4,
+          7
+        ]
+      },
+      "instantiated": false,
+      "last_msg": {
+        "name": "idle"
+      },
+      "messages": [
+        
+      ],
+      "mutable": false,
+      "stepCount": 1,
+      "stored": false
+    },
+    {
+      "#meta": {
+        "index": 6
+      },
+      "adminLen": 6,
+      "admins": {
+        "#set": [
+          11,
+          12,
+          16,
+          2,
+          4,
+          7
+        ]
+      },
+      "instantiated": false,
+      "last_msg": {
+        "name": "idle"
+      },
+      "messages": [
+        
+      ],
+      "mutable": false,
+      "stepCount": 1,
+      "stored": false
+    },
+    {
+      "#meta": {
+        "index": 7
+      },
+      "adminLen": 7,
+      "admins": {
+        "#set": [
+          11,
+          12,
+          16,
+          2,
+          4,
+          7,
+          9
+        ]
+      },
+      "instantiated": false,
+      "last_msg": {
+        "name": "idle"
+      },
+      "messages": [
+        
+      ],
+      "mutable": false,
+      "stepCount": 1,
+      "stored": false
+    },
+    {
+      "#meta": {
+        "index": 8
+      },
+      "adminLen": 8,
+      "admins": {
+        "#set": [
+          11,
+          12,
+          14,
+          16,
+          2,
+          4,
+          7,
+          9
+        ]
+      },
+      "instantiated": false,
+      "last_msg": {
+        "name": "idle"
+      },
+      "messages": [
+        
+      ],
+      "mutable": false,
+      "stepCount": 1,
+      "stored": false
+    },
+    {
+      "#meta": {
+        "index": 9
+      },
+      "adminLen": 9,
+      "admins": {
+        "#set": [
+          11,
+          12,
+          14,
+          16,
+          2,
+          3,
+          4,
+          7,
+          9
+        ]
+      },
+      "instantiated": false,
+      "last_msg": {
+        "name": "idle"
+      },
+      "messages": [
+        
+      ],
+      "mutable": false,
+      "stepCount": 1,
+      "stored": false
+    },
+    {
+      "#meta": {
+        "index": 10
+      },
+      "adminLen": 10,
+      "admins": {
+        "#set": [
+          11,
+          12,
+          14,
+          16,
+          2,
+          3,
+          4,
+          5,
+          7,
+          9
+        ]
+      },
+      "instantiated": false,
+      "last_msg": {
+        "name": "idle"
+      },
+      "messages": [
+        
+      ],
+      "mutable": false,
+      "stepCount": 1,
+      "stored": false
+    },
+    {
+      "#meta": {
+        "index": 11
+      },
+      "adminLen": 10,
+      "admins": {
+        "#set": [
+          11,
+          12,
+          14,
+          16,
+          2,
+          3,
+          4,
+          5,
+          7,
+          9
+        ]
+      },
+      "instantiated": false,
+      "last_msg": {
+        "name": "store_cw_contract",
+        "sender": 7
+      },
+      "messages": [
+        {
+          "name": "idle"
+        }
+      ],
+      "mutable": false,
+      "stepCount": 2,
+      "stored": true
+    },
+    {
+      "#meta": {
+        "index": 12
+      },
+      "adminLen": 10,
+      "admins": {
+        "#set": [
+          11,
+          12,
+          14,
+          16,
+          2,
+          3,
+          4,
+          5,
+          7,
+          9
+        ]
+      },
+      "instantiated": true,
+      "last_msg": {
+        "admins": {
+          "#set": [
+            11,
+            12,
+            14,
+            16,
+            2,
+            3,
+            4,
+            5,
+            7,
+            9
+          ]
+        },
+        "mutable": true,
+        "name": "instantiate"
+      },
+      "messages": [
+        {
+          "name": "idle"
+        },
+        {
+          "name": "store_cw_contract",
+          "sender": 7
+        }
+      ],
+      "mutable": true,
+      "stepCount": 3,
+      "stored": true
+    },
+    {
+      "#meta": {
+        "index": 13
+      },
+      "adminLen": 10,
+      "admins": {
+        "#set": [
+          11,
+          12,
+          14,
+          16,
+          2,
+          3,
+          4,
+          5,
+          7,
+          9
+        ]
+      },
+      "instantiated": true,
+      "last_msg": {
+        "name": "get_admin_list"
+      },
+      "messages": [
+        {
+          "name": "idle"
+        },
+        {
+          "name": "store_cw_contract",
+          "sender": 7
+        },
+        {
+          "admins": {
+            "#set": [
+              11,
+              12,
+              14,
+              16,
+              2,
+              3,
+              4,
+              5,
+              7,
+              9
+            ]
+          },
+          "mutable": true,
+          "name": "instantiate"
+        }
+      ],
+      "mutable": true,
+      "stepCount": 4,
+      "stored": true
+    },
+    {
+      "#meta": {
+        "index": 14
+      },
+      "adminLen": 10,
+      "admins": {
+        "#set": [
+          11,
+          12,
+          14,
+          16,
+          2,
+          3,
+          4,
+          5,
+          7,
+          9
+        ]
+      },
+      "instantiated": true,
+      "last_msg": {
+        "name": "get_admin_list"
+      },
+      "messages": [
+        {
+          "name": "idle"
+        },
+        {
+          "name": "store_cw_contract",
+          "sender": 7
+        },
+        {
+          "admins": {
+            "#set": [
+              11,
+              12,
+              14,
+              16,
+              2,
+              3,
+              4,
+              5,
+              7,
+              9
+            ]
+          },
+          "mutable": true,
+          "name": "instantiate"
+        },
+        {
+          "name": "get_admin_list"
+        }
+      ],
+      "mutable": true,
+      "stepCount": 5,
+      "stored": true
+    },
+    {
+      "#meta": {
+        "index": 15
+      },
+      "adminLen": 10,
+      "admins": {
+        "#set": [
+          11,
+          12,
+          14,
+          16,
+          2,
+          3,
+          4,
+          5,
+          7,
+          9
+        ]
+      },
+      "instantiated": true,
+      "last_msg": {
+        "name": "get_admin_list"
+      },
+      "messages": [
+        {
+          "name": "idle"
+        },
+        {
+          "name": "store_cw_contract",
+          "sender": 7
+        },
+        {
+          "admins": {
+            "#set": [
+              11,
+              12,
+              14,
+              16,
+              2,
+              3,
+              4,
+              5,
+              7,
+              9
+            ]
+          },
+          "mutable": true,
+          "name": "instantiate"
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_admin_list"
+        }
+      ],
+      "mutable": true,
+      "stepCount": 6,
+      "stored": true
+    },
+    {
+      "#meta": {
+        "index": 16
+      },
+      "adminLen": 10,
+      "admins": {
+        "#set": [
+          11,
+          12,
+          14,
+          16,
+          2,
+          3,
+          4,
+          5,
+          7,
+          9
+        ]
+      },
+      "instantiated": true,
+      "last_msg": {
+        "name": "get_admin_list"
+      },
+      "messages": [
+        {
+          "name": "idle"
+        },
+        {
+          "name": "store_cw_contract",
+          "sender": 7
+        },
+        {
+          "admins": {
+            "#set": [
+              11,
+              12,
+              14,
+              16,
+              2,
+              3,
+              4,
+              5,
+              7,
+              9
+            ]
+          },
+          "mutable": true,
+          "name": "instantiate"
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_admin_list"
+        }
+      ],
+      "mutable": true,
+      "stepCount": 7,
+      "stored": true
+    },
+    {
+      "#meta": {
+        "index": 17
+      },
+      "adminLen": 10,
+      "admins": {
+        "#set": [
+          11,
+          12,
+          14,
+          16,
+          2,
+          3,
+          4,
+          5,
+          7,
+          9
+        ]
+      },
+      "instantiated": true,
+      "last_msg": {
+        "name": "get_can_execute",
+        "sender": 7
+      },
+      "messages": [
+        {
+          "name": "idle"
+        },
+        {
+          "name": "store_cw_contract",
+          "sender": 7
+        },
+        {
+          "admins": {
+            "#set": [
+              11,
+              12,
+              14,
+              16,
+              2,
+              3,
+              4,
+              5,
+              7,
+              9
+            ]
+          },
+          "mutable": true,
+          "name": "instantiate"
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_admin_list"
+        }
+      ],
+      "mutable": true,
+      "stepCount": 8,
+      "stored": true
+    },
+    {
+      "#meta": {
+        "index": 18
+      },
+      "adminLen": 10,
+      "admins": {
+        "#set": [
+          11,
+          12,
+          14,
+          16,
+          2,
+          3,
+          4,
+          5,
+          7,
+          9
+        ]
+      },
+      "instantiated": true,
+      "last_msg": {
+        "name": "execute",
+        "sender": 5
+      },
+      "messages": [
+        {
+          "name": "idle"
+        },
+        {
+          "name": "store_cw_contract",
+          "sender": 7
+        },
+        {
+          "admins": {
+            "#set": [
+              11,
+              12,
+              14,
+              16,
+              2,
+              3,
+              4,
+              5,
+              7,
+              9
+            ]
+          },
+          "mutable": true,
+          "name": "instantiate"
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_can_execute",
+          "sender": 7
+        }
+      ],
+      "mutable": true,
+      "stepCount": 9,
+      "stored": true
+    },
+    {
+      "#meta": {
+        "index": 19
+      },
+      "adminLen": 10,
+      "admins": {
+        "#set": [
+          11,
+          12,
+          14,
+          16,
+          2,
+          3,
+          4,
+          5,
+          7,
+          9
+        ]
+      },
+      "instantiated": true,
+      "last_msg": {
+        "name": "get_admin_list"
+      },
+      "messages": [
+        {
+          "name": "idle"
+        },
+        {
+          "name": "store_cw_contract",
+          "sender": 7
+        },
+        {
+          "admins": {
+            "#set": [
+              11,
+              12,
+              14,
+              16,
+              2,
+              3,
+              4,
+              5,
+              7,
+              9
+            ]
+          },
+          "mutable": true,
+          "name": "instantiate"
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_can_execute",
+          "sender": 7
+        },
+        {
+          "name": "execute",
+          "sender": 5
+        }
+      ],
+      "mutable": true,
+      "stepCount": 10,
+      "stored": true
+    },
+    {
+      "#meta": {
+        "index": 20
+      },
+      "adminLen": 10,
+      "admins": {
+        "#set": [
+          11,
+          12,
+          14,
+          16,
+          2,
+          3,
+          4,
+          5,
+          7,
+          9
+        ]
+      },
+      "instantiated": true,
+      "last_msg": {
+        "name": "get_can_execute",
+        "sender": 16
+      },
+      "messages": [
+        {
+          "name": "idle"
+        },
+        {
+          "name": "store_cw_contract",
+          "sender": 7
+        },
+        {
+          "admins": {
+            "#set": [
+              11,
+              12,
+              14,
+              16,
+              2,
+              3,
+              4,
+              5,
+              7,
+              9
+            ]
+          },
+          "mutable": true,
+          "name": "instantiate"
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_can_execute",
+          "sender": 7
+        },
+        {
+          "name": "execute",
+          "sender": 5
+        },
+        {
+          "name": "get_admin_list"
+        }
+      ],
+      "mutable": true,
+      "stepCount": 11,
+      "stored": true
+    },
+    {
+      "#meta": {
+        "index": 21
+      },
+      "adminLen": 10,
+      "admins": {
+        "#set": [
+          11,
+          12,
+          14,
+          16,
+          2,
+          3,
+          4,
+          5,
+          7,
+          9
+        ]
+      },
+      "instantiated": true,
+      "last_msg": {
+        "name": "get_admin_list"
+      },
+      "messages": [
+        {
+          "name": "idle"
+        },
+        {
+          "name": "store_cw_contract",
+          "sender": 7
+        },
+        {
+          "admins": {
+            "#set": [
+              11,
+              12,
+              14,
+              16,
+              2,
+              3,
+              4,
+              5,
+              7,
+              9
+            ]
+          },
+          "mutable": true,
+          "name": "instantiate"
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_can_execute",
+          "sender": 7
+        },
+        {
+          "name": "execute",
+          "sender": 5
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_can_execute",
+          "sender": 16
+        }
+      ],
+      "mutable": true,
+      "stepCount": 12,
+      "stored": true
+    },
+    {
+      "#meta": {
+        "index": 22
+      },
+      "adminLen": 10,
+      "admins": {
+        "#set": [
+          11,
+          12,
+          14,
+          16,
+          2,
+          3,
+          4,
+          5,
+          7,
+          9
+        ]
+      },
+      "instantiated": true,
+      "last_msg": {
+        "name": "execute",
+        "sender": 5
+      },
+      "messages": [
+        {
+          "name": "idle"
+        },
+        {
+          "name": "store_cw_contract",
+          "sender": 7
+        },
+        {
+          "admins": {
+            "#set": [
+              11,
+              12,
+              14,
+              16,
+              2,
+              3,
+              4,
+              5,
+              7,
+              9
+            ]
+          },
+          "mutable": true,
+          "name": "instantiate"
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_can_execute",
+          "sender": 7
+        },
+        {
+          "name": "execute",
+          "sender": 5
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_can_execute",
+          "sender": 16
+        },
+        {
+          "name": "get_admin_list"
+        }
+      ],
+      "mutable": true,
+      "stepCount": 13,
+      "stored": true
+    },
+    {
+      "#meta": {
+        "index": 23
+      },
+      "adminLen": 10,
+      "admins": {
+        "#set": [
+          11,
+          12,
+          14,
+          16,
+          2,
+          3,
+          4,
+          5,
+          7,
+          9
+        ]
+      },
+      "instantiated": true,
+      "last_msg": {
+        "name": "get_admin_list"
+      },
+      "messages": [
+        {
+          "name": "idle"
+        },
+        {
+          "name": "store_cw_contract",
+          "sender": 7
+        },
+        {
+          "admins": {
+            "#set": [
+              11,
+              12,
+              14,
+              16,
+              2,
+              3,
+              4,
+              5,
+              7,
+              9
+            ]
+          },
+          "mutable": true,
+          "name": "instantiate"
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_can_execute",
+          "sender": 7
+        },
+        {
+          "name": "execute",
+          "sender": 5
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_can_execute",
+          "sender": 16
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "execute",
+          "sender": 5
+        }
+      ],
+      "mutable": true,
+      "stepCount": 14,
+      "stored": true
+    },
+    {
+      "#meta": {
+        "index": 24
+      },
+      "adminLen": 10,
+      "admins": {
+        "#set": [
+          11,
+          12,
+          14,
+          16,
+          2,
+          3,
+          4,
+          5,
+          7,
+          9
+        ]
+      },
+      "instantiated": true,
+      "last_msg": {
+        "name": "execute",
+        "sender": 14
+      },
+      "messages": [
+        {
+          "name": "idle"
+        },
+        {
+          "name": "store_cw_contract",
+          "sender": 7
+        },
+        {
+          "admins": {
+            "#set": [
+              11,
+              12,
+              14,
+              16,
+              2,
+              3,
+              4,
+              5,
+              7,
+              9
+            ]
+          },
+          "mutable": true,
+          "name": "instantiate"
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_can_execute",
+          "sender": 7
+        },
+        {
+          "name": "execute",
+          "sender": 5
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_can_execute",
+          "sender": 16
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "execute",
+          "sender": 5
+        },
+        {
+          "name": "get_admin_list"
+        }
+      ],
+      "mutable": true,
+      "stepCount": 15,
+      "stored": true
+    },
+    {
+      "#meta": {
+        "index": 25
+      },
+      "adminLen": 10,
+      "admins": {
+        "#set": [
+          11,
+          12,
+          14,
+          16,
+          2,
+          3,
+          4,
+          5,
+          7,
+          9
+        ]
+      },
+      "instantiated": true,
+      "last_msg": {
+        "name": "get_admin_list"
+      },
+      "messages": [
+        {
+          "name": "idle"
+        },
+        {
+          "name": "store_cw_contract",
+          "sender": 7
+        },
+        {
+          "admins": {
+            "#set": [
+              11,
+              12,
+              14,
+              16,
+              2,
+              3,
+              4,
+              5,
+              7,
+              9
+            ]
+          },
+          "mutable": true,
+          "name": "instantiate"
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_can_execute",
+          "sender": 7
+        },
+        {
+          "name": "execute",
+          "sender": 5
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_can_execute",
+          "sender": 16
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "execute",
+          "sender": 5
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "execute",
+          "sender": 14
+        }
+      ],
+      "mutable": true,
+      "stepCount": 16,
+      "stored": true
+    },
+    {
+      "#meta": {
+        "index": 26
+      },
+      "adminLen": 10,
+      "admins": {
+        "#set": [
+          11,
+          12,
+          14,
+          16,
+          2,
+          3,
+          4,
+          5,
+          7,
+          9
+        ]
+      },
+      "instantiated": true,
+      "last_msg": {
+        "name": "get_can_execute",
+        "sender": 7
+      },
+      "messages": [
+        {
+          "name": "idle"
+        },
+        {
+          "name": "store_cw_contract",
+          "sender": 7
+        },
+        {
+          "admins": {
+            "#set": [
+              11,
+              12,
+              14,
+              16,
+              2,
+              3,
+              4,
+              5,
+              7,
+              9
+            ]
+          },
+          "mutable": true,
+          "name": "instantiate"
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_can_execute",
+          "sender": 7
+        },
+        {
+          "name": "execute",
+          "sender": 5
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_can_execute",
+          "sender": 16
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "execute",
+          "sender": 5
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "execute",
+          "sender": 14
+        },
+        {
+          "name": "get_admin_list"
+        }
+      ],
+      "mutable": true,
+      "stepCount": 17,
+      "stored": true
+    },
+    {
+      "#meta": {
+        "index": 27
+      },
+      "adminLen": 10,
+      "admins": {
+        "#set": [
+          11,
+          12,
+          14,
+          16,
+          2,
+          3,
+          4,
+          5,
+          7,
+          9
+        ]
+      },
+      "instantiated": true,
+      "last_msg": {
+        "name": "execute",
+        "sender": 4
+      },
+      "messages": [
+        {
+          "name": "idle"
+        },
+        {
+          "name": "store_cw_contract",
+          "sender": 7
+        },
+        {
+          "admins": {
+            "#set": [
+              11,
+              12,
+              14,
+              16,
+              2,
+              3,
+              4,
+              5,
+              7,
+              9
+            ]
+          },
+          "mutable": true,
+          "name": "instantiate"
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_can_execute",
+          "sender": 7
+        },
+        {
+          "name": "execute",
+          "sender": 5
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_can_execute",
+          "sender": 16
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "execute",
+          "sender": 5
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "execute",
+          "sender": 14
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_can_execute",
+          "sender": 7
+        }
+      ],
+      "mutable": true,
+      "stepCount": 18,
+      "stored": true
+    },
+    {
+      "#meta": {
+        "index": 28
+      },
+      "adminLen": 10,
+      "admins": {
+        "#set": [
+          11,
+          12,
+          14,
+          16,
+          2,
+          3,
+          4,
+          5,
+          7,
+          9
+        ]
+      },
+      "instantiated": true,
+      "last_msg": {
+        "name": "freeze",
+        "sender": 16
+      },
+      "messages": [
+        {
+          "name": "idle"
+        },
+        {
+          "name": "store_cw_contract",
+          "sender": 7
+        },
+        {
+          "admins": {
+            "#set": [
+              11,
+              12,
+              14,
+              16,
+              2,
+              3,
+              4,
+              5,
+              7,
+              9
+            ]
+          },
+          "mutable": true,
+          "name": "instantiate"
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_can_execute",
+          "sender": 7
+        },
+        {
+          "name": "execute",
+          "sender": 5
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_can_execute",
+          "sender": 16
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "execute",
+          "sender": 5
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "execute",
+          "sender": 14
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_can_execute",
+          "sender": 7
+        },
+        {
+          "name": "execute",
+          "sender": 4
+        }
+      ],
+      "mutable": false,
+      "stepCount": 19,
+      "stored": true
+    },
+    {
+      "#meta": {
+        "index": 29
+      },
+      "adminLen": 10,
+      "admins": {
+        "#set": [
+          11,
+          12,
+          14,
+          16,
+          2,
+          3,
+          4,
+          5,
+          7,
+          9
+        ]
+      },
+      "instantiated": true,
+      "last_msg": {
+        "name": "execute",
+        "sender": 7
+      },
+      "messages": [
+        {
+          "name": "idle"
+        },
+        {
+          "name": "store_cw_contract",
+          "sender": 7
+        },
+        {
+          "admins": {
+            "#set": [
+              11,
+              12,
+              14,
+              16,
+              2,
+              3,
+              4,
+              5,
+              7,
+              9
+            ]
+          },
+          "mutable": true,
+          "name": "instantiate"
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_can_execute",
+          "sender": 7
+        },
+        {
+          "name": "execute",
+          "sender": 5
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_can_execute",
+          "sender": 16
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "execute",
+          "sender": 5
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "execute",
+          "sender": 14
+        },
+        {
+          "name": "get_admin_list"
+        },
+        {
+          "name": "get_can_execute",
+          "sender": 7
+        },
+        {
+          "name": "execute",
+          "sender": 4
+        },
+        {
+          "name": "freeze",
+          "sender": 16
+        }
+      ],
+      "mutable": false,
+      "stepCount": 20,
+      "stored": true
+    }
+  ]
+}
