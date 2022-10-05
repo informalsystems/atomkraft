@@ -58,7 +58,8 @@ Working with other chains is possible too, by installing them and then invoking:
 ```
 atomkraft chain config chain_id <name_of_the_chain>
 atomkraft chain config binary <path-to-the-chain-binary>
-atomkraft chain config prefix <prefix?>
+atomkraft chain config hrp_prefix <prefix>
+atomkraft chain config denom <denom>
 ```
 
 ## Create a model specification
