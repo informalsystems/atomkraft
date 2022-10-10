@@ -53,13 +53,15 @@ Otherwise, you only need to set the chain binary path invoking:
 atomkraft chain config binary <path-to-the-chain-binary>
 ```
 
-Working with other chains is possible too, by installing them and then invoking:
+Working with other chains is possible too, by installing them and and setting the config properties:
 
 ```
 atomkraft chain config chain_id <name_of_the_chain>
 atomkraft chain config binary <path-to-the-chain-binary>
-atomkraft chain config prefix <prefix?>
+atomkraft chain config hrp_prefix <prefix>
+atomkraft chain config denom <denom>
 ```
+The list of configurable properties can be found in the file `.atomkraft/chain.toml`
 
 ## Create a model specification
 
