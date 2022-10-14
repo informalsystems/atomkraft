@@ -1,10 +1,10 @@
 import copy
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 
 def query(
     data: Dict[Any, Any],
-    property_path: str | None,
+    property_path: Optional[str],
 ) -> Any:
     if property_path:
         keys = property_path.split(".")
@@ -37,7 +37,7 @@ def merge(old: Any, new: Any):
         return new
 
 
-def update(data_root: Dict[Any, Any], property_path: str | None, value: Any) -> Any:
+def update(data_root: Dict[Any, Any], property_path: Optional[str], value: Any) -> Any:
     if property_path:
         data = data_root
         keys = property_path.split(".")
