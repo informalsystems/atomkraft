@@ -161,13 +161,12 @@ class Node:
 
     def get(self, path: Path, property_path: Optional[str] = None):
         with open(self.home_dir / path, encoding="utf-8") as f:
-            match path.suffixes[-1]:
-                case ".json":
-                    data = json.load(f)
-                case ".toml":
-                    data = tomlkit.load(f)
-                case _:
-                    raise RuntimeError(f"Unexpected file {path}")
+            if path.suffixes[-1] == ".json":
+                data = json.load(f)
+            elif path.suffixes[-1] == ".toml":
+                data = tomlkit.load(f)
+            else:
+                raise RuntimeError(f"Unexpected file {path}")
         return utils.query(data, property_path)
 
     def get_port(self, port_config: ConfigPort):
@@ -179,24 +178,22 @@ class Node:
     def set(self, path: Path, value: Any, property_path: Optional[str] = None):
         if property_path is not None:
             with open(self.home_dir / path, encoding="utf-8") as f:
-                match os.path.splitext(path)[-1]:
-                    case ".json":
-                        main_data = json.load(f)
-                    case ".toml":
-                        main_data = tomlkit.load(f)
-                    case _:
-                        raise RuntimeError(f"Unexpected file {path}")
+                if os.path.splitext(path)[-1] == ".json":
+                    main_data = json.load(f)
+                elif os.path.splitext(path)[-1] == ".toml":
+                    main_data = tomlkit.load(f)
+                else:
+                    raise RuntimeError(f"Unexpected file {path}")
             main_data = utils.update(main_data, property_path, value)
         else:
             main_data = value
         with open(self.home_dir / path, "w", encoding="utf-8") as f:
-            match os.path.splitext(path)[-1]:
-                case ".json":
-                    json.dump(main_data, f)
-                case ".toml":
-                    tomlkit.dump(main_data, f)
-                case _:
-                    raise RuntimeError(f"Unexpected file {path}")
+            if os.path.splitext(path)[-1] == ".json":
+                json.dump(main_data, f)
+            elif os.path.splitext(path)[-1] == ".toml":
+                tomlkit.dump(main_data, f)
+            else:
+                raise RuntimeError(f"Unexpected file {path}")
 
     def update(
         self,
