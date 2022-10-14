@@ -53,3 +53,6 @@ examples/cosmwasm/*/.atomkraft
 examples/cosmwasm/*/reports
 examples/cosmwasm/counter/cosmwasm-contract/out
 examples/cosmwasm/*/tests
+examples/wynd-dao/*/.atomkraft
+examples/wynd-dao/*/.tests
+examples/wynd-dao/*/reports
