@@ -107,7 +107,9 @@ def test_model(
                 print(f"Writing {test_path.name} ...")
                 test.write(
                     TRACE_TEST_STUB.format(
-                        json.dumps(remove_suffix(str(reactor).replace("/", "."), ".py")),
+                        json.dumps(
+                            remove_suffix(str(reactor).replace("/", "."), ".py")
+                        ),
                         json.dumps(str(trace)),
                         json.dumps(keypath),
                     )
