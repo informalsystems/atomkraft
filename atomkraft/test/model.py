@@ -9,6 +9,7 @@ import pytest
 from atomkraft.chain.testnet import VALIDATOR_DIR
 from atomkraft.config.atomkraft_config import AtomkraftConfig
 from atomkraft.model.traces import generate_traces
+from atomkraft.utils.helpers import remove_suffix
 from atomkraft.utils.project import (
     ATOMKRAFT_INTERNAL_DIR,
     ATOMKRAFT_VAL_DIR_PREFIX,
@@ -97,7 +98,7 @@ def test_model(
             if all(not c.isdigit() for c in trace.name):
                 continue
 
-            trace_name = trace.name.removesuffix(".itf.json")
+            trace_name = remove_suffix(trace.name, ".itf.json")
             print(f"Using {trace} ...")
             trace = get_relative_project_path(trace)
             test_path = test_dir / test_name / f"test_{op}_{trace_name}.py"
@@ -106,7 +107,7 @@ def test_model(
                 print(f"Writing {test_path.name} ...")
                 test.write(
                     TRACE_TEST_STUB.format(
-                        json.dumps(str(reactor).replace("/", ".").removesuffix(".py")),
+                        json.dumps(remove_suffix(str(reactor).replace("/", "."), ".py")),
                         json.dumps(str(trace)),
                         json.dumps(keypath),
                     )
@@ -151,7 +152,7 @@ def test_model(
         copy_if_exists(
             [Path(trace), vals_dir],
             report_dir
-            / snakecase(str(trace).removesuffix(".itf.json"), delimiters="./"),
+            / snakecase(remove_suffix(str(trace), ".itf.json"), delimiters="./"),
         )
 
     if successul_ops:
