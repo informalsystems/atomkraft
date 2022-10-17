@@ -31,7 +31,7 @@ def transfer(testnet: Testnet, action):
 
     msg = MsgSend(sender_addr, receiver_addr, f"{amount}{testnet.denom}")
 
-    result = testnet.broadcast_transaction(sender_id, msg, gas=200_000, fee_amount=20)
+    result = testnet.broadcast_transaction(sender_id, msg, gas=200_000, fee_amount=0)
 
     logging.info(f"\tSender:    {sender_id} ({sender_addr})")
     logging.info(f"\tReceiver:  {receiver_id} ({receiver_addr})")
