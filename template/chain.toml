@@ -7,7 +7,7 @@ denom = "stake"
 coin_type = 118
 
 [config_node.app]
-minimum-gas-prices = "0.000001stake"
+minimum-gas-prices = "0stake"
 api = { enable = true, swagger = true, enabled-unsafe-cors = true }
 rosetta = { enable = false }
 
