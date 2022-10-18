@@ -1,6 +1,6 @@
 chain_id = "test-cosmos"
 validators = 2
-accounts = 21
+accounts = 101
 binary = "wasmd"
 hrp_prefix = "wasm"
 denom = "stake"

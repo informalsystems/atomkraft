@@ -1,101 +1,94 @@
 --------------------------- MODULE cw1_whitelist---------------------------------
 
-EXTENDS Integers, Apalache, Sequences
+EXTENDS Integers, Apalache, Sequences, FiniteSets, Variants
 
 VARIABLES
     \* @type: Bool;
     instantiated,
     \* @type: Bool;
     stored,
-    \* @type: Bool;
-    updating_admins,
      \* @type: Set(Int);
     admins,
     \* @type: Bool;
     mutable,
-    \* @type: [name:Str, cnt: Int];
-    last_msg,
-    \* @type: Seq([name:Str, cnt: Int]);
-    messages,
-    \* @type: Int;
-    stepCount,
-    \* @type: Int;
-    adminLen
+    \* @type: $message;
+    lastMsg
 
-\* @type: () => Str;
-INSTANTIATE == "instantiate"
-\* @type: () => Str;
-EXECUTE == "execute"
-\* @type: () => Str;
-FREEZE == "freeze"
-\* @type: () => Str;
-UPDATE_ADMINS == "update_admins"
-\* @type: () => Str;
-GET_ADMIN_LIST == "get_admin_list"
-\* @type: () => Str;
-GET_CAN_EXECUTE == "get_can_execute"
-\* @type: () => Str;
-IDLE == "idle"
-\* @type: () => Str;
-STORE_CW == "store_cw_contract"
+\* @type: () => Int;
+ADMIN_LEN == 10
+\* @type: () => Int;
+ADMIN_SET_SIZE == 100
 
-\* @type: (Set(Int), Bool) => [name: Str, admins: Set(Int), mutable: Bool];
-Instaniate(_admins, _mutable) == [name |-> INSTANTIATE, admins |-> _admins, mutable |-> _mutable]
-\* @type: () => [name: Str];
-Idle == [name |-> IDLE]
+AdminLen(_admins) == Cardinality(_admins) <= ADMIN_LEN
 
-GetCanExecute(_sender) == [name |->GET_CAN_EXECUTE, sender |-> _sender]
 
-\* @type: () => [name: Str];
-GetAdminList == [name |->GET_ADMIN_LIST]
+(*
+@typeAlias: message = Instantiate({admins: Set(Int), mutable: Bool})
+                    | Idle(NIL)
+                    | GetCanExecute({sender:Int})
+                    | GetAdminList(NIL)
+                    | StoreCW({sender:Int})
+                    | Execute({sender:Int})
+                    | Freeze({sender:Int})
+                    | UpdateAdmins({sender:Int})
+                    ;
+*)
 
-StoreCW(_sender) == [name |-> STORE_CW, sender |-> _sender]
-Execute(_sender) == [name |-> EXECUTE, sender |-> _sender]
-Freeze(_sender) == [name |-> FREEZE, sender |-> _sender]
-UpdateAdmins(_sender) == [name |-> UPDATE_ADMINS, sender |-> _sender]
+\* @type: (Set(Int), Bool) => $message;
+Instaniate(_admins, _mutable) == Variant("Instantiate",[admins |-> _admins, mutable |-> _mutable])
+\* @type: () => $message;
+Idle == Variant("Idle", "0_OF_NIL")
+\* @type: (Int) => $message;
+GetCanExecute(_sender) == Variant("GetCanExecute",[sender |-> _sender])
+\* @type: () => $message;
+GetAdminList == Variant("GetAdminList","0_OF_NIL")
+\* @type: (Int) => $message;
+StoreCW(_sender) == Variant("StoreCW",[sender |-> _sender])
+\* @type: (Int) => $message;
+Execute(_sender) == Variant("Execute",[sender |-> _sender])
+\* @type: (Int) => $message;
+Freeze(_sender) == Variant("Freeze",[sender |-> _sender])
+\* @type: (Int) => $message;
+UpdateAdmins(_sender) == Variant("UpdateAdmins",[sender |-> _sender])
 
 Init ==
     /\ mutable = FALSE
-    /\ admins = {}
+    /\ admins \in SUBSET (1..ADMIN_SET_SIZE)
     /\ instantiated = FALSE
     /\ stored = FALSE
-    /\ updating_admins = FALSE
-    /\ messages = <<>>
-    /\ stepCount = 1
-    /\ adminLen = 0
-    /\ last_msg = Idle
+    /\ lastMsg = Idle
 
 \* @type: () => Set(Bool);
 MutableSet == {TRUE,FALSE}
 
-ProcessInstantiate(_admins, _mutable) ==
-    /\ ~instantiated
-    /\ stored
-    /\ mutable' = _mutable
-    /\ admins' = _admins
-    /\ instantiated' = TRUE
-    /\ UNCHANGED stored
+ProcessInstantiate(msg) ==
+    LET _var==VariantGetOrElse("Instantiate", msg, [admins |-> {0}, mutable |-> FALSE]) IN
+        /\ ~instantiated
+        /\ stored
+        /\ mutable' = _var.mutable
+        /\ admins' = _var.admins
+        /\ instantiated' = TRUE
+        /\ UNCHANGED stored
 
 InstaniateNext(_sender) ==
     /\ \E _m \in MutableSet:
         LET msg == Instaniate(admins, _m) IN
-        /\ ProcessInstantiate(msg.admins, msg.mutable)
-        /\ last_msg' = msg
-        /\ UNCHANGED <<adminLen, updating_admins>>
+            /\ ProcessInstantiate(msg)
+            /\ lastMsg' = msg
 
 CanExecute(_sender) == _sender \in admins
 
-ProcessGetCanExecute(_sender) ==
+ProcessGetCanExecute(msg) ==
+    LET _var==VariantGetOrElse("GetCanExecute", msg, [sender |-> 0]) IN
     /\ instantiated
     /\ stored
-    /\ CanExecute(_sender)
+    /\ CanExecute(_var.sender)
     /\ UNCHANGED<<admins, mutable, instantiated, stored>>
 
 GetCanExecuteNext(_sender) ==
     LET msg == GetCanExecute(_sender) IN
-        /\ ProcessGetCanExecute(_sender)
-        /\ last_msg' = msg
-     /\ UNCHANGED <<adminLen, updating_admins>>
+        /\ ProcessGetCanExecute(msg)
+        /\ lastMsg' = msg
 
 ProcessGetAdminList ==
     /\ instantiated
@@ -105,70 +98,65 @@ ProcessGetAdminList ==
 GetAdminListNext(_sender) ==
     LET msg == GetAdminList IN
         /\ ProcessGetAdminList
-        /\ last_msg' = msg
-        /\ UNCHANGED <<adminLen, updating_admins>>
+        /\ lastMsg' = msg
     
-
 
 CanModify(_sender) ==
     /\ _sender \in admins
     /\ mutable
 
-ProcessExecute(_sender) ==
-    /\ instantiated
-    /\ stored
-    /\ CanExecute(_sender)
-    /\ UNCHANGED<<admins, mutable, instantiated, stored>>
+ProcessExecute(msg) ==
+    LET _var==VariantGetOrElse("Execute", msg, [sender |-> 0]) IN
+        /\ instantiated
+        /\ stored
+        /\ CanExecute(_var.sender)
+        /\ UNCHANGED<<admins, mutable, instantiated, stored>>
 
 ExecuteNext(_sender) ==
     LET msg == Execute(_sender) IN
-        /\ ProcessExecute(msg.sender)
-        /\ last_msg' = msg
-        /\ UNCHANGED <<adminLen, updating_admins>>
+        /\ ProcessExecute(msg)
+        /\ lastMsg' = msg
 
-ProcessFreeze(_sender) ==
-    /\ instantiated
-    /\ stored
-    /\ CanModify(_sender)
-    /\ mutable' = FALSE
-    /\ UNCHANGED<<admins, instantiated, stored>>
+ProcessFreeze(msg) ==
+    LET _var==VariantGetOrElse("Freeze", msg, [sender |-> 0]) IN
+        /\ instantiated
+        /\ stored
+        /\ CanModify(_var.sender)
+        /\ mutable' = FALSE
+        /\ UNCHANGED<<admins, instantiated, stored>>
 
 FreezeNext(_sender) ==
     LET msg == Freeze(_sender) IN
-        /\ ProcessFreeze(msg.sender)
-        /\ last_msg' = msg
-        /\ UNCHANGED <<adminLen, updating_admins>>
+        /\ ProcessFreeze(msg)
+        /\ lastMsg' = msg
 
-ProcessUpdateAdmins(_sender) ==
-    /\ instantiated
-    /\ stored
-    /\ mutable
-    /\ CanModify(_sender)
-    /\ admins' = {}
-    /\ adminLen' = 0
-    /\ updating_admins' = TRUE
-    /\ UNCHANGED<<mutable, instantiated, stored>>
+ProcessUpdateAdmins(msg) ==
+    LET _var==VariantGetOrElse("UpdateAdmins", msg, [sender |-> 0]) IN
+        /\ instantiated
+        /\ stored
+        /\ mutable
+        /\ CanModify(_var.sender)
+        /\ admins' \in SUBSET (1..ADMIN_SET_SIZE)
+        /\ UNCHANGED<<mutable, instantiated, stored>>
 
 UpdateAdminsNext(_sender) ==
     LET msg == UpdateAdmins(_sender) IN
-        /\ ProcessUpdateAdmins(msg.sender)
-        /\ last_msg' = msg
+        /\ ProcessUpdateAdmins(msg)
+        /\ lastMsg' = msg
 
-ProcessStore(_sender) ==
+ProcessStore(msg) ==
     /\ ~instantiated
     /\ ~stored
     /\ stored' = TRUE
-    /\ UNCHANGED <<instantiated, mutable, adminLen, admins, updating_admins>>
+    /\ UNCHANGED <<instantiated, mutable, admins>>
 
 StoreNext(_sender) ==
     LET msg == StoreCW(_sender) IN
-        /\ ProcessStore(msg.sender)
-        /\ last_msg' = msg
+        /\ ProcessStore(msg)
+        /\ lastMsg' = msg
 
-StartNewMessage ==
-    /\ adminLen = 10
-    /\ ~updating_admins
-    /\ \E _sender \in 1..20:
+Next ==
+    \E _sender \in 1..20:
         \/ StoreNext(_sender)
         \/ InstaniateNext(_sender)
         \/ ExecuteNext(_sender)
@@ -176,41 +164,28 @@ StartNewMessage ==
         \/ UpdateAdminsNext(_sender)
         \/ GetAdminListNext(_sender)
         \/ GetCanExecuteNext(_sender)
-    /\ messages' = Append(messages, last_msg)
-    /\ stepCount' = stepCount + 1
-
-FinishUpdateAdmins ==
-    /\ adminLen = 10
-    /\ updating_admins
-    /\ updating_admins' = FALSE
-    /\ UNCHANGED <<messages, last_msg, stepCount, mutable, adminLen, admins, instantiated, stored>>
-
-NextMessage ==
-    FinishUpdateAdmins \/ StartNewMessage
-
-CreateAdminSet ==
-    /\ adminLen < 10
-    /\ ~updating_admins
-    /\ adminLen' = adminLen + 1
-    /\ last_msg' = Idle
-    /\ \E _id \in 1..100:
-        /\ _id \notin admins
-        /\ admins' = admins \union {_id}
-    /\ UNCHANGED <<messages, mutable, stepCount, instantiated, stored, updating_admins>>
-
-UpdateAdminSet ==
-    /\ adminLen < 10
-    /\ updating_admins
-    /\ adminLen' = adminLen + 1
-    /\ last_msg' = Idle
-    /\ \E _id \in 1..100:
-        /\ _id \notin admins
-        /\ admins' = admins \union {_id}
-    /\ UNCHANGED <<messages, mutable, stepCount, instantiated, stored, updating_admins>>
 
 
-Next== NextMessage \/ CreateAdminSet \/ UpdateAdminSet
-    
 
-Inv == stepCount < 20
+(*
+@typeAlias: trace = {
+    instantiated:Bool,
+    stored:Bool,
+    admins:Set(Int),
+    mutable:Bool,
+    lastMsg: $message
+};
+*)
+
+\* @type: (Seq($trace)) => Bool;
+TraceInvBasic(trace) == ~(
+    Len(trace) = 20
+)
+
+\* @type: (Seq($trace)) => Bool;
+TraceInvFreeze(trace) == ~(
+    /\ ~(Len(trace) < 20)
+    /\ (\E i \in  DOMAIN trace: VariantTag(trace[i].lastMsg) = "Freeze")
+)
+
 ===============================================================================
