@@ -188,4 +188,10 @@ TraceInvFreeze(trace) == ~(
     /\ (\E i \in  DOMAIN trace: VariantTag(trace[i].lastMsg) = "Freeze")
 )
 
+\* @type: (Seq($trace)) => Bool;
+TraceAllDifferent(trace) == ~(
+    /\ Len(trace) = 8
+    /\ (\A i, j \in DOMAIN trace: i < j => VariantTag(trace[i].lastMsg) /= VariantTag(trace[j].lastMsg))
+)
+
 ===============================================================================
