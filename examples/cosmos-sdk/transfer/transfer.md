@@ -141,7 +141,7 @@ $ atomkraft model apalache get
 atomkraft model apalache get
 ```
 
-Having obtained the checker, we can smaple test scenarios from the model.
+Having obtained the checker, we can sample test scenarios from the model.
 
 <!--
 ```sh
