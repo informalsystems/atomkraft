@@ -8,6 +8,7 @@ from typing import List, Optional, Union
 import pytest
 from atomkraft.chain.testnet import VALIDATOR_DIR
 from atomkraft.config.atomkraft_config import AtomkraftConfig
+from atomkraft.utils.helpers import remove_suffix
 from atomkraft.utils.project import (
     ATOMKRAFT_INTERNAL_DIR,
     ATOMKRAFT_VAL_DIR_PREFIX,
@@ -95,7 +96,7 @@ def test_trace(
         print(f"Writing {test_name} ...")
         test.write(
             TRACE_TEST_STUB.format(
-                json.dumps(str(reactor).replace("/", ".").removesuffix(".py")),
+                json.dumps(remove_suffix(str(reactor).replace("/", "."), ".py")),
                 json.dumps(str(trace)),
                 json.dumps(keypath),
             )
@@ -179,7 +180,7 @@ def test_trace_dir(
             print(f"Writing {test_file_name} ...")
             test.write(
                 TRACE_TEST_STUB.format(
-                    json.dumps(str(reactor).replace("/", ".").removesuffix(".py")),
+                    json.dumps(remove_suffix(str(reactor).replace("/", "."), ".py")),
                     json.dumps(str(trace)),
                     json.dumps(keypath),
                 )
@@ -220,7 +221,7 @@ def test_trace_dir(
         copy_if_exists(
             [Path(trace), vals_dir],
             report_dir
-            / snakecase(str(trace).removesuffix(".itf.json"), delimiters="./"),
+            / snakecase(remove_suffix(str(trace), ".itf.json"), delimiters="./"),
         )
 
     if traces:

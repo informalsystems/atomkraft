@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         os: ["ubuntu-latest"]
-        python-version: ["3.10"]
+        python-version: ["3.8", "3.10"]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
@@ -34,12 +34,30 @@ jobs:
         run: |
           black . --check
           pylama -l pyflakes,pycodestyle,isort
+
+  compile:
+    strategy:
+      matrix:
+        os: ["ubuntu-latest"]
+        python-version: ["3.8", "3.10"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+      - name: Set up python ${{ matrix.python-version }}
+        id: setup-python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Compile python source code
+        run: python -m compileall atomkraft tests
+
   test:
     strategy:
       fail-fast: true
       matrix:
         os: ["ubuntu-latest", "macos-latest"]
-        python-version: ["3.10", "3.10.6"]
+        python-version: ["3.8", "3.10"]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Check out repository
@@ -63,8 +81,9 @@ jobs:
       - name: Install dependencies
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
         run: poetry install --no-interaction --no-root
+      - name: Install Apalache
+        run: poetry run atomkraft model apalache get
       - name: Run tests
         run: |
           source .venv/bin/activate
-          pip install pytest-github-actions-annotate-failures
           pytest

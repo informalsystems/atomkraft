@@ -19,11 +19,11 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.8"
 pytest = "^7.1.2"
 copier = "^6.1.0"
 typer = {extras = ["all"], version = "^0.6.1"}
-modelator = "^0.6.3"
+modelator = "^0.6.4"
 numpy = "^1.22.4"
 hdwallet = "^2.1.1"
 bip-utils = "^2.3.0"
@@ -67,9 +67,5 @@ version_toml = [
 version_pattern = [
     "template/pyproject.toml.jinja:atomkraft = \"\\^{version}\""
 ]
-major_on_zero = true
 branch = "dev"
-upload_to_pypi = false
-upload_to_release = false
-upload_to_repository = false
-build_command = "poetry build"
+build_command = "pip install poetry && poetry build"
