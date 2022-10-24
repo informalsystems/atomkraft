@@ -67,9 +67,5 @@ version_toml = [
 version_pattern = [
     "template/pyproject.toml.jinja:atomkraft = \"\\^{version}\""
 ]
-major_on_zero = true
 branch = "dev"
-upload_to_pypi = false
-upload_to_release = false
-upload_to_repository = false
-build_command = "poetry build"
+build_command = "pip install poetry && poetry build"
