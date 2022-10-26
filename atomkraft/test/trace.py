@@ -8,7 +8,8 @@ from typing import List, Optional, Union
 import pytest
 from atomkraft.chain.testnet import VALIDATOR_DIR
 from atomkraft.config.atomkraft_config import AtomkraftConfig
-from atomkraft.utils.helpers import remove_suffix
+from atomkraft.utils.filesystem import clean_tricky_chars
+from atomkraft.utils.helpers import natural_sort, remove_suffix
 from atomkraft.utils.project import (
     ATOMKRAFT_INTERNAL_DIR,
     ATOMKRAFT_VAL_DIR_PREFIX,
@@ -23,16 +24,19 @@ from ..reactor.reactor import get_reactor
 # a key for the last used trace path inside internal config
 TRACE_CONFIG_KEY = "trace"
 
-TRACE_TEST_STUB = """import logging
+TEST_FILE_HEADING_STUB = """import logging
 
 from modelator.pytest.decorators import itf
 
 pytest_plugins = {0}
 
+"""
 
-@itf({1}, keypath={2})
-def test_trace():
-    logging.info("Successfully executed trace " + {1})
+TEST_FILE_TEST_TRACE_STUB = """
+@itf({0}, keypath={2})
+def test_{1}():
+    logging.info("Successfully executed trace " + {0})
+
 """
 
 
@@ -84,20 +88,18 @@ def test_trace(
     tests.mkdir(exist_ok=True)
 
     timestamp = datetime.now().isoformat(timespec="milliseconds")
-    test_name = f"test_{str(trace)}_{timestamp}"
-    test_name = (
-        test_name.replace("/", "_")
-        .replace(".", "_")
-        .replace(":", "_")
-        .replace("-", "_")
-    )
+    test_name = clean_tricky_chars(f"test_{str(trace)}_{timestamp}")
     test_path = os.path.join(tests, f"{test_name}.py")
-    with open(test_path, "w") as test:
-        print(f"Writing {test_name} ...")
-        test.write(
-            TRACE_TEST_STUB.format(
-                json.dumps(remove_suffix(str(reactor).replace("/", "."), ".py")),
+    with open(test_path, "w") as test_file:
+        print(f"Writing {get_relative_project_path(test_path)} ...")
+        reactor_module = remove_suffix(str(reactor).replace("/", "."), ".py")
+        test_file.write(TEST_FILE_HEADING_STUB.format(json.dumps(reactor_module)))
+        test_file.write(
+            TEST_FILE_TEST_TRACE_STUB.format(
                 json.dumps(str(trace)),
+                json.dumps(
+                    clean_tricky_chars(remove_suffix(str(trace), ".itf.json"))
+                ).strip('"'),
                 json.dumps(keypath),
             )
         )
@@ -135,7 +137,7 @@ def test_trace_dir(
     trace_dir: Path, reactor: Optional[Path], keypath: str, verbose: bool
 ):
     """
-    Test blockchain by running all available traces
+    Test blockchain by running all available traces in trace_dir.
     """
 
     root = project_root()
@@ -144,48 +146,41 @@ def test_trace_dir(
             "could not find Atomkraft project: are you in the right directory?"
         )
 
-    traces = list(trace_dir.glob("**/*.itf.json"))
+    trace_paths = list(trace_dir.glob("**/*.itf.json"))
+    trace_paths.sort(key=natural_sort)
 
     if reactor is None:
         reactor = get_relative_project_path(get_reactor())
 
     timestamp = datetime.now().isoformat(timespec="milliseconds")
-
-    test_group = (
-        f"all_{timestamp}".replace("/", "_")
-        .replace(".", "_")
-        .replace(":", "_")
-        .replace("-", "_")
-    )
+    test_group = clean_tricky_chars(f"{trace_dir}_{timestamp}")
 
     root_test_dir = root / "tests" / test_group
+    test_file_name = f"test_{test_group}.py"
+    test_path = root_test_dir / test_file_name
+    test_path.parent.mkdir(parents=True, exist_ok=True)
 
-    test_list = []
+    with open(test_path, "w+") as test_file:
+        print(f"Writing {get_relative_project_path(test_path)} ...")
 
-    for trace in traces:
-        if all(not c.isdigit() for c in trace.name):
-            continue
-        trace = get_relative_project_path(trace)
-        trace_name = (
-            str(trace)
-            .replace("/", "_")
-            .replace(".", "_")
-            .replace(":", "_")
-            .replace("-", "_")
-        )
-        test_file_name = f"test_{trace_name}.py"
-        test_path = root_test_dir / test_file_name
-        test_path.parent.mkdir(parents=True, exist_ok=True)
-        with open(test_path, "w") as test:
-            print(f"Writing {test_file_name} ...")
-            test.write(
-                TRACE_TEST_STUB.format(
-                    json.dumps(remove_suffix(str(reactor).replace("/", "."), ".py")),
-                    json.dumps(str(trace)),
+        if trace_paths:
+            reactor_module = remove_suffix(str(reactor).replace("/", "."), ".py")
+            test_file.write(TEST_FILE_HEADING_STUB.format(json.dumps(reactor_module)))
+
+        for trace_path in trace_paths:
+            if all(not c.isdigit() for c in trace_path.name):
+                continue
+            trace_path = get_relative_project_path(trace_path)
+            print(f"Adding test for {trace_path} ...")
+            test_file.write(
+                TEST_FILE_TEST_TRACE_STUB.format(
+                    json.dumps(str(trace_path)),
+                    json.dumps(
+                        clean_tricky_chars(remove_suffix(str(trace_path), ".itf.json"))
+                    ).strip('"'),
                     json.dumps(keypath),
                 )
             )
-        test_list.append((trace, test_path))
 
     report_dir = root / "reports" / test_group
     report_dir.mkdir(parents=True, exist_ok=True)
@@ -209,22 +204,19 @@ def test_trace_dir(
     if val_root_dir.exists():
         shutil.rmtree(val_root_dir)
 
-    exit_code = pytest.main(
-        pytest_args + [str(test_file) for (_, test_file) in test_list]
-    )
+    exit_code = pytest.main(pytest_args + [test_path])
 
     vals_dirs = list((val_root_dir).glob(f"{ATOMKRAFT_VAL_DIR_PREFIX}*"))
-
     vals_dirs.sort(key=lambda k: k.stat().st_mtime)
 
-    for ((trace, _), vals_dir) in zip(test_list, vals_dirs):
+    for (trace_path, vals_dir) in zip(trace_paths, vals_dirs):
         copy_if_exists(
-            [Path(trace), vals_dir],
+            [Path(trace_path), vals_dir],
             report_dir
-            / snakecase(remove_suffix(str(trace), ".itf.json"), delimiters="./"),
+            / snakecase(remove_suffix(str(trace_path), ".itf.json"), delimiters="./"),
         )
 
-    if traces:
+    if trace_paths:
         print(f"Test data is saved at {report_dir}")
     else:
         print("No trace is present.")

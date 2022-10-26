@@ -9,6 +9,7 @@ import pytest
 from atomkraft.chain.testnet import VALIDATOR_DIR
 from atomkraft.config.atomkraft_config import AtomkraftConfig
 from atomkraft.model.traces import generate_traces
+from atomkraft.utils.filesystem import clean_tricky_chars
 from atomkraft.utils.helpers import remove_suffix
 from atomkraft.utils.project import (
     ATOMKRAFT_INTERNAL_DIR,
@@ -20,7 +21,7 @@ from atomkraft.utils.project import (
 from caseconverter import snakecase
 
 from ..reactor.reactor import get_reactor
-from .trace import TRACE_TEST_STUB, copy_if_exists
+from .trace import TEST_FILE_TEST_TRACE_STUB, copy_if_exists
 
 # a key for the last used model path inside internal config
 MODEL_CONFIG_KEY = "model"
@@ -77,14 +78,7 @@ def test_model(
 
     timestamp = datetime.now().isoformat(timespec="milliseconds")
 
-    test_group = f"{model.stem}_{timestamp}"
-    test_group = (
-        test_group.replace("/", "_")
-        .replace(".", "_")
-        .replace(":", "_")
-        .replace("-", "_")
-    )
-
+    test_group = clean_tricky_chars(f"{model.stem}_{timestamp}")
     test_name = f"test_{test_group}"
 
     successul_ops = model_result.successful()
@@ -105,12 +99,16 @@ def test_model(
             test_path.parent.mkdir(parents=True, exist_ok=True)
             with open(test_path, "w") as test:
                 print(f"Writing {test_path.name} ...")
-                test.write(
-                    TRACE_TEST_STUB.format(
-                        json.dumps(
-                            remove_suffix(str(reactor).replace("/", "."), ".py")
-                        ),
+                reactor_module = remove_suffix(str(reactor).replace("/", "."), ".py")
+                test_file.write(
+                    TEST_FILE_HEADING_STUB.format(json.dumps(reactor_module))
+                )
+                test_file.write(
+                    TEST_FILE_TEST_TRACE_STUB.format(
                         json.dumps(str(trace)),
+                        json.dumps(
+                            clean_tricky_chars(remove_suffix(str(trace), ".itf.json"))
+                        ).strip('"'),
                         json.dumps(keypath),
                     )
                 )
