@@ -1,32 +1,18 @@
 --------------------------- MODULE curves ---------------------------------
-EXTENDS Integers, Apalache, Sequences
-
-\* @typeAlias: Point = [x:Int, y:Int];
-
-\* @type: () => Int;
-MAX_NUM_POINTS == 100
+EXTENDS Integers, Apalache, Sequences, Variants
 
 VARIABLES
+    \* @type: Seq($point);   
+    points,
     \* @type: Int;   
-    numPoints
-    \* @type: Int;   
-    i
+    y
 
-\* @type: () => Point;    
-Point(_x, _y) == [x |-> _x, y |->_y]
-\* @type: () => [y:Int];
-Constant(_y) == [y |-> _y]
+\* @typeAlias: point = {x:Int, y:Int};
 
-\* @type: () => [points:Seq(Point)];
-PieceWiseLinear(_points) == [points |-> _points]
+\* @typeAlias: curve = Constant({y: Int});
 
-SaturatingLinear(_points) == Len(_points)=2 /\ PieceWiseLinear(_points)
-
-Init == 
-    /\ \E _num \in 1..MAX_NUM_POINTS:
-        numPoints = _num
-    /\ i=0
-Next ==
+\* @type: (Int) => $curve;
+Constant(_y) == Variant("Constant",[y |-> _y])
 
 
 ===============================================================================
