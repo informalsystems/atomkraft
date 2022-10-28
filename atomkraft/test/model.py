@@ -9,7 +9,7 @@ import pytest
 from atomkraft.chain.testnet import VALIDATOR_DIR
 from atomkraft.config.atomkraft_config import AtomkraftConfig
 from atomkraft.model.traces import generate_traces
-from atomkraft.utils.filesystem import clean_tricky_chars
+from atomkraft.utils.filesystem import rename_chars
 from atomkraft.utils.helpers import remove_suffix
 from atomkraft.utils.project import (
     ATOMKRAFT_INTERNAL_DIR,
@@ -78,7 +78,7 @@ def test_model(
 
     timestamp = datetime.now().isoformat(timespec="milliseconds")
 
-    test_group = clean_tricky_chars(f"{model.stem}_{timestamp}")
+    test_group = rename_chars(f"{model.stem}_{timestamp}")
     test_name = f"test_{test_group}"
 
     successul_ops = model_result.successful()
@@ -107,7 +107,7 @@ def test_model(
                     TEST_FILE_TEST_TRACE_STUB.format(
                         json.dumps(str(trace)),
                         json.dumps(
-                            clean_tricky_chars(remove_suffix(str(trace), ".itf.json"))
+                            rename_chars(remove_suffix(str(trace), ".itf.json"))
                         ).strip('"'),
                         json.dumps(keypath),
                     )
