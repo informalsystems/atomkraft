@@ -1,5 +1,4 @@
 import json
-import os.path
 import shutil
 from datetime import datetime
 from pathlib import Path
@@ -29,14 +28,13 @@ TEST_FILE_HEADING_STUB = """import logging
 from modelator.pytest.decorators import itf
 
 pytest_plugins = {0}
-
 """
 
 TEST_FILE_TEST_TRACE_STUB = """
+
 @itf({0}, keypath={2})
 def test_{1}():
     logging.info("Successfully executed trace " + {0})
-
 """
 
 
@@ -89,7 +87,7 @@ def test_trace(
 
     timestamp = datetime.now().isoformat(timespec="milliseconds")
     test_name = clean_tricky_chars(f"test_{str(trace)}_{timestamp}")
-    test_path = os.path.join(tests, f"{test_name}.py")
+    test_path = tests / f"{test_name}.py"
     with open(test_path, "w") as test_file:
         print(f"Writing {get_relative_project_path(test_path)} ...")
         reactor_module = remove_suffix(str(reactor).replace("/", "."), ".py")
@@ -160,7 +158,7 @@ def test_trace_dir(
     test_path = root_test_dir / test_file_name
     test_path.parent.mkdir(parents=True, exist_ok=True)
 
-    with open(test_path, "w+") as test_file:
+    with open(test_path, "w") as test_file:
         print(f"Writing {get_relative_project_path(test_path)} ...")
 
         if trace_paths:

@@ -12,4 +12,4 @@ def remove_suffix(text: str, suffix: str):
 
 def natural_sort(key):
     """For sorting strings containing numbers without leading zeroes"""
-    return [int(s) if s.isdigit() else s.lower() for s in re.split("(\d+)", str(key))]
+    return [int(s) if s.isdigit() else s.lower() for s in re.split("(\\d+)", str(key))]

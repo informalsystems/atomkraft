@@ -21,7 +21,7 @@ from atomkraft.utils.project import (
 from caseconverter import snakecase
 
 from ..reactor.reactor import get_reactor
-from .trace import TEST_FILE_TEST_TRACE_STUB, copy_if_exists
+from .trace import TEST_FILE_HEADING_STUB, TEST_FILE_TEST_TRACE_STUB, copy_if_exists
 
 # a key for the last used model path inside internal config
 MODEL_CONFIG_KEY = "model"
@@ -97,7 +97,7 @@ def test_model(
             trace = get_relative_project_path(trace)
             test_path = test_dir / test_name / f"test_{op}_{trace_name}.py"
             test_path.parent.mkdir(parents=True, exist_ok=True)
-            with open(test_path, "w") as test:
+            with open(test_path, "w") as test_file:
                 print(f"Writing {test_path.name} ...")
                 reactor_module = remove_suffix(str(reactor).replace("/", "."), ".py")
                 test_file.write(
