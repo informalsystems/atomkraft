@@ -106,9 +106,7 @@ def test_model(
                 test_file.write(
                     TEST_FILE_TEST_TRACE_STUB.format(
                         json.dumps(str(trace)),
-                        json.dumps(
-                            rename_chars(remove_suffix(str(trace), ".itf.json"))
-                        ).strip('"'),
+                        rename_chars(remove_suffix(str(trace), ".itf.json")),
                         json.dumps(keypath),
                     )
                 )

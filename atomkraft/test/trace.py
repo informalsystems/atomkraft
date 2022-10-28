@@ -95,9 +95,7 @@ def test_trace(
         test_file.write(
             TEST_FILE_TEST_TRACE_STUB.format(
                 json.dumps(str(trace)),
-                json.dumps(
-                    rename_chars(remove_suffix(str(trace), ".itf.json"))
-                ).strip('"'),
+                rename_chars(remove_suffix(str(trace), ".itf.json")),
                 json.dumps(keypath),
             )
         )
@@ -173,9 +171,7 @@ def test_trace_dir(
             test_file.write(
                 TEST_FILE_TEST_TRACE_STUB.format(
                     json.dumps(str(trace_path)),
-                    json.dumps(
-                        rename_chars(remove_suffix(str(trace_path), ".itf.json"))
-                    ).strip('"'),
+                    rename_chars(remove_suffix(str(trace_path), ".itf.json")),
                     json.dumps(keypath),
                 )
             )
