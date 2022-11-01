@@ -21,6 +21,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     env:
       COSMOS_SDK_TAG: v0.45.8
+    container: ghcr.io/rnbguy/mdx-docker:nightly
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
@@ -48,12 +49,6 @@ jobs:
       - name: Install dependencies
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
         run: poetry install --no-interaction --no-root
-      - name: Set up OCaml
-        uses: ocaml/setup-ocaml@v2
-        with:
-          ocaml-compiler: 4.13.x
-      - name: Install MDX
-        run: opam install mdx
       - name: Load cached simd
         id: cached-simd
         uses: actions/cache@v3
@@ -84,6 +79,5 @@ jobs:
         run: |
           source .venv/bin/activate
           cd tests/cli
-          eval $(opam env)
           sed -i.bu "s|/dev/|/${{ github.ref_name }}/|g" *md
           for f in `ls *md`; do ocaml-mdx test -v "${f}"; [ ! -f "${f}.corrected" ] || (diff -u "${f}" "${f}.corrected" && exit 1); done
