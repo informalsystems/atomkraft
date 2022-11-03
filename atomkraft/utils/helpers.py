@@ -2,9 +2,16 @@ import pathlib
 import re
 
 
-# removes the suffix `suffix` from `text`.
-# Implemented here as a helper fucntion in order to support Python 3.8
+def remove_prefix(text: str, prefix: str):
+    """Removes the prefix `prefix` from `text`. Needed for Python 3.8."""
+    if text.startswith(prefix):
+        text = text[len(prefix) :]
+
+    return text
+
+
 def remove_suffix(text: str, suffix: str):
+    """Removes the suffix `suffix` from `text`. Needed for Python 3.8."""
     if text.endswith(suffix):
         text = text[: -len(suffix)]
 

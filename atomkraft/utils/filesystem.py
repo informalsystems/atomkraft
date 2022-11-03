@@ -1,7 +1,8 @@
-from pathlib import Path
 import shutil
+from pathlib import Path
 from typing import List, Union
-from caseconverter import snakecase
+
+import caseconverter
 
 
 def last_modified_file_in(dir: Path) -> Path:
@@ -13,7 +14,8 @@ def last_modified_file_in(dir: Path) -> Path:
 
 
 def snakecase(path: str) -> str:
-    return snakecase(path, delimiters="/.:-")
+    return caseconverter.snakecase(path, delimiters="/.:-")
+
 
 def copy_if_exists(srcs: Union[Path, List[Path]], dst_path: Path):
     if isinstance(srcs, Path):

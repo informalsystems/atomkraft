@@ -1,26 +1,24 @@
-import json
-import shutil
-import time
-from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional
 
 import pytest
-from atomkraft.chain.testnet import VALIDATOR_DIR
 from atomkraft.config.atomkraft_config import AtomkraftConfig
 from atomkraft.model.traces import generate_traces
-from atomkraft.utils.filesystem import snakecase
+from atomkraft.test.helpers import (
+    append_timestamp,
+    mk_test_dir,
+    prepare_validators,
+    save_validator_files,
+)
 from atomkraft.utils.helpers import remove_suffix
 from atomkraft.utils.project import (
-    ATOMKRAFT_INTERNAL_DIR,
-    ATOMKRAFT_VAL_DIR_PREFIX,
     get_absolute_project_path,
     get_relative_project_path,
     project_root,
 )
 
 from ..reactor.reactor import get_reactor
-from .trace import TEST_FILE_HEADING_STUB, TEST_FILE_TEST_TRACE_STUB, copy_if_exists
+from .trace import mk_pytest_args, write_header, write_test
 
 # a key for the last used model path inside internal config
 MODEL_CONFIG_KEY = "model"
@@ -49,22 +47,19 @@ def test_model(
     Test blockchain by running one trace
     """
 
-    if model is None:
-        model = get_model()
-
-    if reactor is None:
-        reactor = get_relative_project_path(get_reactor())
-
     root = project_root()
     if not root:
         raise RuntimeError(
             "could not find Atomkraft project: are you in the right directory?"
         )
 
-    timestamp = time.time()
+    if model is None:
+        model = get_model()
+
+    if reactor is None:
+        reactor = get_relative_project_path(get_reactor())
 
     print(f"Generating traces for {model.name} ...")
-
     try:
         model_result = generate_traces(
             None, model, tests, checker_params=checker_params
@@ -72,20 +67,17 @@ def test_model(
     except Exception as e:
         raise RuntimeError(f"[Modelator] {e}")
 
-    test_dir = root / "tests"
-    test_dir.mkdir(exist_ok=True)
+    successful_ops = model_result.successful()
+    if not successful_ops:
+        print("No trace is produced.")
+        return 1
 
-    timestamp = datetime.now().isoformat(timespec="milliseconds")
-
-    test_group = snakecase(f"{model.stem}_{timestamp}")
-    test_name = f"test_{test_group}"
-
-    successul_ops = model_result.successful()
+    test_name = append_timestamp(model.stem)
+    test_dir = mk_test_dir(root, False, test_name)
 
     test_list = []
-
-    for op in successul_ops:
-        print(f"Preparing test for {op} ...")
+    for op in successful_ops:
+        print(f"Preparing tests for {op} ...")
         for trace_path in model_result.trace_paths(op):
             trace = Path(trace_path)
             if all(not c.isdigit() for c in trace.name):
@@ -98,62 +90,18 @@ def test_model(
             test_path.parent.mkdir(parents=True, exist_ok=True)
             with open(test_path, "w") as test_file:
                 print(f"Writing {test_path.name} ...")
-                reactor_module = remove_suffix(str(reactor).replace("/", "."), ".py")
-                test_file.write(
-                    TEST_FILE_HEADING_STUB.format(json.dumps(reactor_module))
-                )
-                test_file.write(
-                    TEST_FILE_TEST_TRACE_STUB.format(
-                        json.dumps(str(trace)),
-                        snakecase(remove_suffix(str(trace), ".itf.json")),
-                        json.dumps(keypath),
-                    )
-                )
+                write_header(test_file, reactor)
+                write_test(test_file, trace, keypath)
             test_list.append((trace, test_path))
 
-    report_dir = root / "reports" / test_name
-    report_dir.mkdir(parents=True, exist_ok=True)
+    print(f"Executing {test_name}...")
+    val_root_dir = prepare_validators(root)
+    pytest_args, report_dir = mk_pytest_args(test_dir, verbose)
+    test_file_paths = [str(test_file) for (_, test_file) in test_list]
+    exit_code = pytest.main(pytest_args + test_file_paths)
 
-    logging_file = report_dir / "log.txt"
-
-    pytest_report_file = report_dir / "report.jsonl"
-
-    pytest_args = [
-        "--log-file-level=INFO",
-        "--log-cli-level=INFO",
-        f"--log-file={logging_file}",
-        f"--report-log={pytest_report_file}",
-    ]
-
-    if verbose:
-        pytest_args.append("-rP")
-
-    val_root_dir = root / ATOMKRAFT_INTERNAL_DIR / VALIDATOR_DIR
-
-    if val_root_dir.exists():
-        shutil.rmtree(val_root_dir)
-
-    exit_code = pytest.main(
-        pytest_args + [str(test_file) for (_, test_file) in test_list]
-    )
-
-    vals_dirs = list(
-        (root / ATOMKRAFT_INTERNAL_DIR / VALIDATOR_DIR).glob(
-            f"{ATOMKRAFT_VAL_DIR_PREFIX}*"
-        )
-    )
-
-    vals_dirs.sort(key=lambda k: k.stat().st_mtime)
-
-    for ((trace, _), vals_dir) in zip(test_list, vals_dirs):
-        copy_if_exists(
-            [Path(trace), vals_dir],
-            report_dir / snakecase(remove_suffix(str(trace), ".itf.json")),
-        )
-
-    if successul_ops:
-        print(f"Test data is saved at {report_dir}")
-    else:
-        print("No trace is produced.")
+    trace_paths = [path for path, _ in test_list]
+    save_validator_files(val_root_dir, report_dir, trace_paths)
+    print(f"Test data is saved at {report_dir}")
 
     return int(exit_code)
