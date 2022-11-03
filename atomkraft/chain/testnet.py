@@ -23,7 +23,7 @@ from terra_sdk.core.msg import Msg
 from terra_sdk.key.mnemonic import MnemonicKey
 
 from .node import Account, AccountId, ConfigPort, Node
-from .utils import get_free_ports, update_port
+from .utils import TmEventSubscribe, get_free_ports, update_port
 
 VALIDATOR_DIR = "validator_nodes"
 
@@ -384,20 +384,32 @@ class Testnet:
 
             service = ServiceStub(channel)
 
-            # # BROADCAST_MODE_BLOCK defines a tx broadcasting mode where the client waits
-            # # for the tx to be committed in a block.
-            # BROADCAST_MODE_BLOCK = 1
-            # # BROADCAST_MODE_SYNC defines a tx broadcasting mode where the client waits
-            # # for a CheckTx execution response only.
-            # BROADCAST_MODE_SYNC = 2
-            # # BROADCAST_MODE_ASYNC defines a tx broadcasting mode where the client
-            # # returns immediately.
-            # BROADCAST_MODE_ASYNC = 3
-            result = asyncio.run(
-                service.broadcast_tx(
-                    tx_bytes=bytes(tx.to_proto()),
-                    mode=BroadcastMode.BROADCAST_MODE_BLOCK,
-                )
-            ).tx_response
+            with TmEventSubscribe({"tm.event": "Tx"}) as subscriber:
+                # # BROADCAST_MODE_SYNC defines a tx broadcasting mode where the client waits
+                # # for a CheckTx execution response only.
+                # BROADCAST_MODE_SYNC = 2
+                result = asyncio.run(
+                    service.broadcast_tx(
+                        tx_bytes=bytes(tx.to_proto()),
+                        mode=BroadcastMode.BROADCAST_MODE_SYNC,
+                    )
+                ).tx_response
+                if result.code == 0:
+                    # CheckTx execution was successful, check for block execution result
+                    subscriber.set_filter(
+                        lambda x: x["events"]["tx.hash"][0] == result.txhash
+                    )
+
+            # wait a little for data availablity
+            # may vary on different computers
+            # TODO: remove this sleep and use some event based technique
+            time.sleep(0.1)
+
+            # # following works, but waits till next block, so waits longer
+            # with TmEventSubscribe({"tm.event": "NewBlock"}):
+            #     pass
+
+            if result.code == 0:
+                result = asyncio.run(service.get_tx(hash=result.txhash)).tx_response
 
         return result
