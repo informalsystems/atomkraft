@@ -1,3 +1,4 @@
+import pathlib
 import re
 
 
@@ -10,6 +11,6 @@ def remove_suffix(text: str, suffix: str):
     return text
 
 
-def natural_sort(key):
-    """For sorting strings containing numbers without leading zeroes"""
+def natural_key(key: pathlib.Path) -> list[int]:
+    """For sorting file paths containing numbers without leading zeroes"""
     return [int(s) if s.isdigit() else s.lower() for s in re.split("(\\d+)", str(key))]

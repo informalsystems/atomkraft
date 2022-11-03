@@ -8,7 +8,7 @@ import pytest
 from atomkraft.chain.testnet import VALIDATOR_DIR
 from atomkraft.config.atomkraft_config import AtomkraftConfig
 from atomkraft.utils.filesystem import rename_chars
-from atomkraft.utils.helpers import natural_sort, remove_suffix
+from atomkraft.utils.helpers import natural_key, remove_suffix
 from atomkraft.utils.project import (
     ATOMKRAFT_INTERNAL_DIR,
     ATOMKRAFT_VAL_DIR_PREFIX,
@@ -143,7 +143,7 @@ def test_trace_dir(
         )
 
     trace_paths = list(trace_dir.glob("**/*.itf.json"))
-    trace_paths.sort(key=natural_sort)
+    trace_paths.sort(key=natural_key)
 
     if reactor is None:
         reactor = get_relative_project_path(get_reactor())
