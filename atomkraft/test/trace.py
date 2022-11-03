@@ -7,7 +7,7 @@ from typing import List, Optional, Union
 import pytest
 from atomkraft.chain.testnet import VALIDATOR_DIR
 from atomkraft.config.atomkraft_config import AtomkraftConfig
-from atomkraft.utils.filesystem import rename_chars
+from atomkraft.utils.filesystem import snakecase
 from atomkraft.utils.helpers import natural_key, remove_suffix
 from atomkraft.utils.project import (
     ATOMKRAFT_INTERNAL_DIR,
@@ -16,7 +16,6 @@ from atomkraft.utils.project import (
     get_relative_project_path,
     project_root,
 )
-from caseconverter import snakecase
 
 from ..reactor.reactor import get_reactor
 
@@ -86,7 +85,7 @@ def test_trace(
     tests.mkdir(exist_ok=True)
 
     timestamp = datetime.now().isoformat(timespec="milliseconds")
-    test_name = rename_chars(f"test_{str(trace)}_{timestamp}")
+    test_name = snakecase(f"test_{str(trace)}_{timestamp}")
     test_path = tests / f"{test_name}.py"
     with open(test_path, "w") as test_file:
         print(f"Writing {get_relative_project_path(test_path)} ...")
@@ -95,7 +94,7 @@ def test_trace(
         test_file.write(
             TEST_FILE_TEST_TRACE_STUB.format(
                 json.dumps(str(trace)),
-                rename_chars(remove_suffix(str(trace), ".itf.json")),
+                snakecase(remove_suffix(str(trace), ".itf.json")),
                 json.dumps(keypath),
             )
         )
@@ -149,7 +148,7 @@ def test_trace_dir(
         reactor = get_relative_project_path(get_reactor())
 
     timestamp = datetime.now().isoformat(timespec="milliseconds")
-    test_group = rename_chars(f"{trace_dir}_{timestamp}")
+    test_group = snakecase(f"{trace_dir}_{timestamp}")
 
     root_test_dir = root / "tests" / test_group
     test_file_name = f"test_{test_group}.py"
@@ -171,7 +170,7 @@ def test_trace_dir(
             test_file.write(
                 TEST_FILE_TEST_TRACE_STUB.format(
                     json.dumps(str(trace_path)),
-                    rename_chars(remove_suffix(str(trace_path), ".itf.json")),
+                    snakecase(remove_suffix(str(trace_path), ".itf.json")),
                     json.dumps(keypath),
                 )
             )
@@ -206,8 +205,7 @@ def test_trace_dir(
     for (trace_path, vals_dir) in zip(trace_paths, vals_dirs):
         copy_if_exists(
             [Path(trace_path), vals_dir],
-            report_dir
-            / snakecase(remove_suffix(str(trace_path), ".itf.json"), delimiters="./"),
+            report_dir / snakecase(remove_suffix(str(trace_path), ".itf.json")),
         )
 
     if trace_paths:

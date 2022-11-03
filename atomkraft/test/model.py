@@ -9,7 +9,7 @@ import pytest
 from atomkraft.chain.testnet import VALIDATOR_DIR
 from atomkraft.config.atomkraft_config import AtomkraftConfig
 from atomkraft.model.traces import generate_traces
-from atomkraft.utils.filesystem import rename_chars
+from atomkraft.utils.filesystem import snakecase
 from atomkraft.utils.helpers import remove_suffix
 from atomkraft.utils.project import (
     ATOMKRAFT_INTERNAL_DIR,
@@ -18,7 +18,6 @@ from atomkraft.utils.project import (
     get_relative_project_path,
     project_root,
 )
-from caseconverter import snakecase
 
 from ..reactor.reactor import get_reactor
 from .trace import TEST_FILE_HEADING_STUB, TEST_FILE_TEST_TRACE_STUB, copy_if_exists
@@ -78,7 +77,7 @@ def test_model(
 
     timestamp = datetime.now().isoformat(timespec="milliseconds")
 
-    test_group = rename_chars(f"{model.stem}_{timestamp}")
+    test_group = snakecase(f"{model.stem}_{timestamp}")
     test_name = f"test_{test_group}"
 
     successul_ops = model_result.successful()
@@ -106,7 +105,7 @@ def test_model(
                 test_file.write(
                     TEST_FILE_TEST_TRACE_STUB.format(
                         json.dumps(str(trace)),
-                        rename_chars(remove_suffix(str(trace), ".itf.json")),
+                        snakecase(remove_suffix(str(trace), ".itf.json")),
                         json.dumps(keypath),
                     )
                 )
@@ -149,8 +148,7 @@ def test_model(
     for ((trace, _), vals_dir) in zip(test_list, vals_dirs):
         copy_if_exists(
             [Path(trace), vals_dir],
-            report_dir
-            / snakecase(remove_suffix(str(trace), ".itf.json"), delimiters="./"),
+            report_dir / snakecase(remove_suffix(str(trace), ".itf.json")),
         )
 
     if successul_ops:

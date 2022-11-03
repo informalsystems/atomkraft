@@ -1,4 +1,5 @@
 from pathlib import Path
+from caseconverter import snakecase
 
 
 def last_modified_file_in(dir: Path) -> Path:
@@ -9,5 +10,5 @@ def last_modified_file_in(dir: Path) -> Path:
     return max(all_files, key=lambda x: x.stat().st_mtime)
 
 
-def rename_chars(path: str) -> str:
-    return path.replace("/", "_").replace(".", "_").replace(":", "_").replace("-", "_")
+def snakecase(path: str) -> str:
+    return snakecase(path, delimiters="/.:-")
