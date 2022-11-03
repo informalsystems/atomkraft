@@ -1,18 +1,18 @@
 --------------------------- MODULE curves ---------------------------------
 EXTENDS Integers, Apalache, Sequences, Variants
 
-VARIABLES
-    \* @type: Seq($point);   
-    points,
-    \* @type: Int;   
-    y
-
-\* @typeAlias: point = {x:Int, y:Int};
 
 \* @typeAlias: curve = Constant({y: Int});
 
 \* @type: (Int) => $curve;
 Constant(_y) == Variant("Constant",[y |-> _y])
 
-
+\* @type: ($curve) => Int;
+Value(_curve) == VariantGetUnsafe("Constant", _curve).y
+\* @type: ($curve, $curve) => $curve;
+Combine(_curve1, _curve2) ==
+    Variant("Constant",
+    [y |-> VariantGetUnsafe("Constant", _curve1).y + VariantGetUnsafe("Constant", _curve2).y])
+    
+  
 ===============================================================================
