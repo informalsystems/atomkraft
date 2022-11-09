@@ -311,22 +311,23 @@ class Testnet:
         for node in self.validator_nodes.values():
             node.start()
         for node in self.validator_nodes.values():
-            while True:
-                try:
-                    addr = node.get(
-                        self.ports()["rpc"].config_file,
-                        self.ports()["rpc"].property_path,
-                    )
-                    ip, port = addr.split("//")[-1].split(":")
-                    with socket.create_connection(
-                        (ip, port),
-                        timeout=5,
-                    ):
-                        break
-                except OSError:
-                    # todo: remove this sleep in future
-                    time.sleep(0.1)
-                    pass
+            for endpoint_type in ["rpc", "grpc"]:
+                while True:
+                    try:
+                        addr = node.get(
+                            self.ports()[endpoint_type].config_file,
+                            self.ports()[endpoint_type].property_path,
+                        )
+                        ip, port = addr.split("//")[-1].split(":")
+                        with socket.create_connection(
+                            (ip, port),
+                            timeout=5,
+                        ):
+                            break
+                    except OSError:
+                        # todo: remove this sleep in future
+                        time.sleep(0.1)
+                        pass
 
     def oneshot(self):
         self.prepare()
