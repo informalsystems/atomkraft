@@ -3,7 +3,7 @@
 ## Init
 
 ```sh
-$ [ -d transfer ] && rm -rdf transfer
+$ [ ! -d transfer ] || rm -rdf transfer
 $ atomkraft init transfer
 ...
 $ cd transfer
