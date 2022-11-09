@@ -3,7 +3,7 @@ import shutil
 from datetime import datetime
 from io import TextIOWrapper
 from pathlib import Path
-from typing import Tuple
+from typing import List, Tuple
 
 from atomkraft.chain.testnet import VALIDATOR_DIR
 from atomkraft.utils.filesystem import copy_if_exists, snakecase
@@ -76,7 +76,7 @@ def write_test(test_file: TextIOWrapper, trace_path: Path, keypath: str):
     )
 
 
-def mk_pytest_args(test_dir: Path, verbose: bool) -> Tuple[list[str], str]:
+def mk_pytest_args(test_dir: Path, verbose: bool) -> Tuple[List[str], str]:
     report_dir = Path(
         str(get_relative_project_path(test_dir)).replace("tests/", "reports/")
     )
@@ -104,7 +104,7 @@ def prepare_validators(root: Path):
     return val_root_dir
 
 
-def save_validator_files(val_root_dir: Path, report_dir: Path, trace_paths: list[Path]):
+def save_validator_files(val_root_dir: Path, report_dir: Path, trace_paths: List[Path]):
     vals_dirs = list(val_root_dir.glob(f"{ATOMKRAFT_VAL_DIR_PREFIX}*"))
     vals_dirs.sort(key=lambda k: k.stat().st_mtime)
 
