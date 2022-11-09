@@ -1,9 +1,7 @@
-import os
 import sys
 from pathlib import Path
 from typing import Callable, Dict, Optional, Type
 
-import git
 import modelator
 import pytest
 import typer
