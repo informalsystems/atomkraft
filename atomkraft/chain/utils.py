@@ -93,8 +93,7 @@ class TmEventSubscribe:
             if (
                 isinstance(msg, responses.Ok)
                 and msg.result.get("query", None) == self.query
-                and self.filter is not None
-                and self.filter(msg.result)
+                and (self.filter is None or self.filter(msg.result))
             ):
                 break
 
