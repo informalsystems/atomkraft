@@ -6,7 +6,7 @@ import socket
 from dataclasses import dataclass
 from pathlib import Path
 from subprocess import PIPE, Popen
-from typing import Any, Callable, Dict, Optional, Union
+from typing import Any, Callable, Dict, List, Optional, Union
 
 import bip_utils
 import hdwallet
@@ -119,23 +119,17 @@ class Node:
     def init(self) -> Dict["str", Any]:
         if self.overwrite and os.path.exists(self.home_dir):
             shutil.rmtree(self.home_dir)
-        args = f"init {self.moniker} --chain-id {self.chain_id}".split()
-        _, data = self._execute(args, stderr=PIPE)
-        return json.loads(data.decode())
+        argstr = f"init {self.moniker} --chain-id {self.chain_id}"
+        return self._execute_and_json(argstr.split())
 
     def add_key(self, account: Account):
         argstr = (
             f"keys add {account.name} --recover --keyring-backend test --output json"
         )
-        stdout, stderr = self._execute(
+        return self._execute_and_json(
             argstr.split(),
             stdin=f"{account.wallet.mnemonic()}\n".encode(),
-            stdout=PIPE,
-            stderr=PIPE,
         )
-        if stdout:
-            return json.loads(stdout.decode())
-        return json.loads(stderr.decode())
 
     def add_account(self, account: Account, coins: Union[Dict[str, int], int]):
         if isinstance(coins, int):
@@ -150,8 +144,7 @@ class Node:
 
     def collect_gentx(self):
         argstr = "collect-gentxs"
-        _, data = self._execute(argstr.split(), stderr=PIPE)
-        return json.loads(data.decode())
+        return self._execute_and_json(argstr.split())
 
     def copy_gentx_from(self, other: "Node"):
         for file in glob.glob(f"{other.home_dir}/config/gentx/*.json"):
@@ -224,7 +217,7 @@ class Node:
 
     def _execute(
         self,
-        args,
+        args: List[str],
         *,
         stdin: Optional[bytes] = None,
         stdout: Optional[int] = None,
@@ -239,6 +232,26 @@ class Node:
             if rt != 0:
                 raise RuntimeError(f"Non-zero return code {rt}\n{err.decode()}")
             return (out, err)
+
+    def _execute_and_json(
+        self,
+        args: List[str],
+        *,
+        stdin: Optional[bytes] = None,
+    ) -> Dict:
+        stdout, stderr = self._execute(
+            args,
+            stdin=stdin,
+            stdout=PIPE,
+            stderr=PIPE,
+        )
+        if stdout.strip() and stderr.strip():
+            raise RuntimeWarning(
+                f"Got non-empty output on stdout and stderr:\n\n{stdout.decode()}\n\n{stderr.decode()}"
+            )
+        if stdout:
+            return json.loads(stdout.decode())
+        return json.loads(stderr.decode())
 
     def __enter__(self):
         return self
