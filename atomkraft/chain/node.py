@@ -249,14 +249,13 @@ class Node:
             raise RuntimeWarning(
                 f"Got non-empty output on stdout and stderr:\n\n{stdout.decode()}\n\n{stderr.decode()}"
             )
-        if stdout:
+        try:
+            return json.loads(stdout.decode())
+        except json.decoder.JSONDecodeError:
             try:
-                return json.loads(stdout.decode())
+                return json.loads(stderr.decode())
             except json.decoder.JSONDecodeError:
-                try:
-                    return json.loads(stderr.decode())
-                except json.decoder.JSONDecodeError:
-                    return
+                return
 
     def __enter__(self):
         return self
