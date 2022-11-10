@@ -97,7 +97,7 @@ Check that a test file was created:
 
 <!-- $MDX dir=transfer -->
 ```sh
-$ find "tests" -type f -iname "test_ex_violation1.py" -exec echo File found! \;
+$ find "tests" -type f -iname "test_test_alice_zero_violation*.py" -exec echo File found! \;
 File found!
 ```
 
