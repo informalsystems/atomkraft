@@ -155,7 +155,7 @@ The generated Python test files are correctly formatted:
 
 <!-- $MDX dir=transfer -->
 ```sh
-$ black . --check
+$ black --line-length 1000 . --check
 ...
 All done! ✨ 🍰 ✨
 ...
