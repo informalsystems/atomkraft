@@ -83,6 +83,8 @@ class TmEventSubscribe:
         return self
 
     async def _wait(self):
+        # if no transaction is created inside `with TmEventSubscribe(...)`,
+        # tx event polling will be stuck. the following early-return avoids it.
         if self.params.get("tm.event", None) == "Tx" and self.filter is None:
             return
         while True:
