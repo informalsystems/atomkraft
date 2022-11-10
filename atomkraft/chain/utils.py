@@ -59,10 +59,7 @@ class TmEventSubscribe:
             filter (Optional[Callable[[Any], bool]], optional): Filter on events. Defaults to None.
         """
         self.params: Dict[str, str] = params
-        if filter:
-            self.filter: Optional[Callable[[Any], bool]] = filter
-        else:
-            self.filter = None
+        self.filter: Optional[Callable[[Any], bool]] = filter
 
     def set_filter(self, func: Callable[[Any], bool]):
         """Set event filter later.
