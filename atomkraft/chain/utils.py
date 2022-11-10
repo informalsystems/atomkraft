@@ -85,6 +85,9 @@ class TmEventSubscribe:
     async def _wait(self):
         # if no transaction is created inside `with TmEventSubscribe(...)`,
         # tx event polling will be stuck. the following early-return avoids it.
+        # note: it can still get stuck if it subscribes for an event that will not
+        # be produced by the blockchain.
+        # Eg. `Tx` event with an incorrect transaction filter
         if self.params.get("tm.event", None) == "Tx" and self.filter is None:
             return
         while True:
