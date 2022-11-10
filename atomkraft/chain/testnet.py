@@ -109,12 +109,16 @@ class Testnet:
 
     def acc_addr(self, id: AccountId) -> str:
         if id not in self.accounts:
-            self.accounts[id] = Account(id, group="acc", seed=self._account_seed)
+            self.accounts[id] = Account(
+                id, group="acc", seed=self._account_seed, coin_type=self.coin_type
+            )
         return self.accounts[id].address(self.hrp_prefix)
 
     def val_addr(self, id: AccountId, valoper: bool = False) -> str:
         if id not in self.validators:
-            self.validators[id] = Account(id, group="val", seed=self._account_seed)
+            self.validators[id] = Account(
+                id, group="val", seed=self._account_seed, coin_type=self.coin_type
+            )
         if valoper:
             return self.validators[id].validator_address(self.hrp_prefix)
         else:
@@ -122,11 +126,15 @@ class Testnet:
 
     def finalize_accounts(self):
         self.validators: Dict[AccountId, Account] = {
-            v: Account(v, group="val", seed=self._account_seed)
+            v: Account(
+                v, group="val", seed=self._account_seed, coin_type=self.coin_type
+            )
             for v in self._validator_ids
         }
         self.accounts: Dict[AccountId, Account] = {
-            a: Account(a, group="acc", seed=self._account_seed)
+            a: Account(
+                a, group="acc", seed=self._account_seed, coin_type=self.coin_type
+            )
             for a in self._account_ids
         }
 
