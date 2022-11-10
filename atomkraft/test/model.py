@@ -4,7 +4,7 @@ from typing import Dict, List, Optional
 
 from atomkraft.config.atomkraft_config import AtomkraftConfig
 from atomkraft.model.traces import generate_traces
-from atomkraft.test.helpers import create_test, execute_test
+from atomkraft.test.test import Test
 from atomkraft.utils.project import (
     get_absolute_project_path,
     get_relative_project_path,
@@ -70,10 +70,9 @@ def test_model(
         trace_paths = [Path(t) for t in model_result.trace_paths(op)]
         trace_dir = Path(os.path.dirname(os.path.commonprefix(trace_paths)))
 
-        test_name, test_file_path = create_test(
-            root, trace_dir, trace_paths, reactor, keypath
-        )
-        exit_code = execute_test(root, test_name, test_file_path, trace_paths, verbose)
+        test = Test(root, trace_dir)
+        test.create_file(trace_paths, reactor, keypath)
+        exit_code = test.execute(verbose)
         if exit_code != 0:
             return exit_code
 
