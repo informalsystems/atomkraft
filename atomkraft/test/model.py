@@ -1,16 +1,10 @@
+import os
 from pathlib import Path
 from typing import Dict, List, Optional
 
-import pytest
 from atomkraft.config.atomkraft_config import AtomkraftConfig
 from atomkraft.model.traces import generate_traces
-from atomkraft.test.helpers import (
-    append_timestamp,
-    mk_test_dir,
-    prepare_validators,
-    save_validator_files,
-)
-from atomkraft.utils.helpers import remove_suffix
+from atomkraft.test.helpers import create_test, execute_test
 from atomkraft.utils.project import (
     get_absolute_project_path,
     get_relative_project_path,
@@ -18,7 +12,6 @@ from atomkraft.utils.project import (
 )
 
 from ..reactor.reactor import get_reactor
-from .trace import mk_pytest_args, write_header, write_test
 
 # a key for the last used model path inside internal config
 MODEL_CONFIG_KEY = "model"
@@ -50,7 +43,7 @@ def test_model(
     root = project_root()
     if not root:
         raise RuntimeError(
-            "could not find Atomkraft project: are you in the right directory?"
+            "Could not find Atomkraft project: are you in the right directory?"
         )
 
     if model is None:
@@ -69,39 +62,19 @@ def test_model(
 
     successful_ops = model_result.successful()
     if not successful_ops:
-        print("No trace is produced.")
+        print("No trace generated.")
         return 1
 
-    test_name = append_timestamp(model.stem)
-    test_dir = mk_test_dir(root, False, test_name)
-
-    test_list = []
     for op in successful_ops:
         print(f"Preparing tests for {op} ...")
-        for trace_path in model_result.trace_paths(op):
-            trace = Path(trace_path)
-            if all(not c.isdigit() for c in trace.name):
-                continue
+        trace_paths = [Path(t) for t in model_result.trace_paths(op)]
+        trace_dir = Path(os.path.dirname(os.path.commonprefix(trace_paths)))
 
-            trace_name = remove_suffix(trace.name, ".itf.json")
-            print(f"Using {trace} ...")
-            trace = get_relative_project_path(trace)
-            test_path = test_dir / test_name / f"test_{op}_{trace_name}.py"
-            test_path.parent.mkdir(parents=True, exist_ok=True)
-            with open(test_path, "w") as test_file:
-                print(f"Writing {test_path.name} ...")
-                write_header(test_file, reactor)
-                write_test(test_file, trace, keypath)
-            test_list.append((trace, test_path))
+        test_name, test_file_path = create_test(
+            root, trace_dir, trace_paths, reactor, keypath
+        )
+        exit_code = execute_test(root, test_name, test_file_path, trace_paths, verbose)
+        if exit_code != 0:
+            return exit_code
 
-    print(f"Executing {test_name}...")
-    val_root_dir = prepare_validators(root)
-    pytest_args, report_dir = mk_pytest_args(test_dir, verbose)
-    test_file_paths = [str(test_file) for (_, test_file) in test_list]
-    exit_code = pytest.main(pytest_args + test_file_paths)
-
-    trace_paths = [path for path, _ in test_list]
-    save_validator_files(val_root_dir, report_dir, trace_paths)
-    print(f"Test data is saved at {report_dir}")
-
-    return int(exit_code)
+    return 0
