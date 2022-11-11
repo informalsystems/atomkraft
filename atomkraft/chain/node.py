@@ -179,8 +179,8 @@ class Node:
 
     @tenacity.retry(
         retry=tenacity.retry_if_exception_type((ConnectionRefusedError)),
-        wait=tenacity.wait_fixed(0.1),
-        stop=(tenacity.stop_after_delay(20) | tenacity.stop_after_attempt(100)),
+        wait=tenacity.wait_fixed(0.3),
+        stop=tenacity.stop_after_delay(600),
     )
     def wait_for_port(self, port_config: ConfigPort):
         addr = self.get(
