@@ -22,7 +22,7 @@ function cleanup {
 
 trap cleanup EXIT
 
-for f in `ls *md`; do
+for f in `ls test_*.md`; do
     echo "testing ${f} ..."
     [ -f "${f}.corrected" ] && rm "${f}.corrected"
     ocaml-mdx test -v "${f}"
