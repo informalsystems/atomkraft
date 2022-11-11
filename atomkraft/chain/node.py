@@ -2,6 +2,7 @@ import glob
 import json
 import os
 import shutil
+import socket
 from dataclasses import dataclass
 from pathlib import Path
 from subprocess import PIPE, Popen
@@ -10,6 +11,7 @@ from typing import Any, Callable, Dict, Optional, Union
 import bip_utils
 import hdwallet
 import numpy as np
+import tenacity
 import tomlkit
 from hdwallet.symbols import ATOM
 
@@ -174,6 +176,23 @@ class Node:
             port_config.config_file,
             port_config.property_path,
         )
+
+    @tenacity.retry(
+        retry=tenacity.retry_if_exception_type((ConnectionRefusedError)),
+        wait=tenacity.wait_fixed(0.1),
+        stop=(tenacity.stop_after_delay(20) | tenacity.stop_after_attempt(100)),
+    )
+    def wait_for_port(self, port_config: ConfigPort):
+        addr = self.get(
+            port_config.config_file,
+            port_config.property_path,
+        )
+        ip, port = addr.split("//")[-1].split(":")
+        with socket.create_connection(
+            (ip, port),
+            timeout=5,
+        ):
+            pass
 
     def set(self, path: Path, value: Any, property_path: Optional[str] = None):
         if property_path is not None:

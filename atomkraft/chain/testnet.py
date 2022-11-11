@@ -1,5 +1,4 @@
 import asyncio
-import socket
 import tempfile
 import time
 from contextlib import closing
@@ -312,22 +311,7 @@ class Testnet:
             node.start()
         for node in self.validator_nodes.values():
             for endpoint_type in ["rpc", "grpc"]:
-                while True:
-                    try:
-                        addr = node.get(
-                            self.ports()[endpoint_type].config_file,
-                            self.ports()[endpoint_type].property_path,
-                        )
-                        ip, port = addr.split("//")[-1].split(":")
-                        with socket.create_connection(
-                            (ip, port),
-                            timeout=5,
-                        ):
-                            break
-                    except OSError:
-                        # todo: remove this sleep in future
-                        time.sleep(0.1)
-                        pass
+                node.wait_for_port(self.ports()[endpoint_type])
 
     def oneshot(self):
         self.prepare()
