@@ -19,7 +19,7 @@ p2p = { addr_book_strict = false, allow_duplicate_ip = true }
 voting_params = { voting_period = "600s" }
 
 [config_genesis.app_state.mint]
-minter = { inflation = "0.300000000000000000" }
+minter = { inflation = "0.3" }
 
 [config_node.config.consensus]
 timeout_commit = "100ms"
