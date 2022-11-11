@@ -309,9 +309,11 @@ class Testnet:
     def spinup(self):
         for node in self.validator_nodes.values():
             node.start()
+        endpoint_types = ["rpc", "grpc"]
         for node in self.validator_nodes.values():
-            for endpoint_type in ["rpc", "grpc"]:
+            for endpoint_type in endpoint_types:
                 node.wait_for_port(self.ports()[endpoint_type])
+        print("Endpoints are ready:", " ".join(endpoint_types))
 
     def oneshot(self):
         self.prepare()
