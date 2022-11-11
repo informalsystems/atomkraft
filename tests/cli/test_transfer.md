@@ -6,6 +6,8 @@
 $ [ ! -d transfer ] || rm -rdf transfer
 $ atomkraft init transfer
 ...
+Atomkraft project is ready: transfer
+...
 $ cd transfer
 ```
 
@@ -13,8 +15,7 @@ $ cd transfer
 
 <!-- $MDX dir=transfer -->
 ```sh
-$ curl -Lo models/transfer.tla https://raw.githubusercontent.com/informalsystems/atomkraft/dev/examples/cosmos-sdk/transfer/transfer.tla
-...
+$ curl -sLo models/transfer.tla https://raw.githubusercontent.com/informalsystems/atomkraft/dev/examples/cosmos-sdk/transfer/transfer.tla
 ```
 
 ```sh
@@ -80,6 +81,8 @@ $ rm -rf tests/*
 ```sh
 $ atomkraft test trace --path traces/Ex/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag --verbose
 ...
+PASSED                                                                   [100%]
+...
 ```
 
 Check that a test file was created:
@@ -108,8 +111,7 @@ $ atomkraft test trace --path traces/Ex --reactor reactors/reactor.py --keypath 
 
 <!-- $MDX dir=transfer -->
 ```sh
-$ curl -Lo reactors/reactor.py https://raw.githubusercontent.com/informalsystems/atomkraft/dev/examples/cosmos-sdk/transfer/reactor.py
-...
+$ curl -sLo reactors/reactor.py https://raw.githubusercontent.com/informalsystems/atomkraft/dev/examples/cosmos-sdk/transfer/reactor.py
 ```
 
 ## Test
@@ -118,7 +120,9 @@ $ curl -Lo reactors/reactor.py https://raw.githubusercontent.com/informalsystems
 
 <!-- $MDX dir=transfer -->
 ```sh
-$ atomkraft test trace --path traces/Ex/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag
+$ atomkraft test trace --path traces/Ex/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag --verbose
+...
+PASSED                                                                   [100%]
 ...
 ```
 
@@ -127,7 +131,13 @@ $ atomkraft test trace --path traces/Ex/violation1.itf.json --reactor reactors/r
 <!-- $MDX dir=transfer -->
 ```sh
 $ rm -rf traces/*
-$ atomkraft test model --model models/transfer.tla --test Ex --max-trace 3 --view View --reactor reactors/reactor.py --keypath action.tag
+$ atomkraft test model --model models/transfer.tla --test Ex --max-trace 3 --view View --reactor reactors/reactor.py --keypath action.tag --verbose
+...
+PASSED                                                                   [ 33%]
+...
+PASSED                                                                   [ 66%]
+...
+PASSED                                                                   [100%]
 ...
 ```
 
@@ -139,8 +149,9 @@ The generated Python test files are correctly formatted:
 ```sh
 $ black . --check
 ...
-$ pylama -l pyflakes,pycodestyle,isort
+All done! ✨ 🍰 ✨
 ...
+$ pylama -l pyflakes,pycodestyle,isort
 ```
 
 ## Clean up
