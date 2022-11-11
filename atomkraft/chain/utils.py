@@ -59,10 +59,7 @@ class TmEventSubscribe:
             filter (Optional[Callable[[Any], bool]], optional): Filter on events. Defaults to None.
         """
         self.params: Dict[str, str] = params
-        if filter:
-            self.filter: Callable[[Any], bool] = filter
-        else:
-            self.filter = lambda x: True
+        self.filter: Optional[Callable[[Any], bool]] = filter
 
     def set_filter(self, func: Callable[[Any], bool]):
         """Set event filter later.
@@ -86,12 +83,19 @@ class TmEventSubscribe:
         return self
 
     async def _wait(self):
+        # if no transaction is created inside `with TmEventSubscribe(...)`,
+        # tx event polling will be stuck. the following early-return avoids it.
+        # note: it can still get stuck if it subscribes for an event that will not
+        # be produced by the blockchain.
+        # Eg. `Tx` event with an incorrect transaction filter
+        if self.params.get("tm.event", None) == "Tx" and self.filter is None:
+            return
         while True:
             msg = responses.to_result(json.loads(await self.websocket.recv()))
             if (
                 isinstance(msg, responses.Ok)
                 and msg.result.get("query", None) == self.query
-                and self.filter(msg.result)
+                and (self.filter is None or self.filter(msg.result))
             ):
                 break
 
