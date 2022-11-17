@@ -33,6 +33,7 @@ MANIFEST.in
 /tests/fixtures/simple_project/setup.py
 /tests/fixtures/project_with_extras/setup.py
 .mypy_cache
+__pycache__
 
 .venv
 /releases/*
@@ -46,3 +47,9 @@ tests/project/reactors/
 
 # CLI
 .model.pickle
+
+# examples
+examples/cosmwasm/*/.atomkraft
+examples/cosmwasm/*/reports
+examples/cosmwasm/counter/cosmwasm-contract/out
+examples/cosmwasm/*/tests

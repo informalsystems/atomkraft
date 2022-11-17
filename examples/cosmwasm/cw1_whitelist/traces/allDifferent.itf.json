@@ -1,0 +1,480 @@
+{
+    "#meta": {
+      "format": "ITF",
+      "format-description": "https://apalache.informal.systems/docs/adr/015adr-trace.html",
+      "description": "Created by Apalache on Thu Oct 20 14:00:28 CEST 2022"
+    },
+    "vars": [
+      "instantiated",
+      "admins",
+      "lastMsg",
+      "stored",
+      "mutable"
+    ],
+    "states": [
+      {
+        "#meta": {
+          "index": 0
+        },
+        "admins": {
+          "#set": [
+            100,
+            21,
+            22,
+            23,
+            25,
+            26,
+            28,
+            30,
+            31,
+            34,
+            35,
+            38,
+            46,
+            48,
+            5,
+            50,
+            51,
+            52,
+            54,
+            60,
+            61,
+            62,
+            66,
+            68,
+            69,
+            70,
+            72,
+            73,
+            74,
+            76,
+            77,
+            79,
+            80,
+            83,
+            84,
+            88,
+            90,
+            92,
+            94,
+            98
+          ]
+        },
+        "instantiated": false,
+        "lastMsg": {
+          "tag": "Idle",
+          "value": "0_OF_NIL"
+        },
+        "mutable": false,
+        "stored": false
+      },
+      {
+        "#meta": {
+          "index": 1
+        },
+        "admins": {
+          "#set": [
+            100,
+            21,
+            22,
+            23,
+            25,
+            26,
+            28,
+            30,
+            31,
+            34,
+            35,
+            38,
+            46,
+            48,
+            5,
+            50,
+            51,
+            52,
+            54,
+            60,
+            61,
+            62,
+            66,
+            68,
+            69,
+            70,
+            72,
+            73,
+            74,
+            76,
+            77,
+            79,
+            80,
+            83,
+            84,
+            88,
+            90,
+            92,
+            94,
+            98
+          ]
+        },
+        "instantiated": false,
+        "lastMsg": {
+          "tag": "StoreCW",
+          "value": {
+            "sender": 1
+          }
+        },
+        "mutable": false,
+        "stored": true
+      },
+      {
+        "#meta": {
+          "index": 2
+        },
+        "admins": {
+          "#set": [
+            100,
+            21,
+            22,
+            23,
+            25,
+            26,
+            28,
+            30,
+            31,
+            34,
+            35,
+            38,
+            46,
+            48,
+            5,
+            50,
+            51,
+            52,
+            54,
+            60,
+            61,
+            62,
+            66,
+            68,
+            69,
+            70,
+            72,
+            73,
+            74,
+            76,
+            77,
+            79,
+            80,
+            83,
+            84,
+            88,
+            90,
+            92,
+            94,
+            98
+          ]
+        },
+        "instantiated": true,
+        "lastMsg": {
+          "tag": "Instantiate",
+          "value": {
+            "admins": {
+              "#set": [
+                100,
+                21,
+                22,
+                23,
+                25,
+                26,
+                28,
+                30,
+                31,
+                34,
+                35,
+                38,
+                46,
+                48,
+                5,
+                50,
+                51,
+                52,
+                54,
+                60,
+                61,
+                62,
+                66,
+                68,
+                69,
+                70,
+                72,
+                73,
+                74,
+                76,
+                77,
+                79,
+                80,
+                83,
+                84,
+                88,
+                90,
+                92,
+                94,
+                98
+              ]
+            },
+            "mutable": true
+          }
+        },
+        "mutable": true,
+        "stored": true
+      },
+      {
+        "#meta": {
+          "index": 3
+        },
+        "admins": {
+          "#set": [
+            100,
+            21,
+            22,
+            23,
+            25,
+            26,
+            28,
+            30,
+            31,
+            34,
+            35,
+            38,
+            46,
+            48,
+            5,
+            50,
+            51,
+            52,
+            54,
+            60,
+            61,
+            62,
+            66,
+            68,
+            69,
+            70,
+            72,
+            73,
+            74,
+            76,
+            77,
+            79,
+            80,
+            83,
+            84,
+            88,
+            90,
+            92,
+            94,
+            98
+          ]
+        },
+        "instantiated": true,
+        "lastMsg": {
+          "tag": "GetCanExecute",
+          "value": {
+            "sender": 5
+          }
+        },
+        "mutable": true,
+        "stored": true
+      },
+      {
+        "#meta": {
+          "index": 4
+        },
+        "admins": {
+          "#set": [
+            10,
+            100,
+            11,
+            16,
+            18,
+            2,
+            21,
+            24,
+            35,
+            36,
+            37,
+            45,
+            47,
+            48,
+            49,
+            51,
+            52,
+            54,
+            60,
+            61,
+            71,
+            74,
+            76,
+            83,
+            84,
+            85,
+            9,
+            92,
+            93,
+            97
+          ]
+        },
+        "instantiated": true,
+        "lastMsg": {
+          "tag": "UpdateAdmins",
+          "value": {
+            "sender": 5
+          }
+        },
+        "mutable": true,
+        "stored": true
+      },
+      {
+        "#meta": {
+          "index": 5
+        },
+        "admins": {
+          "#set": [
+            10,
+            100,
+            11,
+            16,
+            18,
+            2,
+            21,
+            24,
+            35,
+            36,
+            37,
+            45,
+            47,
+            48,
+            49,
+            51,
+            52,
+            54,
+            60,
+            61,
+            71,
+            74,
+            76,
+            83,
+            84,
+            85,
+            9,
+            92,
+            93,
+            97
+          ]
+        },
+        "instantiated": true,
+        "lastMsg": {
+          "tag": "Execute",
+          "value": {
+            "sender": 18
+          }
+        },
+        "mutable": true,
+        "stored": true
+      },
+      {
+        "#meta": {
+          "index": 6
+        },
+        "admins": {
+          "#set": [
+            10,
+            100,
+            11,
+            16,
+            18,
+            2,
+            21,
+            24,
+            35,
+            36,
+            37,
+            45,
+            47,
+            48,
+            49,
+            51,
+            52,
+            54,
+            60,
+            61,
+            71,
+            74,
+            76,
+            83,
+            84,
+            85,
+            9,
+            92,
+            93,
+            97
+          ]
+        },
+        "instantiated": true,
+        "lastMsg": {
+          "tag": "GetAdminList",
+          "value": "0_OF_NIL"
+        },
+        "mutable": true,
+        "stored": true
+      },
+      {
+        "#meta": {
+          "index": 7
+        },
+        "admins": {
+          "#set": [
+            10,
+            100,
+            11,
+            16,
+            18,
+            2,
+            21,
+            24,
+            35,
+            36,
+            37,
+            45,
+            47,
+            48,
+            49,
+            51,
+            52,
+            54,
+            60,
+            61,
+            71,
+            74,
+            76,
+            83,
+            84,
+            85,
+            9,
+            92,
+            93,
+            97
+          ]
+        },
+        "instantiated": true,
+        "lastMsg": {
+          "tag": "Freeze",
+          "value": {
+            "sender": 10
+          }
+        },
+        "mutable": false,
+        "stored": true
+      }
+    ]
+  }
