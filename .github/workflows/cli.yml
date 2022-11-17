@@ -23,6 +23,12 @@ jobs:
       COSMOS_SDK_TAG: v0.45.8
     container: ghcr.io/rnbguy/mdx-docker:nightly
     steps:
+      - name: Restoring after GitHub default container params
+        run: |
+          echo "PATH=$PATH:/home/opam/.opam/4.14/bin" >> $GITHUB_ENV
+          ln -s "/__t" "/opt/hostedtoolcache"
+          mkdir -p /home/runner
+          ln -s "/__w" "/home/runner/work"
       - name: Check out repository
         uses: actions/checkout@v3
       - name: Set up python ${{ matrix.python-version }}
