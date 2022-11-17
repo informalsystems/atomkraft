@@ -526,33 +526,26 @@ python-versions = "*"
 
 [[package]]
 name = "modelator"
-version = "0.6.4"
+version = "0.6.5"
 description = "Framework for Model Based Testing"
 category = "main"
 optional = false
-python-versions = "^3.8"
-develop = false
+python-versions = ">=3.8,<4.0"
 
 [package.dependencies]
-appdirs = "^1.4.4"
-deepdiff = "^5.8.1"
-modelator-py = "^0.2.3"
-munch = "^2.5.0"
-pyrsistent = "^0.18.1"
-rich = "^12.5.1"
-semver = "^2.13.0"
-tabulate = "^0.8.9"
-toml = "^0.10.2"
-typer = {version = "^0.6.1", extras = ["all"]}
-typing-extensions = "^4.2.0"
-watchdog = "^2.1.8"
-wget = "^3.2"
-
-[package.source]
-type = "git"
-url = "https://github.com/informalsystems/modelator"
-reference = "ivan/examples2testsRebased"
-resolved_reference = "f3bb26c14c5e683c3aa5234f11305dcbd35ae821"
+appdirs = ">=1.4.4,<2.0.0"
+deepdiff = ">=5.8.1,<6.0.0"
+modelator-py = ">=0.2.3,<0.3.0"
+munch = ">=2.5.0,<3.0.0"
+pyrsistent = ">=0.18.1,<0.19.0"
+rich = ">=12.5.1,<13.0.0"
+semver = ">=2.13.0,<3.0.0"
+tabulate = ">=0.8.9,<0.9.0"
+toml = ">=0.10.2,<0.11.0"
+typer = {version = ">=0.6.1,<0.7.0", extras = ["all"]}
+typing-extensions = ">=4.2.0,<5.0.0"
+watchdog = ">=2.1.8,<3.0.0"
+wget = ">=3.2,<4.0"
 
 [[package]]
 name = "modelator-py"
@@ -1177,7 +1170,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "9ab6a1b395a79b8ea3714f8bf1dc1789313075589e17851bdf4498e7a90344e8"
+content-hash = "bab5e431a7da030272167a9025135098804e0c61940f920b7a6e9782eadd0505"
 
 [metadata.files]
 aiohttp = [
@@ -1471,9 +1464,6 @@ copier = [
 ]
 crcmod = [
     {file = "crcmod-1.7.tar.gz", hash = "sha256:dc7051a0db5f2bd48665a990d3ec1cc305a466a77358ca4492826f41f283601e"},
-    {file = "crcmod-1.7.win32-py2.6.msi", hash = "sha256:69a2e5c6c36d0f096a7beb4cd34e5f882ec5fd232efb710cdb85d4ff196bd52e"},
-    {file = "crcmod-1.7.win32-py2.7.msi", hash = "sha256:737fb308fa2ce9aed2e29075f0d5980d4a89bfbec48a368c607c5c63b3efb90e"},
-    {file = "crcmod-1.7.win32-py3.1.msi", hash = "sha256:50586ab48981f11e5b117523d97bb70864a2a1af246cf6e4f5c4a21ef4611cd1"},
 ]
 deepdiff = [
     {file = "deepdiff-5.8.1-py3-none-any.whl", hash = "sha256:e9aea49733f34fab9a0897038d8f26f9d94a97db1790f1b814cced89e9e0d2b7"},
@@ -1737,7 +1727,10 @@ mnemonic = [
     {file = "mnemonic-0.19-py2.py3-none-any.whl", hash = "sha256:a8d78c5100acfa7df9bab6b9db7390831b0e54490934b718ff9efd68f0d731a6"},
     {file = "mnemonic-0.19.tar.gz", hash = "sha256:4e37eb02b2cbd56a0079cabe58a6da93e60e3e4d6e757a586d9f23d96abea931"},
 ]
-modelator = []
+modelator = [
+    {file = "modelator-0.6.5-py3-none-any.whl", hash = "sha256:64a8c2c0e839167edb4b22a684eabf488e4e783071db609bc683a455f7ef67f0"},
+    {file = "modelator-0.6.5.tar.gz", hash = "sha256:bb7d4ea1f544be7dbf1cde4751745504c7c4b5550f97e2a2792072253597c6ba"},
+]
 modelator-py = [
     {file = "modelator_py-0.2.3-py3-none-any.whl", hash = "sha256:bd9015327b34df4559c9ab3676d0610157ffa3d71666d3c56bdf634e6756d538"},
     {file = "modelator_py-0.2.3.tar.gz", hash = "sha256:bd049ccf4623b8c812dd2a560d9b33bf35a32ab699e8e9b872e185e821ce2bab"},
@@ -2146,6 +2139,13 @@ pyyaml = [
     {file = "PyYAML-6.0-cp310-cp310-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:f84fbc98b019fef2ee9a1cb3ce93e3187a6df0b2538a651bfb890254ba9f90b5"},
     {file = "PyYAML-6.0-cp310-cp310-win32.whl", hash = "sha256:2cd5df3de48857ed0544b34e2d40e9fac445930039f3cfe4bcc592a1f836d513"},
     {file = "PyYAML-6.0-cp310-cp310-win_amd64.whl", hash = "sha256:daf496c58a8c52083df09b80c860005194014c3698698d1a57cbcfa182142a3a"},
+    {file = "PyYAML-6.0-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:d4b0ba9512519522b118090257be113b9468d804b19d63c71dbcf4a48fa32358"},
+    {file = "PyYAML-6.0-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:81957921f441d50af23654aa6c5e5eaf9b06aba7f0a19c18a538dc7ef291c5a1"},
+    {file = "PyYAML-6.0-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:afa17f5bc4d1b10afd4466fd3a44dc0e245382deca5b3c353d8b757f9e3ecb8d"},
+    {file = "PyYAML-6.0-cp311-cp311-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:dbad0e9d368bb989f4515da330b88a057617d16b6a8245084f1b05400f24609f"},
+    {file = "PyYAML-6.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:432557aa2c09802be39460360ddffd48156e30721f5e8d917f01d31694216782"},
+    {file = "PyYAML-6.0-cp311-cp311-win32.whl", hash = "sha256:bfaef573a63ba8923503d27530362590ff4f576c626d86a9fed95822a8255fd7"},
+    {file = "PyYAML-6.0-cp311-cp311-win_amd64.whl", hash = "sha256:01b45c0191e6d66c470b6cf1b9531a771a83c1c4208272ead47a3ae4f2f603bf"},
     {file = "PyYAML-6.0-cp36-cp36m-macosx_10_9_x86_64.whl", hash = "sha256:897b80890765f037df3403d22bab41627ca8811ae55e9a722fd0392850ec4d86"},
     {file = "PyYAML-6.0-cp36-cp36m-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:50602afada6d6cbfad699b0c7bb50d5ccffa7e46a3d738092afddc1f9758427f"},
     {file = "PyYAML-6.0-cp36-cp36m-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:48c346915c114f5fdb3ead70312bd042a953a8ce5c7106d5bfb1a5254e47da92"},
@@ -2218,7 +2218,6 @@ smmap = [
 ]
 tabulate = [
     {file = "tabulate-0.8.10-py3-none-any.whl", hash = "sha256:0ba055423dbaa164b9e456abe7920c5e8ed33fcc16f6d1b2f2d152c8e1e8b4fc"},
-    {file = "tabulate-0.8.10-py3.8.egg", hash = "sha256:436f1c768b424654fce8597290d2764def1eea6a77cfa5c33be00b1bc0f4f63d"},
     {file = "tabulate-0.8.10.tar.gz", hash = "sha256:6c57f3f3dd7ac2782770155f3adb2db0b1a269637e42f27599925e64b114f519"},
 ]
 tenacity = [
