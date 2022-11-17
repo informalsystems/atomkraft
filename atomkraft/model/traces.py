@@ -60,7 +60,7 @@ def generate_traces(
 
     model = Model.parse_file(str(model_path), init, next)
     return model.sample(
-        traces_dir=traces_dir, examples=sample_operators, checker_params=checker_params
+        traces_dir=traces_dir, tests=sample_operators, checker_params=checker_params
     )
 
 
