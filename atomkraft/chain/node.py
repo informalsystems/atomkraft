@@ -224,7 +224,7 @@ class Node:
         stdin: Optional[bytes] = None,
         stdout: Optional[int] = None,
         stderr: Optional[int] = None,
-    ) -> Tuple[bytes, bytes]:
+    ) -> Tuple[Optional[bytes], Optional[bytes]]:
         final_args = f"{self.binary} --home {self.home_dir}".split() + args
         # print(" ".join(final_args))
         stdin_pipe = None if stdin is None else PIPE
@@ -237,16 +237,21 @@ class Node:
 
     def _json_from_stdout_or_stderr(
         self,
-        stdout: bytes,
-        stderr: bytes,
+        stdout: Optional[bytes],
+        stderr: Optional[bytes],
     ) -> Optional[Dict]:
-        if stdout.strip() and stderr.strip():
+        if stdout and stdout.strip() and stderr and stderr.strip():
             raise RuntimeWarning(
                 f"Got non-empty output on stdout and stderr:\n\n{stdout.decode()}\n\n{stderr.decode()}"
             )
-        try:
-            return json.loads(stdout.decode())
-        except json.decoder.JSONDecodeError:
+
+        if stdout and stdout.strip():
+            try:
+                return json.loads(stdout.decode())
+            except json.decoder.JSONDecodeError:
+                pass
+
+        if stderr and stderr.strip():
             try:
                 return json.loads(stderr.decode())
             except json.decoder.JSONDecodeError:
