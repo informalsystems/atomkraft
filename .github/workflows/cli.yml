@@ -25,7 +25,7 @@ jobs:
     steps:
       - name: Restoring after GitHub default container params
         run: |
-          echo "PATH=$PATH:/home/opam/.opam/4.14/bin" >> $GITHUB_ENV
+          echo "/home/opam/.opam/4.14/bin" >> $GITHUB_PATH
           ln -s "/__t" "/opt/hostedtoolcache"
           mkdir -p /home/runner
           ln -s "/__w" "/home/runner/work"
@@ -74,7 +74,7 @@ jobs:
           make build
       - name: Put Cosmos-SDK binary in system path
         run: |
-          echo "PATH=$PATH:$(pwd)/cosmos-sdk/build" >> $GITHUB_ENV
+          echo "$(pwd)/cosmos-sdk/build" >> $GITHUB_PATH
       - name: Setup Atomkraft and Apalache
         run: |
           source .venv/bin/activate
