@@ -6,7 +6,7 @@ import socket
 from dataclasses import dataclass
 from pathlib import Path
 from subprocess import PIPE, Popen
-from typing import Any, Callable, Dict, List, Optional, Union
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 import bip_utils
 import hdwallet
@@ -116,19 +116,21 @@ class Node:
         self._stdout = None
         self._stderr = None
 
-    def init(self) -> Dict["str", Any]:
+    def init(self) -> Optional[Dict]:
         if self.overwrite and os.path.exists(self.home_dir):
             shutil.rmtree(self.home_dir)
         argstr = f"init {self.moniker} --chain-id {self.chain_id}"
-        return self._execute_and_json(argstr.split())
+        return self._json_from_stdout_or_stderr(*self._execute(argstr.split()))
 
-    def add_key(self, account: Account):
+    def add_key(self, account: Account) -> Optional[Dict]:
         argstr = (
             f"keys add {account.name} --recover --keyring-backend test --output json"
         )
-        return self._execute_and_json(
-            argstr.split(),
-            stdin=f"{account.wallet.mnemonic()}\n".encode(),
+        return self._json_from_stdout_or_stderr(
+            *self._execute(
+                argstr.split(),
+                stdin=f"{account.wallet.mnemonic()}\n".encode(),
+            )
         )
 
     def add_account(self, account: Account, coins: Union[Dict[str, int], int]):
@@ -144,7 +146,7 @@ class Node:
 
     def collect_gentx(self):
         argstr = "collect-gentxs"
-        return self._execute_and_json(argstr.split())
+        return self._json_from_stdout_or_stderr(*self._execute(argstr.split()))
 
     def copy_gentx_from(self, other: "Node"):
         for file in glob.glob(f"{other.home_dir}/config/gentx/*.json"):
@@ -222,7 +224,7 @@ class Node:
         stdin: Optional[bytes] = None,
         stdout: Optional[int] = None,
         stderr: Optional[int] = None,
-    ):
+    ) -> Tuple[bytes, bytes]:
         final_args = f"{self.binary} --home {self.home_dir}".split() + args
         # print(" ".join(final_args))
         stdin_pipe = None if stdin is None else PIPE
@@ -233,18 +235,11 @@ class Node:
                 raise RuntimeError(f"Non-zero return code {rt}\n{err.decode()}")
             return (out, err)
 
-    def _execute_and_json(
+    def _json_from_stdout_or_stderr(
         self,
-        args: List[str],
-        *,
-        stdin: Optional[bytes] = None,
+        stdout: bytes,
+        stderr: bytes,
     ) -> Optional[Dict]:
-        stdout, stderr = self._execute(
-            args,
-            stdin=stdin,
-            stdout=PIPE,
-            stderr=PIPE,
-        )
         if stdout.strip() and stderr.strip():
             raise RuntimeWarning(
                 f"Got non-empty output on stdout and stderr:\n\n{stdout.decode()}\n\n{stderr.decode()}"
