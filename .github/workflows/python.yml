@@ -72,6 +72,11 @@ jobs:
         with:
           virtualenvs-create: true
           virtualenvs-in-project: true
+      - name: Install java
+        uses: actions/setup-java@v3
+        with:
+          distribution: "temurin"
+          java-version: 17
       - name: Load cached venv
         id: cached-poetry-dependencies
         uses: actions/cache@v3
