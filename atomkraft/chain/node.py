@@ -13,7 +13,7 @@ import hdwallet
 import numpy as np
 import tenacity
 import tomlkit
-from hdwallet.symbols import ATOM
+from hdwallet.cryptocurrencies import CoinType, Cryptocurrency
 
 from .. import utils
 
@@ -56,6 +56,7 @@ class Account:
         group: Optional[str] = None,
         seed: Optional[str] = None,
         strength: int = 128,
+        coin_type: int = 118,
     ):
         if strength not in [128, 160, 192, 224, 256]:
             raise ValueError(
@@ -70,7 +71,12 @@ class Account:
         self.entropy = (
             np.random.default_rng(list(bytes(final_seed))).bytes(strength // 8).hex()
         )
-        self.wallet = hdwallet.BIP44HDWallet(symbol=ATOM).from_entropy(
+        self.coin_type = coin_type
+
+        class LocalCC(Cryptocurrency):
+            COIN_TYPE = CoinType({"INDEX": self.coin_type, "HARDENED": True})
+
+        self.wallet = hdwallet.BIP44HDWallet(cryptocurrency=LocalCC).from_entropy(
             entropy=self.entropy, language="english", passphrase=""
         )
 
