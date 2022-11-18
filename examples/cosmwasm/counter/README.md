@@ -37,6 +37,9 @@ atomkraft model simulate --model-path models/counter.tla --max-trace 10 --length
 ### Run tests on generated traces
 
 ```sh
+# just one trace
+atomkraft test trace --path traces/example1.itf.json --reactor reactors/reactor.py --keypath last_msg.tag
+# or all traces in a directory
 atomkraft test trace --path traces --reactor reactors/reactor.py --keypath last_msg.tag
 ```
 
