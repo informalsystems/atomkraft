@@ -46,7 +46,7 @@ StoreCW(_sender) == Variant("StoreCwContract", [sender |-> _sender])
 
 
 \* @type: () => Set(Int);
-ACCOUNTS == 1..MAX_ACCOUNTS
+ACCOUNTS == 0..(MAX_ACCOUNTS-1)
 
 Init ==
     /\ count = 0
