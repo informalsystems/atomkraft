@@ -21,6 +21,13 @@ git clone --depth 1 https://github.com/CosmWasm/wasmd
 ls wasmd/build/wasmd # wasmd binary
 ```
 
+### Make sure Atomkraft is installed and set up Apalache
+
+```
+atomkraft model apalache get # to download and set up apalache
+atomkraft model apalache info # confirm apalache distribution
+```
+
 ### Generate traces
 
 ```sh
