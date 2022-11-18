@@ -1,21 +1,16 @@
-import os
 import sys
 from pathlib import Path
 from typing import Callable, Dict, Optional, Type
 
-import git
 import modelator
 import pytest
 import typer
 from atomkraft import __version__
-from atomkraft.utils.project import NoProjectError, project_root
-from copier import run_auto
+from atomkraft.utils.project import NoProjectError, init_project, project_root
+from rich import print
 
 from .. import chain, test
 from ..reactor.reactor import generate_reactor
-
-GH_TEMPLATE = "gh:informalsystems/atomkraft"
-GH_REVISION = "dev"
 
 
 class ErrorHandlingTyper(typer.Typer):
@@ -88,21 +83,24 @@ def version():
     no_args_is_help=True,
 )
 def init(
-    name: Path = typer.Argument(..., help="Name of new directory", show_default=False),
-    atomkraft_rev: Optional[str] = typer.Option(
-        None, help="Atomkraft Github revision for project template"
-    ),
+    name: str = typer.Argument(..., help="Name of new directory", show_default=False),
 ):
     """
     Initialize new Atomkraft project in the given directory
     """
-    try:
-        git.Repo(os.getcwd(), search_parent_directories=True)
-    except git.InvalidGitRepositoryError:
-        git.Repo.init(name)
-    if atomkraft_rev is None:
-        atomkraft_rev = GH_REVISION
-    run_auto(GH_TEMPLATE, name, vcs_ref=atomkraft_rev, data={"project_name": name})
+    dir_path = Path.cwd() / name
+
+    if (dir_path).exists():
+        print(
+            f"[red bold]{'Error'.rjust(12)}[/red bold]  A directory `{name}` already exists!"
+        )
+        raise typer.Exit(1)
+
+    init_project(name, Path.cwd() / name)
+
+    print(
+        f"[green bold]{'Created'.rjust(12)}[/green bold]  Atomkraft project `{name}`."
+    )
 
 
 app.add_typer(

@@ -21,7 +21,6 @@ classifiers = [
 [tool.poetry.dependencies]
 python = "^3.8"
 pytest = "^7.2.0"
-copier = "^7.0.1"
 typer = {extras = ["all"], version = "^0.7.0"}
 modelator = "^0.6.6"
 numpy = "^1.23.4"
@@ -30,7 +29,6 @@ bip-utils = "^2.7.0"
 tabulate = "^0.9.0"
 jsonrpcclient = "^4.0.2"
 websockets = "^10.4"
-gitpython = "^3.1.29"
 tomlkit = "^0.11.6"
 case-converter = "^1.1.0"
 pytest-reportlog = "^0.1.2"
@@ -38,6 +36,8 @@ terra-sdk = "^3.0.1"
 terra-proto = "^2.1.0"
 setuptools = "^65.5.1"
 tenacity = "^8.1.0"
+jinja2 = "^3.1.2"
+rich = "^12.6.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0", "setuptools>=42"]

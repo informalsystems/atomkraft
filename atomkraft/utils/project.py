@@ -2,6 +2,8 @@ import os
 from pathlib import Path
 from typing import Union
 
+import jinja2
+
 ATOMKRAFT_INTERNAL_DIR = ".atomkraft"
 
 ATOMKRAFT_VAL_DIR_PREFIX = "val_"
@@ -37,3 +39,14 @@ def get_relative_project_path(path: Path) -> Path:
         return path.relative_to(project_root())
     else:
         return path.absolute().relative_to(project_root())
+
+
+def init_project(name: str, dir_path: Path):
+    loader = jinja2.PackageLoader("atomkraft", "templates/project")
+    env = jinja2.Environment(loader=loader)
+    env.globals["project_name"] = name
+    for tmpl_path in env.list_templates():
+        tmpl = env.get_template(tmpl_path)
+        final_path = dir_path / tmpl_path
+        final_path.parent.mkdir(parents=True, exist_ok=True)
+        tmpl.stream().dump(str(final_path))

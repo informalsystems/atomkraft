@@ -1,7 +1,0 @@
-_subdirectory: template
-
-_exclude:
-  - ".gitkeep"
-
-_tasks:
-  - "echo 'Atomkraft project is ready: {{ project_name }}'"
