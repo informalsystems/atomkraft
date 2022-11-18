@@ -65,8 +65,8 @@ ProcessInstantiate(_sender, _count) ==
 InstaniateNext(_sender) ==
     \E instantiate_count \in 0..100:
         LET msg == Instaniate(_sender, instantiate_count) IN
-        LET _msg == VariantGetUnsafe("Instantiate", msg) IN
-        /\ ProcessInstantiate(_msg.sender, _msg.count)
+        LET msg_unpacked == VariantGetUnsafe("Instantiate", msg) IN
+        /\ ProcessInstantiate(msg_unpacked.sender, msg_unpacked.count)
         /\ last_msg' = msg
 
 ProcessReset(_owner, _sender, _count) ==
@@ -78,8 +78,8 @@ ProcessReset(_owner, _sender, _count) ==
 ResetNext(_sender) ==
     \E reset_count \in 0..100:
         LET msg == Reset(_sender, reset_count) IN
-        LET _msg == VariantGetUnsafe("Reset", msg) IN
-        /\ ProcessReset(owner, _msg.sender, _msg.count)
+        LET msg_unpacked == VariantGetUnsafe("Reset", msg) IN
+        /\ ProcessReset(owner, msg_unpacked.sender, msg_unpacked.count)
         /\ last_msg' = msg
 
 ProcessIncrement ==
