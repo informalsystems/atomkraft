@@ -110,7 +110,5 @@ Next==
     /\ messages' = Append(messages, last_msg)
     /\ stepCount' = stepCount + 1
 
-MaxLength == stepCount < MAX_STEP
-
 View == <<owner,VariantTag(last_msg)>>
 ===============================================================================
