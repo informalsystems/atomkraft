@@ -5,9 +5,10 @@
 ```sh
 $ [ ! -d transfer ] || rm -rdf transfer
 $ atomkraft init transfer
-...
-Atomkraft project is ready: transfer
-...
+     Created  Atomkraft project `transfer`.
+$ atomkraft init transfer
+       Error  A directory `transfer` already exists!
+[1]
 $ cd transfer
 ```
 
