@@ -2,7 +2,7 @@
   "#meta": {
     "format": "ITF",
     "format-description": "https://apalache.informal.systems/docs/adr/015adr-trace.html",
-    "description": "Created by Apalache on Tue Jul 05 17:54:09 CEST 2022"
+    "description": "Created by Apalache on Fri Nov 18 12:50:48 CET 2022"
   },
   "vars": [
     "owner",
@@ -20,10 +20,14 @@
       "count": 0,
       "instantiated": false,
       "last_msg": {
-        "name": "store_cw_contract",
-        "sender": 0
+        "tag": "StoreCwContract",
+        "value": {
+          "sender": 1
+        }
       },
-      "messages": [],
+      "messages": [
+        
+      ],
       "owner": 0,
       "stepCount": 1
     },
@@ -34,17 +38,21 @@
       "count": 0,
       "instantiated": true,
       "last_msg": {
-        "cnt": 0,
-        "name": "instantiate",
-        "sender": 0
+        "tag": "Instantiate",
+        "value": {
+          "count": 0,
+          "sender": 1
+        }
       },
       "messages": [
         {
-          "name": "store_cw_contract",
-          "sender": 0
+          "tag": "StoreCwContract",
+          "value": {
+            "sender": 1
+          }
         }
       ],
-      "owner": 0,
+      "owner": 1,
       "stepCount": 2
     },
     {
@@ -54,383 +62,501 @@
       "count": 0,
       "instantiated": true,
       "last_msg": {
-        "cnt": 0,
-        "name": "reset",
-        "sender": 0
+        "tag": "Reset",
+        "value": {
+          "count": 0,
+          "sender": 1
+        }
       },
       "messages": [
         {
-          "name": "store_cw_contract",
-          "sender": 0
+          "tag": "StoreCwContract",
+          "value": {
+            "sender": 1
+          }
         },
         {
-          "cnt": 0,
-          "name": "instantiate",
-          "sender": 0
+          "tag": "Instantiate",
+          "value": {
+            "count": 0,
+            "sender": 1
+          }
         }
       ],
-      "owner": 0,
+      "owner": 1,
       "stepCount": 3
     },
     {
       "#meta": {
         "index": 3
       },
-      "count": 1,
+      "count": 0,
       "instantiated": true,
       "last_msg": {
-        "name": "increment",
-        "sender": 0
+        "tag": "Reset",
+        "value": {
+          "count": 0,
+          "sender": 1
+        }
       },
       "messages": [
         {
-          "name": "store_cw_contract",
-          "sender": 0
+          "tag": "StoreCwContract",
+          "value": {
+            "sender": 1
+          }
         },
         {
-          "cnt": 0,
-          "name": "instantiate",
-          "sender": 0
+          "tag": "Instantiate",
+          "value": {
+            "count": 0,
+            "sender": 1
+          }
         },
         {
-          "cnt": 0,
-          "name": "reset",
-          "sender": 0
+          "tag": "Reset",
+          "value": {
+            "count": 0,
+            "sender": 1
+          }
         }
       ],
-      "owner": 0,
+      "owner": 1,
       "stepCount": 4
     },
     {
       "#meta": {
         "index": 4
       },
-      "count": 0,
+      "count": 1,
       "instantiated": true,
       "last_msg": {
-        "cnt": 0,
-        "name": "reset",
-        "sender": 0
+        "tag": "Increment",
+        "value": {
+          "sender": 1
+        }
       },
       "messages": [
         {
-          "name": "store_cw_contract",
-          "sender": 0
+          "tag": "StoreCwContract",
+          "value": {
+            "sender": 1
+          }
         },
         {
-          "cnt": 0,
-          "name": "instantiate",
-          "sender": 0
+          "tag": "Instantiate",
+          "value": {
+            "count": 0,
+            "sender": 1
+          }
         },
         {
-          "cnt": 0,
-          "name": "reset",
-          "sender": 0
+          "tag": "Reset",
+          "value": {
+            "count": 0,
+            "sender": 1
+          }
         },
         {
-          "name": "increment",
-          "sender": 0
+          "tag": "Reset",
+          "value": {
+            "count": 0,
+            "sender": 1
+          }
         }
       ],
-      "owner": 0,
+      "owner": 1,
       "stepCount": 5
     },
     {
       "#meta": {
         "index": 5
       },
-      "count": 0,
+      "count": 2,
       "instantiated": true,
       "last_msg": {
-        "cnt": 0,
-        "name": "reset",
-        "sender": 0
+        "tag": "Increment",
+        "value": {
+          "sender": 1
+        }
       },
       "messages": [
         {
-          "name": "store_cw_contract",
-          "sender": 0
+          "tag": "StoreCwContract",
+          "value": {
+            "sender": 1
+          }
         },
         {
-          "cnt": 0,
-          "name": "instantiate",
-          "sender": 0
+          "tag": "Instantiate",
+          "value": {
+            "count": 0,
+            "sender": 1
+          }
         },
         {
-          "cnt": 0,
-          "name": "reset",
-          "sender": 0
+          "tag": "Reset",
+          "value": {
+            "count": 0,
+            "sender": 1
+          }
         },
         {
-          "name": "increment",
-          "sender": 0
+          "tag": "Reset",
+          "value": {
+            "count": 0,
+            "sender": 1
+          }
         },
         {
-          "cnt": 0,
-          "name": "reset",
-          "sender": 0
+          "tag": "Increment",
+          "value": {
+            "sender": 1
+          }
         }
       ],
-      "owner": 0,
+      "owner": 1,
       "stepCount": 6
     },
     {
       "#meta": {
         "index": 6
       },
-      "count": 1,
+      "count": 2,
       "instantiated": true,
       "last_msg": {
-        "name": "increment",
-        "sender": 0
+        "tag": "GetCount",
+        "value": {
+          "sender": 1
+        }
       },
       "messages": [
         {
-          "name": "store_cw_contract",
-          "sender": 0
+          "tag": "StoreCwContract",
+          "value": {
+            "sender": 1
+          }
         },
         {
-          "cnt": 0,
-          "name": "instantiate",
-          "sender": 0
+          "tag": "Instantiate",
+          "value": {
+            "count": 0,
+            "sender": 1
+          }
         },
         {
-          "cnt": 0,
-          "name": "reset",
-          "sender": 0
+          "tag": "Reset",
+          "value": {
+            "count": 0,
+            "sender": 1
+          }
         },
         {
-          "name": "increment",
-          "sender": 0
+          "tag": "Reset",
+          "value": {
+            "count": 0,
+            "sender": 1
+          }
         },
         {
-          "cnt": 0,
-          "name": "reset",
-          "sender": 0
+          "tag": "Increment",
+          "value": {
+            "sender": 1
+          }
         },
         {
-          "cnt": 0,
-          "name": "reset",
-          "sender": 0
+          "tag": "Increment",
+          "value": {
+            "sender": 1
+          }
         }
       ],
-      "owner": 0,
+      "owner": 1,
       "stepCount": 7
     },
     {
       "#meta": {
         "index": 7
       },
-      "count": 0,
+      "count": 3,
       "instantiated": true,
       "last_msg": {
-        "cnt": 0,
-        "name": "reset",
-        "sender": 0
+        "tag": "Increment",
+        "value": {
+          "sender": 1
+        }
       },
       "messages": [
         {
-          "name": "store_cw_contract",
-          "sender": 0
+          "tag": "StoreCwContract",
+          "value": {
+            "sender": 1
+          }
         },
         {
-          "cnt": 0,
-          "name": "instantiate",
-          "sender": 0
+          "tag": "Instantiate",
+          "value": {
+            "count": 0,
+            "sender": 1
+          }
         },
         {
-          "cnt": 0,
-          "name": "reset",
-          "sender": 0
+          "tag": "Reset",
+          "value": {
+            "count": 0,
+            "sender": 1
+          }
         },
         {
-          "name": "increment",
-          "sender": 0
+          "tag": "Reset",
+          "value": {
+            "count": 0,
+            "sender": 1
+          }
         },
         {
-          "cnt": 0,
-          "name": "reset",
-          "sender": 0
+          "tag": "Increment",
+          "value": {
+            "sender": 1
+          }
         },
         {
-          "cnt": 0,
-          "name": "reset",
-          "sender": 0
+          "tag": "Increment",
+          "value": {
+            "sender": 1
+          }
         },
         {
-          "name": "increment",
-          "sender": 0
+          "tag": "GetCount",
+          "value": {
+            "sender": 1
+          }
         }
       ],
-      "owner": 0,
+      "owner": 1,
       "stepCount": 8
     },
     {
       "#meta": {
         "index": 8
       },
-      "count": 1,
+      "count": 3,
       "instantiated": true,
       "last_msg": {
-        "name": "increment",
-        "sender": 0
+        "tag": "GetCount",
+        "value": {
+          "sender": 1
+        }
       },
       "messages": [
         {
-          "name": "store_cw_contract",
-          "sender": 0
+          "tag": "StoreCwContract",
+          "value": {
+            "sender": 1
+          }
         },
         {
-          "cnt": 0,
-          "name": "instantiate",
-          "sender": 0
+          "tag": "Instantiate",
+          "value": {
+            "count": 0,
+            "sender": 1
+          }
         },
         {
-          "cnt": 0,
-          "name": "reset",
-          "sender": 0
+          "tag": "Reset",
+          "value": {
+            "count": 0,
+            "sender": 1
+          }
         },
         {
-          "name": "increment",
-          "sender": 0
+          "tag": "Reset",
+          "value": {
+            "count": 0,
+            "sender": 1
+          }
         },
         {
-          "cnt": 0,
-          "name": "reset",
-          "sender": 0
+          "tag": "Increment",
+          "value": {
+            "sender": 1
+          }
         },
         {
-          "cnt": 0,
-          "name": "reset",
-          "sender": 0
+          "tag": "Increment",
+          "value": {
+            "sender": 1
+          }
         },
         {
-          "name": "increment",
-          "sender": 0
+          "tag": "GetCount",
+          "value": {
+            "sender": 1
+          }
         },
         {
-          "cnt": 0,
-          "name": "reset",
-          "sender": 0
+          "tag": "Increment",
+          "value": {
+            "sender": 1
+          }
         }
       ],
-      "owner": 0,
+      "owner": 1,
       "stepCount": 9
     },
     {
       "#meta": {
         "index": 9
       },
-      "count": 2,
+      "count": 3,
       "instantiated": true,
       "last_msg": {
-        "name": "increment",
-        "sender": 0
+        "tag": "GetCount",
+        "value": {
+          "sender": 1
+        }
       },
       "messages": [
         {
-          "name": "store_cw_contract",
-          "sender": 0
+          "tag": "StoreCwContract",
+          "value": {
+            "sender": 1
+          }
         },
         {
-          "cnt": 0,
-          "name": "instantiate",
-          "sender": 0
+          "tag": "Instantiate",
+          "value": {
+            "count": 0,
+            "sender": 1
+          }
         },
         {
-          "cnt": 0,
-          "name": "reset",
-          "sender": 0
+          "tag": "Reset",
+          "value": {
+            "count": 0,
+            "sender": 1
+          }
         },
         {
-          "name": "increment",
-          "sender": 0
+          "tag": "Reset",
+          "value": {
+            "count": 0,
+            "sender": 1
+          }
         },
         {
-          "cnt": 0,
-          "name": "reset",
-          "sender": 0
+          "tag": "Increment",
+          "value": {
+            "sender": 1
+          }
         },
         {
-          "cnt": 0,
-          "name": "reset",
-          "sender": 0
+          "tag": "Increment",
+          "value": {
+            "sender": 1
+          }
         },
         {
-          "name": "increment",
-          "sender": 0
+          "tag": "GetCount",
+          "value": {
+            "sender": 1
+          }
         },
         {
-          "cnt": 0,
-          "name": "reset",
-          "sender": 0
+          "tag": "Increment",
+          "value": {
+            "sender": 1
+          }
         },
         {
-          "name": "increment",
-          "sender": 0
+          "tag": "GetCount",
+          "value": {
+            "sender": 1
+          }
         }
       ],
-      "owner": 0,
+      "owner": 1,
       "stepCount": 10
     },
     {
       "#meta": {
         "index": 10
       },
-      "count": 2,
+      "count": 0,
       "instantiated": true,
       "last_msg": {
-        "name": "get_count",
-        "sender": 0
+        "tag": "Reset",
+        "value": {
+          "count": 0,
+          "sender": 1
+        }
       },
       "messages": [
         {
-          "name": "store_cw_contract",
-          "sender": 0
+          "tag": "StoreCwContract",
+          "value": {
+            "sender": 1
+          }
         },
         {
-          "cnt": 0,
-          "name": "instantiate",
-          "sender": 0
+          "tag": "Instantiate",
+          "value": {
+            "count": 0,
+            "sender": 1
+          }
         },
         {
-          "cnt": 0,
-          "name": "reset",
-          "sender": 0
+          "tag": "Reset",
+          "value": {
+            "count": 0,
+            "sender": 1
+          }
         },
         {
-          "name": "increment",
-          "sender": 0
+          "tag": "Reset",
+          "value": {
+            "count": 0,
+            "sender": 1
+          }
         },
         {
-          "cnt": 0,
-          "name": "reset",
-          "sender": 0
+          "tag": "Increment",
+          "value": {
+            "sender": 1
+          }
         },
         {
-          "cnt": 0,
-          "name": "reset",
-          "sender": 0
+          "tag": "Increment",
+          "value": {
+            "sender": 1
+          }
         },
         {
-          "name": "increment",
-          "sender": 0
+          "tag": "GetCount",
+          "value": {
+            "sender": 1
+          }
         },
         {
-          "cnt": 0,
-          "name": "reset",
-          "sender": 0
+          "tag": "Increment",
+          "value": {
+            "sender": 1
+          }
         },
         {
-          "name": "increment",
-          "sender": 0
+          "tag": "GetCount",
+          "value": {
+            "sender": 1
+          }
         },
         {
-          "name": "increment",
-          "sender": 0
+          "tag": "GetCount",
+          "value": {
+            "sender": 1
+          }
         }
       ],
-      "owner": 0,
+      "owner": 1,
       "stepCount": 11
     }
   ]

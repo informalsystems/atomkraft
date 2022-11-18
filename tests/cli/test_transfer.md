@@ -21,7 +21,7 @@ $ curl -sLo models/transfer.tla https://raw.githubusercontent.com/informalsystem
 ```sh
 $ atomkraft model apalache info
 ...
-Apalache JAR file exists and its version is 0.25.10
+Apalache JAR file exists and its version is 0.30.1
 ...
 ```
 

@@ -21,13 +21,29 @@ git clone --depth 1 https://github.com/CosmWasm/wasmd
 ls wasmd/build/wasmd # wasmd binary
 ```
 
-### Finally run the tests
+### Make sure Atomkraft is installed and set up Apalache
 
-```sh
-atomkraft test trace --path traces/example0.itf.json --reactor reactors/reactor.py --keypath last_msg.name
+```
+atomkraft model apalache get # to download and set up apalache
+atomkraft model apalache info # confirm apalache distribution
 ```
 
-## Recipe of this example project
+### Generate traces
+
+```sh
+atomkraft model simulate --model-path models/counter.tla --max-trace 10 --length 10 --traces-dir traces --view=View
+```
+
+### Run tests on generated traces
+
+```sh
+# just one trace
+atomkraft test trace --path traces/example1.itf.json --reactor reactors/reactor.py --keypath last_msg.tag
+# or all traces in a directory
+atomkraft test trace --path traces --reactor reactors/reactor.py --keypath last_msg.tag
+```
+
+## Recipe for this example project
 
 ### Install/update `atomkraft` cli
 

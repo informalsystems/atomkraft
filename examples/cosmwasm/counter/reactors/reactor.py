@@ -20,9 +20,10 @@ def state():
     return {}
 
 
-@step("store_cw_contract")
+@step("StoreCwContract")
 def store_contract(testnet: Testnet, state: Dict, last_msg):
-    logging.info("Step: store_cw_contract")
+    last_msg = last_msg.value
+    logging.info("Step: StoreCwContract")
     testnet.oneshot()
     time.sleep(10)
 
@@ -65,10 +66,11 @@ def store_contract(testnet: Testnet, state: Dict, last_msg):
     time.sleep(0.5)
 
 
-@step("instantiate")
+@step("Instantiate")
 def instantiate(testnet: Testnet, state: Dict, last_msg):
-    logging.info("Step: instantiate")
-    dict_msg = {"count": last_msg["cnt"]}
+    last_msg = last_msg.value
+    logging.info("Step: Instantiate")
+    dict_msg = {"count": last_msg.count}
 
     msg = MsgInstantiateContract(
         sender=testnet.acc_addr(last_msg.sender),
@@ -100,10 +102,11 @@ def instantiate(testnet: Testnet, state: Dict, last_msg):
     state["contract_address"] = contract_address
 
 
-@step("reset")
+@step("Reset")
 def reset(testnet: Testnet, state: Dict, last_msg):
-    logging.info("Step: reset")
-    dict_msg = {"reset": {"count": last_msg["cnt"]}}
+    last_msg = last_msg.value
+    logging.info("Step: Reset")
+    dict_msg = {"reset": {"count": last_msg.count}}
     contract_address = state["contract_address"]
 
     msg = MsgExecuteContract(
@@ -125,9 +128,10 @@ def reset(testnet: Testnet, state: Dict, last_msg):
         logging.info("\tlog:  %s\n", result.raw_log)
 
 
-@step("increment")
+@step("Increment")
 def increment(testnet: Testnet, state: Dict, last_msg):
-    logging.info("Step: increment")
+    last_msg = last_msg.value
+    logging.info("Step: Increment")
     dict_msg = {"increment": {}}
     contract_address = state["contract_address"]
 
@@ -150,9 +154,9 @@ def increment(testnet: Testnet, state: Dict, last_msg):
         logging.info("\tlog:  %s\n", result.raw_log)
 
 
-@step("get_count")
+@step("GetCount")
 def get_count(testnet: Testnet, state: Dict, count):
-    logging.info("Step: get_count")
+    logging.info("Step: GetCount")
 
     dict_msg = {"get_count": {}}
     contract_address = state["contract_address"]
