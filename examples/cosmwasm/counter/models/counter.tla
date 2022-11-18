@@ -1,18 +1,22 @@
 --------------------------- MODULE counter ---------------------------------
 
-EXTENDS Integers, Apalache, Sequences
-
-
-\* CONSTANTS
-\*     \* @type: Int;
-\*     MAX_STEP,
-\*     \* @type: Int;
-\*     MAX_ACCOUNTS
+EXTENDS Integers, Variants, Sequences
 
 \* @type: () => Int;
 MAX_STEP == 20
 \* @type: () => Int;
 MAX_ACCOUNTS == 3
+
+(*
+@typeAlias: message = Instantiate({sender: Int, count: Int})
+                    | Reset({sender: Int, count: Int})
+                    | Increment({sender: Int})
+                    | GetCount({sender: Int})
+                    | StoreCwContract({sender: Int})
+                    ;
+*)
+typedef == TRUE
+
 
 VARIABLES
     \* @type: Int;
@@ -21,38 +25,28 @@ VARIABLES
     owner,
     \* @type: Bool;
     instantiated,
-    \* @type: [name:Str, cnt: Int];
+    \* @type: $message;
     last_msg,
-    \* @type: Seq([name:Str, cnt: Int]);
+    \* @type: Seq($message);
     messages,
     \* @type: Int;
     stepCount
 
-\* @type: () => Str;
-INSTANTIATE == "instantiate"
-\* @type: () => Str;
-RESET == "reset"
-\* @type: () => Str;
-INCREMENT == "increment"
-\* @type: () => Str;
-GET_COUNT == "get_count"
-\* @type: () => Str;
-STORE_CW == "store_cw_contract"
 
-\* @type: (Int, Int) => [name: Str, sender: Int, cnt: Int];
-Instaniate(_sender, val) == [name |-> INSTANTIATE, sender |-> _sender, cnt |-> val]
-\* @type: (Int, Int) => [name: Str, sender: Int, cnt: Int];
-Reset(_sender, val) == [name |-> RESET, sender |-> _sender, cnt |-> val]
-\* @type: (Int) => [name: Str, sender: Int];
-Increment(_sender) == [name |-> INCREMENT, sender |-> _sender]
-\* @type: (Int) => [name: Str, sender: Int];
-GetCount(_sender) == [name |-> GET_COUNT, sender |-> _sender]
-\* @type: (Int) => [name: Str, sender: Int];
-StoreCW(_sender) == [name |-> STORE_CW, sender |-> _sender]
+\* @type: (Int, Int) => $message;
+Instaniate(_sender, _count) == Variant("Instantiate", [sender |-> _sender, count |-> _count])
+\* @type: (Int, Int) => $message;
+Reset(_sender, _count) == Variant("Reset", [sender |-> _sender, count |-> _count])
+\* @type: (Int) => $message;
+Increment(_sender) == Variant("Increment", [sender |-> _sender])
+\* @type: (Int) => $message;
+GetCount(_sender) == Variant("GetCount", [sender |-> _sender])
+\* @type: (Int) => $message;
+StoreCW(_sender) == Variant("StoreCwContract", [sender |-> _sender])
 
 
 \* @type: () => Set(Int);
-ACCOUNTS == 0..(MAX_ACCOUNTS-1)
+ACCOUNTS == 1..MAX_ACCOUNTS
 
 Init ==
     /\ count = 0
@@ -69,9 +63,10 @@ ProcessInstantiate(_sender, _count) ==
     /\ instantiated' = TRUE
 
 InstaniateNext(_sender) ==
-    \E instantiate_cnt \in 0..100:
-        LET msg == Instaniate(_sender, instantiate_cnt) IN
-        /\ ProcessInstantiate(msg.sender, msg.cnt)
+    \E instantiate_count \in 0..100:
+        LET msg == Instaniate(_sender, instantiate_count) IN
+        LET _msg == VariantGetUnsafe("Instantiate", msg) IN
+        /\ ProcessInstantiate(_msg.sender, _msg.count)
         /\ last_msg' = msg
 
 ProcessReset(_owner, _sender, _count) ==
@@ -81,9 +76,10 @@ ProcessReset(_owner, _sender, _count) ==
     /\ UNCHANGED<<owner, instantiated>>
 
 ResetNext(_sender) ==
-    \E reset_cnt \in 0..100:
-        LET msg == Reset(_sender, reset_cnt) IN
-        /\ ProcessReset(owner, msg.sender, msg.cnt)
+    \E reset_count \in 0..100:
+        LET msg == Reset(_sender, reset_count) IN
+        LET _msg == VariantGetUnsafe("Reset", msg) IN
+        /\ ProcessReset(owner, _msg.sender, _msg.count)
         /\ last_msg' = msg
 
 ProcessIncrement ==
@@ -114,8 +110,7 @@ Next==
     /\ messages' = Append(messages, last_msg)
     /\ stepCount' = stepCount + 1
 
-Inv == stepCount < MAX_STEP
+MaxLength == stepCount < MAX_STEP
 
-View == <<count,owner,last_msg>>
-View2 == last_msg.name
+View == <<owner,VariantTag(last_msg)>>
 ===============================================================================
