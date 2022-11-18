@@ -21,13 +21,19 @@ git clone --depth 1 https://github.com/CosmWasm/wasmd
 ls wasmd/build/wasmd # wasmd binary
 ```
 
-### Finally run the tests
+### Generate traces
 
 ```sh
-atomkraft test trace --path traces/example0.itf.json --reactor reactors/reactor.py --keypath last_msg.name
+atomkraft model simulate --model-path models/counter.tla --max-trace 10 --length 10 --traces-dir traces --view=View
 ```
 
-## Recipe of this example project
+### Run tests on generated traces
+
+```sh
+atomkraft test trace --path traces --reactor reactors/reactor.py --keypath last_msg.tag
+```
+
+## Recipe for this example project
 
 ### Install/update `atomkraft` cli
 
