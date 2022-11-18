@@ -1,0 +1,22 @@
+name: Check project rules
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/project.yml
+      - pyproject.toml
+
+jobs:
+  dependency-version-check:
+    runs-on: "ubuntu-latest"
+    container: "archlinux"
+    steps:
+      - name: Install dependencies
+        run: |
+          pacman -Syu --needed --noconfirm git yq
+      - name: Check out repository
+        uses: actions/checkout@v3
+      - name: Check for git version
+        run: |
+          cat pyproject.toml | tomlq -r '.tool.poetry.dependencies[].git?' | (! grep --invert-match null)
