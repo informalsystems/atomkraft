@@ -1,0 +1,2 @@
+reactor = "/home/philip/atomkraft/transfer/reactors/reactor.py"
+trace = "traces/TestAliceZero/violation1.itf.json"

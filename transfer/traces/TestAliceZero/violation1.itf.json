@@ -1,0 +1,69 @@
+{
+  "#meta": {
+    "format": "ITF",
+    "format-description": "https://apalache.informal.systems/docs/adr/015adr-trace.html",
+    "description": "Created by Apalache on Tue Nov 22 16:12:06 CET 2022"
+  },
+  "vars": [
+    "balances",
+    "action",
+    "step"
+  ],
+  "states": [
+    {
+      "#meta": {
+        "index": 0
+      },
+      "action": {
+        "tag": "Init",
+        "value": {
+          "wallets": {
+            "#set": [
+              "Alice",
+              "Bob"
+            ]
+          }
+        }
+      },
+      "balances": {
+        "#map": [
+          [
+            "Alice",
+            100
+          ],
+          [
+            "Bob",
+            100
+          ]
+        ]
+      },
+      "step": 0
+    },
+    {
+      "#meta": {
+        "index": 1
+      },
+      "action": {
+        "tag": "Transfer",
+        "value": {
+          "amount": 100,
+          "receiver": "Bob",
+          "sender": "Alice"
+        }
+      },
+      "balances": {
+        "#map": [
+          [
+            "Alice",
+            0
+          ],
+          [
+            "Bob",
+            200
+          ]
+        ]
+      },
+      "step": 1
+    }
+  ]
+}

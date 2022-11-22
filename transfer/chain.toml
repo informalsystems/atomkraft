@@ -1,0 +1,25 @@
+chain_id = "cosmoshub-4"
+validators = 3
+accounts = 2
+binary = "simd"
+hrp_prefix = "cosmos"
+denom = "stake"
+coin_type = 118
+
+[config_node.app]
+minimum-gas-prices = "0stake"
+api = { enable = true, swagger = true, enabled-unsafe-cors = true }
+rosetta = { enable = false }
+
+[config_node.config]
+instrumentation = { prometheus = false }
+p2p = { addr_book_strict = false, allow_duplicate_ip = true }
+
+[config_genesis.app_state.gov]
+voting_params = { voting_period = "600s" }
+
+[config_genesis.app_state.mint]
+minter = { inflation = "0.3" }
+
+[config_node.config.consensus]
+timeout_commit = "100ms"
