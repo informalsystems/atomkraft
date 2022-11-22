@@ -24,6 +24,9 @@ from terra_sdk.key.mnemonic import MnemonicKey
 from .node import Account, AccountId, ConfigPort, Node
 from .utils import TmEventSubscribe, get_free_ports, update_port
 
+from subprocess import PIPE, Popen
+
+
 VALIDATOR_DIR = "validator_nodes"
 
 Bank = Dict[AccountId, Dict[str, int]]
@@ -315,13 +318,22 @@ class Testnet:
             node.collect_gentx()
 
     def spinup(self):
-        for node in self.validator_nodes.values():
-            node.start()
-        endpoint_types = ["rpc", "grpc"]
-        for node in self.validator_nodes.values():
-            for endpoint_type in endpoint_types:
-                node.wait_for_port(self.ports()[endpoint_type])
-        print("Endpoints are ready:", " ".join(endpoint_types))
+        self.start_tendermock()
+
+    def start_tendermock(self):
+        abci_stdout = open("abci_stdout.txt", "w", encoding="utf-8")
+        abci_stderr = open("abci_stderr.txt", "w", encoding="utf-8")
+        args = f"docker run --add-host=host.docker.internal:host-gateway --name simapp -ti -p 26658:26658 -p 26656:26656 -p 9091:9091 -p 1317:1317 -p 9090:9090 informalofftermatt/testnet:tendermock simd start --transport=grpc --with-tendermint=false --grpc-only --rpc.laddr=tcp://host.docker.internal:99999".split()
+
+        Popen(args, stdout=abci_stdout, stderr=abci_stderr)
+
+        tendermock_stdout = open("tendermock_stdout.txt", "w", encoding="utf-8")
+        tendermock_stderr = open("tendermock_stderr.txt", "w", encoding="utf-8")
+
+        args = f"".split()
+        
+        Popen(args, stdout=abci_stdout, stderr=abci_stderr)
+
 
     def oneshot(self):
         self.prepare()
