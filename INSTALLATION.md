@@ -9,9 +9,10 @@ check the [TL;DR section](#tldr).
 
 ## Installing Atomkraft
 
-Installing Atomkraft requires [Python](https://www.python.org) 3.10, `git` and [`java` 17 or newer](https://apalache.informal.systems/docs/apalache/installation/jvm.html).
+Installing Atomkraft requires [Python](https://www.python.org) 3.8 or newer (together with its package manager [pip](https://pip.pypa.io/en/stable/installation/)) `git` and [`java` 17 or newer](https://apalache.informal.systems/docs/apalache/installation/jvm.html).
 
-If you don't have Python 3.10 already installed, please consult the [installation instructions](https://realpython.com/installing-python/) for different installation options.
+We suggest using Python 3.10.
+If you don't have it already installed, please consult the [installation instructions](https://realpython.com/installing-python/) for different installation options.
 One quick way for installing and managing different Python options for your system is by using [pyenv](https://github.com/pyenv/pyenv) and running
 
 ```
@@ -22,7 +23,7 @@ pyenv global 3.10.6
 These two commands set the `python` version to `3.10.6`.
 If you want to go back to your old Python version, run `pyenv global system`.
 
-Once Python 3.10 installed, install Atomkraft with `pip install atomkraft`.
+Once Python is installed, install Atomkraft with `pip install atomkraft`.
 
 That's it! Please verify that the tool is working by issuing `atomkraft` on the command line.
 You should see something like this:
