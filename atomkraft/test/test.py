@@ -149,10 +149,8 @@ class Test:
         vals_dirs.sort(key=lambda k: k.stat().st_mtime)
 
         for (trace_path, validator_dir) in zip(self.trace_paths, vals_dirs):
-            copy_if_exists(
-                [trace_path, validator_dir],
-                report_dir / Path(Test._path_to_id(Path(os.path.basename(trace_path)))),
-            )
+            subdir = Path(Test._path_to_id(Path(os.path.basename(trace_path))))
+            copy_if_exists([trace_path, validator_dir], report_dir / subdir)
 
 
 def all_traces_from(trace_dir: Path):
