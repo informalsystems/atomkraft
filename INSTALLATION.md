@@ -9,10 +9,9 @@ check the [TL;DR section](#tldr).
 
 ## Installing Atomkraft
 
-Installing Atomkraft requires [Python](https://www.python.org) 3.8 or newer (together with its package manager [pip](https://pip.pypa.io/en/stable/installation/)) `git` and [`java` 17 or newer](https://apalache.informal.systems/docs/apalache/installation/jvm.html).
+Installing Atomkraft requires [Python](https://www.python.org) 3.8 or newer (we suggest using Python 3.10), together with its package manager [pip](https://pip.pypa.io/en/stable/installation/).
 
-We suggest using Python 3.10.
-If you don't have it already installed, please consult the [installation instructions](https://realpython.com/installing-python/) for different installation options.
+If you don't have Python already installed, please consult the [installation instructions](https://realpython.com/installing-python/) for different installation options.
 One quick way for installing and managing different Python options for your system is by using [pyenv](https://github.com/pyenv/pyenv) and running
 
 ```
@@ -30,13 +29,14 @@ You should see something like this:
 
 ![Atomkraft CLI](docs/images/cli.png)
 
-## Git
+## Optional dependencies
 
-Atomkraft generates testing projects templates.
-Those templates are obtained using `git`.
-Install `git` following [the installation instructions](https://git-scm.com/downloads).
+Atomkraft is used to test Cosmos-SDK based blockchains.
+You will need to obtain the binary of the blockchain you want to test.
+In order to use the full power of Atomkraft,
+you also need [`java` 17 or newer](https://apalache.informal.systems/docs/apalache/installation/jvm.html), for running the Apalache model checker.
 
-## Blockchain binary
+### Blockchain binary
 
 If you are interested in Atomkraft, you probably want to test some Cosmos SDK blockchain; so, there is a high probability you have a blockchain binary in your system already. If this is the case, feel free skip the rest of this section.
 
@@ -51,7 +51,7 @@ The blockchain binary will be at `./cosmos-sdk/build/simd`.
 
 You may also install the compiled binary in your system (requires [setting up Go](https://go.dev/doc/install)), executing directly `(cd cosmos-sdk; make install)` instead of `(cd cosmos-sdk; make build)`.
 
-## Java
+### Java
 
 This is not required for basic tool usage, e.g. for running standalone test scenarios against a blockchain. For advanced usage, we employ our in-house [Apalache Model Checker](https://apalache.informal.systems); it allows to generate test scenarios from TLA+ models. If you are interested in this functionality, please continue reading.
 
