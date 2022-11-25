@@ -75,7 +75,7 @@ class Test:
         pytest_args = self.make_pytest_args(verbose)
         exit_code = pytest.main(pytest_args + [self.file_path])
 
-        self.save_validator_files(val_root_dir, self.report_dir)
+        self.save_validator_files(val_root_dir)
         print(f"Test data for {self.name} saved at {self.report_dir}")
 
         return int(exit_code)
@@ -142,13 +142,15 @@ class Test:
             shutil.rmtree(val_root_dir)
         return val_root_dir
 
-    def save_validator_files(self, val_root_dir: Path, report_dir: Path):
+    def save_validator_files(self, val_root_dir: Path):
         vals_dirs = list(val_root_dir.glob(f"{ATOMKRAFT_VAL_DIR_PREFIX}*"))
         vals_dirs.sort(key=lambda k: k.stat().st_mtime)
 
+        # Be careful: zip assumes that trace_paths and the validator directories
+        # are sorted in the same order. We should improve this code.
         for (trace_path, validator_dir) in zip(self.trace_paths, vals_dirs):
             subdir = Path(Test._path_to_id(Path(os.path.basename(trace_path))))
-            copy_if_exists([trace_path, validator_dir], report_dir / subdir)
+            copy_if_exists([trace_path, validator_dir], self.report_dir / subdir)
 
 
 def all_traces_from(trace_dir: Path):
