@@ -9,22 +9,14 @@ check the [TL;DR section](#tldr).
 
 ## Installing Atomkraft
 
-Installing Atomkraft requires [Python](https://www.python.org) 3.8 or newer (we suggest using Python 3.10), together with its package manager [pip](https://pip.pypa.io/en/stable/installation/).
+Installing Atomkraft requires [Python](https://www.python.org) 3.8 or newer, together with its package manager [pip](https://pip.pypa.io/en/stable/installation/).
 
 If you don't have Python already installed, please consult the [installation instructions](https://wiki.python.org/moin/BeginnersGuide/Download) for different installation options.
-One quick way for installing and managing different Python options for your system is by using [pyenv](https://github.com/pyenv/pyenv) and running
-
-```
-pyenv install 3.10.6
-pyenv global 3.10.6
-```
-
-These two commands set the `python` version to `3.10.6`.
-If you want to go back to your old Python version, run `pyenv global system`.
+One quick way for installing and managing different Python versions for your system is by using [pyenv](https://github.com/pyenv/pyenv).
 
 Once Python is installed, install Atomkraft with `pip install atomkraft`.
 
-That's it! Please verify that the tool is working by issuing `atomkraft` on the command line.
+That's it! Please verify that the tool is working by writing `atomkraft` on the command line.
 You should see something like this:
 
 ![Atomkraft CLI](docs/images/cli.png)
