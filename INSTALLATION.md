@@ -9,33 +9,26 @@ check the [TL;DR section](#tldr).
 
 ## Installing Atomkraft
 
-Installing Atomkraft requires [Python](https://www.python.org) 3.10, `git` and [`java` 17 or newer](https://apalache.informal.systems/docs/apalache/installation/jvm.html).
+Installing Atomkraft requires [Python](https://www.python.org) 3.8 or newer, together with its package manager [pip](https://pip.pypa.io/en/stable/installation/).
 
-If you don't have Python 3.10 already installed, please consult the [installation instructions](https://realpython.com/installing-python/) for different installation options.
-One quick way for installing and managing different Python options for your system is by using [pyenv](https://github.com/pyenv/pyenv) and running
+If you don't have Python already installed, please consult the [installation instructions](https://wiki.python.org/moin/BeginnersGuide/Download) for different installation options.
+One quick way for installing and managing different Python versions for your system is by using [pyenv](https://github.com/pyenv/pyenv).
 
-```
-pyenv install 3.10.6
-pyenv global 3.10.6
-```
+Once Python is installed, install Atomkraft with `pip install atomkraft`.
 
-These two commands set the `python` version to `3.10.6`.
-If you want to go back to your old Python version, run `pyenv global system`.
-
-Once Python 3.10 installed, install Atomkraft with `pip install atomkraft`.
-
-That's it! Please verify that the tool is working by issuing `atomkraft` on the command line.
+That's it! Please verify that the tool is working by writing `atomkraft` on the command line.
 You should see something like this:
 
 ![Atomkraft CLI](docs/images/cli.png)
 
-## Git
+## Optional dependencies
 
-Atomkraft generates testing projects templates.
-Those templates are obtained using `git`.
-Install `git` following [the installation instructions](https://git-scm.com/downloads).
+Atomkraft is a tool for end-to-end testing of Cosmos SDK based blockchains.
+You will need to obtain the binary of a blockchain you want to test.
+In order to use the full power of Atomkraft,
+you also need [`java` 17 or newer](https://apalache.informal.systems/docs/apalache/installation/jvm.html), for running the Apalache model checker.
 
-## Blockchain binary
+### Blockchain binary
 
 If you are interested in Atomkraft, you probably want to test some Cosmos SDK blockchain; so, there is a high probability you have a blockchain binary in your system already. If this is the case, feel free skip the rest of this section.
 
@@ -50,7 +43,7 @@ The blockchain binary will be at `./cosmos-sdk/build/simd`.
 
 You may also install the compiled binary in your system (requires [setting up Go](https://go.dev/doc/install)), executing directly `(cd cosmos-sdk; make install)` instead of `(cd cosmos-sdk; make build)`.
 
-## Java
+### Java
 
 This is not required for basic tool usage, e.g. for running standalone test scenarios against a blockchain. For advanced usage, we employ our in-house [Apalache Model Checker](https://apalache.informal.systems); it allows to generate test scenarios from TLA+ models. If you are interested in this functionality, please continue reading.
 
