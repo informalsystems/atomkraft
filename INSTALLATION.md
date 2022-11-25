@@ -11,7 +11,7 @@ check the [TL;DR section](#tldr).
 
 Installing Atomkraft requires [Python](https://www.python.org) 3.8 or newer (we suggest using Python 3.10), together with its package manager [pip](https://pip.pypa.io/en/stable/installation/).
 
-If you don't have Python already installed, please consult the [installation instructions](https://realpython.com/installing-python/) for different installation options.
+If you don't have Python already installed, please consult the [installation instructions](https://wiki.python.org/moin/BeginnersGuide/Download) for different installation options.
 One quick way for installing and managing different Python options for your system is by using [pyenv](https://github.com/pyenv/pyenv) and running
 
 ```
@@ -31,8 +31,8 @@ You should see something like this:
 
 ## Optional dependencies
 
-Atomkraft is used to test Cosmos-SDK based blockchains.
-You will need to obtain the binary of the blockchain you want to test.
+Atomkraft is a tool for end-to-end testing of Cosmos SDK based blockchains.
+You will need to obtain the binary of a blockchain you want to test.
 In order to use the full power of Atomkraft,
 you also need [`java` 17 or newer](https://apalache.informal.systems/docs/apalache/installation/jvm.html), for running the Apalache model checker.
 
