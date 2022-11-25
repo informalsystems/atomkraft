@@ -53,9 +53,7 @@ class Test:
         self.tests_dir.mkdir(parents=True, exist_ok=True)
         self.file_path = self.tests_dir / f"test_{self.name}.py"
 
-        self.report_dir = (
-            root / "reports" / f"{Test._path_to_id(trace)}_{self.timestamp}"
-        )
+        self.report_dir = root / "reports" / Test._path_to_id(trace) / self.timestamp
         self.report_dir.mkdir(parents=True, exist_ok=True)
 
     def create_file(self, traces: List[Path], reactor: Path, keypath: str):
