@@ -31,6 +31,9 @@ VALIDATOR_DIR = "validator_nodes"
 
 Bank = Dict[AccountId, Dict[str, int]]
 
+TENDERMOCK_BINARY = "./tendermock.py"
+GENESIS_PATH = "./genesis.json"
+
 
 class Testnet:
     def __init__(
@@ -327,12 +330,15 @@ class Testnet:
 
         Popen(args, stdout=abci_stdout, stderr=abci_stderr)
 
+        # wait until ABCI has finished starting
+        time.sleep(10)
+
         tendermock_stdout = open("tendermock_stdout.txt", "w", encoding="utf-8")
         tendermock_stderr = open("tendermock_stderr.txt", "w", encoding="utf-8")
 
-        args = f"python ../src/tendermock.py genesis.json --tendermock-host localhost --tendermock-port 26657 --app-host localhost --app-port 26658".split()
+        args = f"python {TENDERMOCK_BINARY} {GENESIS_PATH} --tendermock-host localhost --tendermock-port 26657 --app-host localhost --app-port 26658".split()
         
-        Popen(args, stdout=abci_stdout, stderr=abci_stderr)
+        Popen(args, stdout=tendermock_stdout, stderr=tendermock_stderr)
 
 
     def oneshot(self):
