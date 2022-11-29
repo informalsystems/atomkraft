@@ -1,4 +1,5 @@
 import asyncio
+import socket
 import tempfile
 import time
 from contextlib import closing
@@ -31,7 +32,7 @@ VALIDATOR_DIR = "validator_nodes"
 
 Bank = Dict[AccountId, Dict[str, int]]
 
-TENDERMOCK_BINARY = "./tendermock.py"
+TENDERMOCK_BINARY = "/home/philip/tendermock/src/tendermock.py"
 GENESIS_PATH = "./genesis.json"
 
 
@@ -159,13 +160,16 @@ class Testnet:
         data = {}
 
         # config.toml
-        data["p2p"] = ConfigPort("P2P", Path("config/config.toml"), "p2p.laddr")
+        data["p2p"] = ConfigPort("P2P", Path(
+            "config/config.toml"), "p2p.laddr")
         # data["p2p_ext"] = ConfigPort("P2P External", "config/config.toml", "p2p.external_address")
-        data["abci"] = ConfigPort("ABCI", Path("config/config.toml"), "proxy_app")
+        data["abci"] = ConfigPort("ABCI", Path(
+            "config/config.toml"), "proxy_app")
         data["pprof_laddr"] = ConfigPort(
             "PPROF", Path("config/config.toml"), "rpc.pprof_laddr"
         )
-        data["rpc"] = ConfigPort("RPC", Path("config/config.toml"), "rpc.laddr")
+        data["rpc"] = ConfigPort("RPC", Path(
+            "config/config.toml"), "rpc.laddr")
         data["prometheus"] = ConfigPort(
             "Prometheus",
             Path("config/config.toml"),
@@ -174,7 +178,8 @@ class Testnet:
 
         # app.toml
         data["lcd"] = ConfigPort("LCD", Path("config/app.toml"), "api.address")
-        data["grpc"] = ConfigPort("gRPC", Path("config/app.toml"), "grpc.address")
+        data["grpc"] = ConfigPort("gRPC", Path(
+            "config/app.toml"), "grpc.address")
         data["grpc-web"] = ConfigPort(
             "gRPC", Path("config/app.toml"), "grpc-web.address"
         )
@@ -187,14 +192,17 @@ class Testnet:
     def get_grpc_channel(self, validator_id: Optional[AccountId] = None) -> Channel:
         if validator_id is None:
             validator_id = self._lead_validator
-        grpc_ip, grpc_port = self.get_validator_port(validator_id, "grpc").split(":", 1)
+        grpc_ip, grpc_port = self.get_validator_port(
+            validator_id, "grpc").split(":", 1)
         return Channel(host=grpc_ip, port=int(grpc_port))
 
     def prepare(self):
+        print("Preparing")
         self.finalize_accounts()
         self.data_dir.mkdir(parents=True, exist_ok=True)
         self.data_dir = Path(
-            tempfile.mkdtemp(prefix=ATOMKRAFT_VAL_DIR_PREFIX, dir=str(self.data_dir))
+            tempfile.mkdtemp(prefix=ATOMKRAFT_VAL_DIR_PREFIX,
+                             dir=str(self.data_dir))
         )
         self.validator_nodes = {
             validator_id: Node(
@@ -210,219 +218,255 @@ class Testnet:
             for validator_id in self.validators.keys()
         }
 
-        for node in self.validator_nodes.values():
-            node.init()
+        # for node in self.validator_nodes.values():
+        #     node.init()
 
-        for (k, v) in self.config_genesis.items():
-            self.validator_nodes[self._lead_validator].set(
-                Path("config/genesis.json"), v, k
-            )
+        # for (k, v) in self.config_genesis.items():
+        #     self.validator_nodes[self._lead_validator].set(
+        #         Path("config/genesis.json"), v, k
+        #     )
 
-        for (v_id, validator) in self.validators.items():
-            self.validator_nodes[self._lead_validator].add_account(
-                validator, self.validator_balances[v_id]
-            )
+        # for (v_id, validator) in self.validators.items():
+        #     self.validator_nodes[self._lead_validator].add_account(
+        #         validator, self.validator_balances[v_id]
+        #     )
 
-        for (a_id, account) in self.accounts.items():
-            self.validator_nodes[self._lead_validator].add_account(
-                account, self.account_balances[a_id]
-            )
+        # for (a_id, account) in self.accounts.items():
+        #     self.validator_nodes[self._lead_validator].add_account(
+        #         account, self.account_balances[a_id]
+        #     )
 
-        for node_id, node in self.validator_nodes.items():
-            if node_id != self._lead_validator:
-                self.validator_nodes[node_id].copy_genesis_from(
-                    self.validator_nodes[self._lead_validator]
-                )
+        # for node_id, node in self.validator_nodes.items():
+        #     if node_id != self._lead_validator:
+        #         self.validator_nodes[node_id].copy_genesis_from(
+        #             self.validator_nodes[self._lead_validator]
+        #         )
 
         # very hacky
-        all_ports = (
-            np.array(get_free_ports(len(self.ports()) * (len(self.validators) - 1)))
-            .reshape((-1, len(self.ports())))
-            .tolist()
-        )
+        # all_ports = (
+        #     np.array(get_free_ports(len(self.ports())
+        #              * (len(self.validators) - 1)))
+        #     .reshape((-1, len(self.ports())))
+        #     .tolist()
+        # )
 
-        all_port_data = []
+        # all_port_data = []
 
-        for (node_id, node) in self.validator_nodes.items():
-            for (config_file, configs) in self.config_node.items():
-                for (k, v) in configs.items():
-                    if isinstance(v, str):
-                        # TODO: avoid tomlkit.items.str being a list
-                        node.set(Path(f"config/{config_file}.toml"), str(v), k)
-                    else:
-                        node.set(Path(f"config/{config_file}.toml"), v, k)
+        # for (node_id, node) in self.validator_nodes.items():
+        #     for (config_file, configs) in self.config_node.items():
+        #         for (k, v) in configs.items():
+        #             if isinstance(v, str):
+        #                 # TODO: avoid tomlkit.items.str being a list
+        #                 node.set(Path(f"config/{config_file}.toml"), str(v), k)
+        #             else:
+        #                 node.set(Path(f"config/{config_file}.toml"), v, k)
 
-            if node_id != self._lead_validator:
-                ports = all_ports.pop()
-                for (j, e_port) in enumerate(self.ports().values()):
-                    node.update(
-                        e_port.config_file,
-                        lambda x: update_port(x, ports[j]),
-                        e_port.property_path,
-                    )
+        #     if node_id != self._lead_validator:
+        #         ports = all_ports.pop()
+        #         for (j, e_port) in enumerate(self.ports().values()):
+        #             node.update(
+        #                 e_port.config_file,
+        #                 lambda x: update_port(x, ports[j]),
+        #                 e_port.property_path,
+        #             )
 
-            port_data = [node.moniker]
-            for e_port in self.ports().values():
-                port_data.append(node.get(e_port.config_file, e_port.property_path))
-            all_port_data.append(port_data)
+        #     port_data = [node.moniker]
+        #     for e_port in self.ports().values():
+        #         port_data.append(
+        #             node.get(e_port.config_file, e_port.property_path))
+        #     all_port_data.append(port_data)
 
-        if self.verbose:
-            print(
-                tabulate.tabulate(
-                    all_port_data,
-                    headers=["Moniker"] + [e.title for e in self.ports().values()],
-                )
-            )
+        # if self.verbose:
+        #     print(
+        #         tabulate.tabulate(
+        #             all_port_data,
+        #             headers=["Moniker"] +
+        #             [e.title for e in self.ports().values()],
+        #         )
+        #     )
 
-            print(
-                tabulate.tabulate(
-                    [
-                        [validator.address(self.hrp_prefix)]
-                        for validator in self.validators.values()
-                    ],
-                    headers=["Validators"],
-                )
-            )
+        #     print(
+        #         tabulate.tabulate(
+        #             [
+        #                 [validator.address(self.hrp_prefix)]
+        #                 for validator in self.validators.values()
+        #             ],
+        #             headers=["Validators"],
+        #         )
+        #     )
 
-            print(
-                tabulate.tabulate(
-                    [
-                        [account.address(self.hrp_prefix)]
-                        for account in self.accounts.values()
-                    ],
-                    headers=["Accounts"],
-                )
-            )
+        #     print(
+        #         tabulate.tabulate(
+        #             [
+        #                 [account.address(self.hrp_prefix)]
+        #                 for account in self.accounts.values()
+        #             ],
+        #             headers=["Accounts"],
+        #         )
+        #     )
 
-        for (node_id, node) in self.validator_nodes.items():
-            node.add_key(self.validators[node_id])
-            p2p = self.ports()["p2p"]
-            node.add_validator(
-                self.validators[node_id], self.validator_balances[node_id][self.denom]
-            )
+        # for (node_id, node) in self.validator_nodes.items():
+        #     node.add_key(self.validators[node_id])
+        #     p2p = self.ports()["p2p"]
+        #     node.add_validator(
+        #         self.validators[node_id], self.validator_balances[node_id][self.denom]
+        #     )
 
-            if node_id != self._lead_validator:
-                # because this
-                # https://github.com/cosmos/cosmos-sdk/blob/88ee7fb2e9303f43c52bd32410901841cad491fb/x/staking/client/cli/tx.go#L599
-                gentx_file = next(node.home_dir.glob("config/gentx/*json"))
-                gentx_file = gentx_file.relative_to(node.home_dir)
-                node_p2p = node.get(p2p.config_file, p2p.property_path).rsplit(
-                    ":", maxsplit=1
-                )[-1]
-                node.update(gentx_file, lambda x: update_port(x, node_p2p), "body.memo")
-                node.sign(self.validators[node_id], node.home_dir / gentx_file)
+        #     if node_id != self._lead_validator:
+        #         # because this
+        #         # https://github.com/cosmos/cosmos-sdk/blob/88ee7fb2e9303f43c52bd32410901841cad491fb/x/staking/client/cli/tx.go#L599
+        #         gentx_file = next(node.home_dir.glob("config/gentx/*json"))
+        #         gentx_file = gentx_file.relative_to(node.home_dir)
+        #         node_p2p = node.get(p2p.config_file, p2p.property_path).rsplit(
+        #             ":", maxsplit=1
+        #         )[-1]
+        #         node.update(gentx_file, lambda x: update_port(
+        #             x, node_p2p), "body.memo")
+        #         node.sign(self.validators[node_id], node.home_dir / gentx_file)
 
-        for (id_a, node_a) in self.validator_nodes.items():
-            for (id_b, node_b) in self.validator_nodes.items():
-                if id_a != id_b:
-                    node_a.copy_gentx_from(node_b)
+        # for (id_a, node_a) in self.validator_nodes.items():
+        #     for (id_b, node_b) in self.validator_nodes.items():
+        #         if id_a != id_b:
+        #             node_a.copy_gentx_from(node_b)
 
-        for node in self.validator_nodes.values():
-            node.collect_gentx()
+        # for node in self.validator_nodes.values():
+        #     node.collect_gentx()
 
     def spinup(self):
+        self.start_abci_container()
         self.start_tendermock()
 
-    def start_tendermock(self):
+    def start_abci_container(self):
         abci_stdout = open("abci_stdout.txt", "w", encoding="utf-8")
         abci_stderr = open("abci_stderr.txt", "w", encoding="utf-8")
-        args = f"docker run --add-host=host.docker.internal:host-gateway --name simapp -ti -p 26658:26658 -p 26656:26656 -p 9091:9091 -p 1317:1317 -p 9090:9090 informalofftermatt/testnet:tendermock simd start --transport=grpc --with-tendermint=false --grpc-only --rpc.laddr=tcp://host.docker.internal:99999".split()
+
+        # ensure previous container is stopped and removed
+        args = "docker stop simapp".split()
+        Popen(args)
+        time.sleep(0.5)
+        args = "docker rm simapp".split()
+        Popen(args)
+        time.sleep(0.5)
+
+        args = f"docker run --add-host=host.docker.internal:host-gateway --name simapp -p 26658:26658 -p 26656:26656 -p 9091:9091 -p 1317:1317 -p 9090:9090 informalofftermatt/testnet:tendermock simd start --transport=grpc --with-tendermint=false --grpc-only --rpc.laddr=tcp://host.docker.internal:99999".split()
+
+        print(f"> Starting ABCI App: {' '.join(args)}")
 
         Popen(args, stdout=abci_stdout, stderr=abci_stderr)
 
-        # wait until ABCI has finished starting
-        time.sleep(10)
+        # wait until app is started. TODO: more reliable way to check whether call is done
+        time.sleep(0.5)
 
-        tendermock_stdout = open("tendermock_stdout.txt", "w", encoding="utf-8")
-        tendermock_stderr = open("tendermock_stderr.txt", "w", encoding="utf-8")
+    def start_tendermock(self):
+
+        print(self.config_genesis)
+
+        tendermock_stdout = open(
+            "tendermock_stdout.txt", "w", encoding="utf-8")
+        tendermock_stderr = open(
+            "tendermock_stderr.txt", "w", encoding="utf-8")
 
         args = f"python {TENDERMOCK_BINARY} {GENESIS_PATH} --tendermock-host localhost --tendermock-port 26657 --app-host localhost --app-port 26658".split()
-        
+
+        print(f"> Starting Tendermock: {' '.join(args)}")
+
         Popen(args, stdout=tendermock_stdout, stderr=tendermock_stderr)
 
+        # wait until tendermock is started. TODO: more reliable way to check whether call is done
+        time.sleep(0.5)
 
     def oneshot(self):
         self.prepare()
         self.spinup()
 
     def teardown(self):
-        for node in self.validator_nodes.values():
-            node.close()
+        # for node in self.validator_nodes.values():
+        #     node.close()
+        pass
 
     def broadcast_transaction(
         self,
         account_id: AccountId,
         msgs: Union[Msg, List[Msg]],
-        *,
         gas: int = 200_000,
         fee_amount: int = 0,
         validator_id: Optional[AccountId] = None,
     ) -> TxResponse:
-        if validator_id is None:
-            validator_id = self._lead_validator
-
-        if not isinstance(msgs, list):
-            msgs = [msgs]
-
         account = self.accounts[account_id]
+        # sign tx
 
-        lcdclient = LCDClient("ip", chain_id="phoenix-1")
-        lcdclient.chain_id = self.chain_id
 
-        if account.mnemonic is None:
-            raise ValueError(f"Account({account.name}) do not have mnemonic")
+        # submit tx
 
-        wallet = lcdclient.wallet(
-            MnemonicKey(
-                mnemonic=account.mnemonic,
-                coin_type=self.coin_type,
-            )
-        )
+        # check result
 
-        with closing(self.get_grpc_channel(validator_id=validator_id)) as channel:
-            stub = AuthQueryStub(channel)
-            result = asyncio.run(stub.account(address=account.address(self.hrp_prefix)))
-            account_info = BaseAccount().parse(result.account.value)
-            account_number = account_info.account_number
-            sequence = account_info.sequence
+        # if validator_id is None:
+        #     validator_id = self._lead_validator
 
-            tx = wallet.create_and_sign_tx(
-                CreateTxOptions(
-                    msgs,
-                    fee=Fee(gas, Coins(f"{fee_amount}{self.denom}")),
-                    account_number=account_number,
-                    sequence=sequence,
-                )
-            )
+        # if not isinstance(msgs, list):
+        #     msgs = [msgs]
 
-            service = ServiceStub(channel)
+        # account = self.accounts[account_id]
 
-            with TmEventSubscribe({"tm.event": "Tx"}) as subscriber:
-                # # BROADCAST_MODE_SYNC defines a tx broadcasting mode where the client waits
-                # # for a CheckTx execution response only.
-                # BROADCAST_MODE_SYNC = 2
-                result = asyncio.run(
-                    service.broadcast_tx(
-                        tx_bytes=bytes(tx.to_proto()),
-                        mode=BroadcastMode.BROADCAST_MODE_SYNC,
-                    )
-                ).tx_response
-                if result.code == 0:
-                    # CheckTx execution was successful, check for block execution result
-                    subscriber.set_filter(
-                        lambda x: x["events"]["tx.hash"][0] == result.txhash
-                    )
+        # lcdclient = LCDClient("ip", chain_id="phoenix-1")
+        # lcdclient.chain_id = self.chain_id
 
-            # wait a little for data availablity
-            # may vary on different computers
-            # TODO: remove this sleep and use some event based technique
-            time.sleep(0.1)
+        # if account.mnemonic is None:
+        #     raise ValueError(f"Account({account.name}) do not have mnemonic")
 
-            # # following works, but waits till next block, so waits longer
-            # with TmEventSubscribe({"tm.event": "NewBlock"}):
-            #     pass
+        # wallet = lcdclient.wallet(
+        #     MnemonicKey(
+        #         mnemonic=account.mnemonic,
+        #         coin_type=self.coin_type,
+        #     )
+        # )
 
-            if result.code == 0:
-                result = asyncio.run(service.get_tx(hash=result.txhash)).tx_response
+        # with closing(self.get_grpc_channel(validator_id=validator_id)) as channel:
+        #     stub = AuthQueryStub(channel)
+        #     result = asyncio.run(stub.account(
+        #         address=account.address(self.hrp_prefix)))
+        #     account_info = BaseAccount().parse(result.account.value)
+        #     account_number = account_info.account_number
+        #     sequence = account_info.sequence
+
+            # tx = wallet.create_and_sign_tx(
+            #     CreateTxOptions(
+            #         msgs,
+            #         fee=Fee(gas, Coins(f"{fee_amount}{self.denom}")),
+            #         account_number=account_number,
+            #         sequence=sequence,
+            #     )
+            # )
+
+        #     service = ServiceStub(channel)
+
+        #     with TmEventSubscribe({"tm.event": "Tx"}) as subscriber:
+        #         # # BROADCAST_MODE_SYNC defines a tx broadcasting mode where the client waits
+        #         # # for a CheckTx execution response only.
+        #         # BROADCAST_MODE_SYNC = 2
+        #         result = asyncio.run(
+        #             service.broadcast_tx(
+        #                 tx_bytes=bytes(tx.to_proto()),
+        #                 mode=BroadcastMode.BROADCAST_MODE_SYNC,
+        #             )
+        #         ).tx_response
+        #         if result.code == 0:
+        #             # CheckTx execution was successful, check for block execution result
+        #             subscriber.set_filter(
+        #                 lambda x: x["events"]["tx.hash"][0] == result.txhash
+        #             )
+
+        #     # wait a little for data availablity
+        #     # may vary on different computers
+        #     # TODO: remove this sleep and use some event based technique
+        #     time.sleep(0.1)
+
+        #     # # following works, but waits till next block, so waits longer
+        #     # with TmEventSubscribe({"tm.event": "NewBlock"}):
+        #     #     pass
+
+        #     if result.code == 0:
+        #         result = asyncio.run(service.get_tx(
+        #             hash=result.txhash)).tx_response
 
         return result
