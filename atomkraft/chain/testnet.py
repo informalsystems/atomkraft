@@ -330,7 +330,7 @@ class Testnet:
         tendermock_stdout = open("tendermock_stdout.txt", "w", encoding="utf-8")
         tendermock_stderr = open("tendermock_stderr.txt", "w", encoding="utf-8")
 
-        args = f"".split()
+        args = f"python ../src/tendermock.py genesis.json --tendermock-host localhost --tendermock-port 26657 --app-host localhost --app-port 26658".split()
         
         Popen(args, stdout=abci_stdout, stderr=abci_stderr)
 
