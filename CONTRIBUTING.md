@@ -15,7 +15,7 @@ python -m atomkraft --help
 
 ```
 poetry add atomkraft
-poerty run atomkraft --help
+poetry run atomkraft --help
 # or
 poetry run python -m atomkraft --help
 ```
