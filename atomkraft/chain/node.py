@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from subprocess import PIPE, Popen
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+import logging
 
 import bip_utils
 import hdwallet
@@ -232,7 +233,7 @@ class Node:
         stderr: Optional[int] = None,
     ) -> Tuple[Optional[bytes], Optional[bytes]]:
         final_args = f"{self.binary} --home {self.home_dir}".split() + args
-        # print(" ".join(final_args))
+        logging.info(" ".join(final_args))
         stdin_pipe = None if stdin is None else PIPE
         with Popen(final_args, stdin=stdin_pipe, stdout=stdout, stderr=stderr) as p:
             out, err = p.communicate(input=stdin)

@@ -1,14 +1,18 @@
 import asyncio
+import json
+import logging
+import os
 import socket
 import tempfile
 import time
 from contextlib import closing
 from pathlib import Path
-from typing import Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 import numpy as np
 import tabulate
 import tomlkit
+from atomkraft import utils
 from atomkraft.utils.project import ATOMKRAFT_INTERNAL_DIR, ATOMKRAFT_VAL_DIR_PREFIX
 from grpclib.client import Channel
 from terra_proto.cosmos.auth.v1beta1 import BaseAccount
@@ -197,7 +201,7 @@ class Testnet:
         return Channel(host=grpc_ip, port=int(grpc_port))
 
     def prepare(self):
-        print("Preparing")
+        logging.info("Preparing")
         self.finalize_accounts()
         self.data_dir.mkdir(parents=True, exist_ok=True)
         self.data_dir = Path(
@@ -336,31 +340,146 @@ class Testnet:
         self.start_abci_container()
         self.start_tendermock()
 
+    def set(self, path: Path, value: Any, property_path: Optional[str] = None):
+        if property_path is not None:
+            with open(path, encoding="utf-8") as f:
+                if os.path.splitext(path)[-1] == ".json":
+                    main_data = json.load(f)
+                elif os.path.splitext(path)[-1] == ".toml":
+                    main_data = tomlkit.load(f)
+                else:
+                    raise RuntimeError(f"Unexpected file {path}")
+            main_data = utils.update(main_data, property_path, value)
+        else:
+            main_data = value
+        with open(path, "w", encoding="utf-8") as f:
+            if os.path.splitext(path)[-1] == ".json":
+                json.dump(main_data, f)
+            elif os.path.splitext(path)[-1] == ".toml":
+                tomlkit.dump(main_data, f)
+            else:
+                raise RuntimeError(f"Unexpected file {path}")
+
+    def modify_config(self, node):
+        for (config_file, configs) in self.config_node.items():
+            # copy config file to host
+            args = f"docker cp simapp:{node.home_dir}/config/{config_file}.toml ./tmp.toml".split()
+            logging.info(args)
+            Popen(args).communicate()
+
+            # modify config file
+            for (k, v) in configs.items():
+                if isinstance(v, str):
+                    # TODO: avoid tomlkit.items.str being a list
+                    self.set(Path("./tmp.toml"), str(v), k)
+                else:
+                    self.set(Path("./tmp.toml"), v, k)
+
+            # copy config file to container
+            args = f"docker cp ./tmp.toml simapp:{node.home_dir}/config/{config_file}.toml".split(
+            )
+            logging.info(args)
+            Popen(args).communicate()
+
+    def modify_genesis(self, node):
+        # copy genesis file to host
+        args = f"docker cp simapp:{node.home_dir}/config/genesis.json ./genesis.json".split()
+        logging.info(args)
+        Popen(args).communicate()
+
+        # modify genesis file
+        for (k, v) in self.config_genesis.items():
+            self.set(
+                Path("./genesis.json"), v, k
+            )
+
+        # copy genesis file to container
+        args = f"docker cp ./genesis.json simapp:{node.home_dir}/config/genesis.json".split(
+        )
+        logging.info(args)
+        Popen(args).communicate()
+
     def start_abci_container(self):
         abci_stdout = open("abci_stdout.txt", "w", encoding="utf-8")
         abci_stderr = open("abci_stderr.txt", "w", encoding="utf-8")
 
         # ensure previous container is stopped and removed
         args = "docker stop simapp".split()
-        Popen(args)
-        time.sleep(0.5)
+        Popen(args).communicate()
         args = "docker rm simapp".split()
-        Popen(args)
-        time.sleep(0.5)
+        Popen(args).communicate()
 
-        args = f"docker run --add-host=host.docker.internal:host-gateway --name simapp -p 26658:26658 -p 26656:26656 -p 9091:9091 -p 1317:1317 -p 9090:9090 informalofftermatt/testnet:tendermock simd start --transport=grpc --with-tendermint=false --grpc-only --rpc.laddr=tcp://host.docker.internal:99999".split()
+        abci_args = f"docker run --add-host=host.docker.internal:host-gateway --name simapp -p 26658:26658 -p 26656:26656 -p 9091:9091 -p 1317:1317 -p 9090:9090 -i simapp sleep infinity".split()
 
-        print(f"> Starting ABCI App: {' '.join(args)}")
+        logging.info(f"> Starting ABCI Container: {' '.join(abci_args)}")
 
+        Popen(abci_args)
+
+        # wait until container was started. TODO better way to do this
+        time.sleep(1)
+
+        # set up initial chain config
+        # hacky way to reuse code from node
+
+        node = Node("node",
+                    self.chain_id,
+                    self.data_dir / f"net",
+                    overwrite=self.overwrite,
+                    keep=self.keep,
+                    binary="docker exec -i simapp simd",
+                    denom=self.denom,
+                    hrp_prefix=self.hrp_prefix)
+
+        node.init()
+
+        self.modify_genesis(node)
+
+        for (v_id, validator) in self.validators.items():
+            node.add_account(
+                validator, self.validator_balances[v_id]
+            )
+
+        for (a_id, account) in self.accounts.items():
+            node.add_account(
+                account, self.account_balances[a_id]
+            )
+
+        self.modify_config(node)
+
+        # create folder for genesis transactions
+        args = f"docker exec simapp mkdir ./gentxs".split(
+        )
+        logging.info(args)
+        Popen(args).communicate()
+
+        for (node_id, _) in self.validator_nodes.items():
+            logging.info(self.validators[node_id].mnemonic)
+            node.add_key(self.validators[node_id])
+
+            # use alternative add_validator function to add output document location based on node_id
+            def add_validator(node, account: Account, staking_amount: int):
+                argstr = f"gentx {account.name} {staking_amount}{node.denom} --keyring-backend test --chain-id {node.chain_id} --output json --output-document={node.home_dir}/{node_id}.json --output-document ./gentxs/{node_id}.json"
+                node._execute(argstr.split(), stderr=PIPE)
+
+            add_validator(
+                node, self.validators[node_id], self.validator_balances[node_id][self.denom]
+            )
+
+        def collect_gentx(node):
+            argstr = "collect-gentxs --gentx-dir ./gentxs/"
+            return node._json_from_stdout_or_stderr(*node._execute(argstr.split()))
+
+        genesis_file = collect_gentx(node)
+
+
+        args = f"docker exec simapp simd start --transport=grpc --with-tendermint=false --grpc-only --rpc.laddr=tcp://host.docker.internal:99999 --home {node.home_dir}".split()
+        logging.info(f"> Starting simd: {' '.join(args)}")
+        time.sleep(6000)
         Popen(args, stdout=abci_stdout, stderr=abci_stderr)
+        time.sleep(1)
 
-        # wait until app is started. TODO: more reliable way to check whether call is done
-        time.sleep(0.5)
 
     def start_tendermock(self):
-
-        print(self.config_genesis)
-
         tendermock_stdout = open(
             "tendermock_stdout.txt", "w", encoding="utf-8")
         tendermock_stderr = open(
@@ -368,12 +487,12 @@ class Testnet:
 
         args = f"python {TENDERMOCK_BINARY} {GENESIS_PATH} --tendermock-host localhost --tendermock-port 26657 --app-host localhost --app-port 26658".split()
 
-        print(f"> Starting Tendermock: {' '.join(args)}")
+        logging.info(f"> Starting Tendermock: {' '.join(args)}")
 
         Popen(args, stdout=tendermock_stdout, stderr=tendermock_stderr)
 
         # wait until tendermock is started. TODO: more reliable way to check whether call is done
-        time.sleep(0.5)
+        time.sleep(1)
 
     def oneshot(self):
         self.prepare()
@@ -383,90 +502,3 @@ class Testnet:
         # for node in self.validator_nodes.values():
         #     node.close()
         pass
-
-    def broadcast_transaction(
-        self,
-        account_id: AccountId,
-        msgs: Union[Msg, List[Msg]],
-        gas: int = 200_000,
-        fee_amount: int = 0,
-        validator_id: Optional[AccountId] = None,
-    ) -> TxResponse:
-        account = self.accounts[account_id]
-        # sign tx
-
-
-        # submit tx
-
-        # check result
-
-        # if validator_id is None:
-        #     validator_id = self._lead_validator
-
-        # if not isinstance(msgs, list):
-        #     msgs = [msgs]
-
-        # account = self.accounts[account_id]
-
-        # lcdclient = LCDClient("ip", chain_id="phoenix-1")
-        # lcdclient.chain_id = self.chain_id
-
-        # if account.mnemonic is None:
-        #     raise ValueError(f"Account({account.name}) do not have mnemonic")
-
-        # wallet = lcdclient.wallet(
-        #     MnemonicKey(
-        #         mnemonic=account.mnemonic,
-        #         coin_type=self.coin_type,
-        #     )
-        # )
-
-        # with closing(self.get_grpc_channel(validator_id=validator_id)) as channel:
-        #     stub = AuthQueryStub(channel)
-        #     result = asyncio.run(stub.account(
-        #         address=account.address(self.hrp_prefix)))
-        #     account_info = BaseAccount().parse(result.account.value)
-        #     account_number = account_info.account_number
-        #     sequence = account_info.sequence
-
-            # tx = wallet.create_and_sign_tx(
-            #     CreateTxOptions(
-            #         msgs,
-            #         fee=Fee(gas, Coins(f"{fee_amount}{self.denom}")),
-            #         account_number=account_number,
-            #         sequence=sequence,
-            #     )
-            # )
-
-        #     service = ServiceStub(channel)
-
-        #     with TmEventSubscribe({"tm.event": "Tx"}) as subscriber:
-        #         # # BROADCAST_MODE_SYNC defines a tx broadcasting mode where the client waits
-        #         # # for a CheckTx execution response only.
-        #         # BROADCAST_MODE_SYNC = 2
-        #         result = asyncio.run(
-        #             service.broadcast_tx(
-        #                 tx_bytes=bytes(tx.to_proto()),
-        #                 mode=BroadcastMode.BROADCAST_MODE_SYNC,
-        #             )
-        #         ).tx_response
-        #         if result.code == 0:
-        #             # CheckTx execution was successful, check for block execution result
-        #             subscriber.set_filter(
-        #                 lambda x: x["events"]["tx.hash"][0] == result.txhash
-        #             )
-
-        #     # wait a little for data availablity
-        #     # may vary on different computers
-        #     # TODO: remove this sleep and use some event based technique
-        #     time.sleep(0.1)
-
-        #     # # following works, but waits till next block, so waits longer
-        #     # with TmEventSubscribe({"tm.event": "NewBlock"}):
-        #     #     pass
-
-        #     if result.code == 0:
-        #         result = asyncio.run(service.get_tx(
-        #             hash=result.txhash)).tx_response
-
-        return result
