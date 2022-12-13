@@ -22,18 +22,20 @@ from atomkraft.chain.node import Account, AccountId, ConfigPort, Node
 from atomkraft.chain.testnet import Testnet
 from atomkraft.chain.utils import TmEventSubscribe, get_free_ports, update_port
 from atomkraft.utils.project import ATOMKRAFT_INTERNAL_DIR, ATOMKRAFT_VAL_DIR_PREFIX
+from betterproto.lib.google.protobuf import Any
 from grpclib.client import Channel
 from modelator.pytest.decorators import step
 from terra_proto.cosmos.auth.v1beta1 import BaseAccount
 from terra_proto.cosmos.auth.v1beta1 import QueryStub as AuthQueryStub
 from terra_proto.cosmos.base.abci.v1beta1 import TxResponse
-from terra_proto.cosmos.tx.v1beta1 import BroadcastMode, ServiceStub
+from terra_proto.cosmos.base.v1beta1 import Coin
 from terra_sdk.client.lcd import LCDClient
 from terra_sdk.client.lcd.api.tx import CreateTxOptions
 from terra_sdk.core import Coins
-from terra_sdk.core.bank import MsgSend
+from terra_sdk.core.bank.msgs import MsgSend
 from terra_sdk.core.fee import Fee
 from terra_sdk.core.msg import Msg
+from terra_sdk.core.tx import TxBody, Tx, AuthInfo
 from terra_sdk.key.mnemonic import MnemonicKey
 
 
@@ -59,6 +61,7 @@ def transfer(testnet: Testnet, action):
     sender_addr = testnet.acc_addr(sender_id)
     receiver_addr = testnet.acc_addr(receiver_id)
 
+    # important that this is imported from terra_sdk, not terra_proto.cosmos
     msg = MsgSend(sender_addr, receiver_addr, f"{amount}{testnet.denom}")
 
     result = sign_and_broadcast(
@@ -106,9 +109,15 @@ def sign_and_broadcast(testnet: Testnet,
 
     coin_denom = testnet.denom
 
-    tx = tptx.TxBody(messages=msgs)
+    body = TxBody(messages=[msg for msg in msgs])
+    auth = AuthInfo([], Fee(amount=f"{fee_amount}{testnet.denom}", gas_limit=gas, granter="", payer=""))
 
-    signed_tx = sign_tx(account_addr, mnemonic, testnet.chain_id, tx)
+    tx = Tx(body=body, auth_info=auth, signatures=[])
+
+    logging.info(json.dumps(tx.to_data()))
+
+    signed_tx = sign_tx(account_addr, mnemonic,
+                        testnet.chain_id, tx, testnet.lead_node)
     broadcast_signed_tx(signed_tx, coin_denom, mnemonic, testnet.chain_id,
                         gas, fee_amount, validator_id)
 
@@ -117,7 +126,8 @@ def sign_tx(
         account_addr,
         mnemonic,
         chain_id,
-        tx):
+        tx: TxBody,
+        lead_node: Node):
 
     with open("tendermint_client.log", "a") as logfile:
 
@@ -135,6 +145,7 @@ def sign_tx(
             [],
         )
         str_result = cmd.call()
+        logging.info("Result: " + str(str_result))
         result = json.loads(str_result)
 
         account_number = result["account_number"]
@@ -145,15 +156,20 @@ def sign_tx(
             logfile,
             DOCKER_PATH,
             ["tee", "tx_tmp.json"],
-            [tx],
+            [tx.to_json()],
         )
         cmd.call()
+
+        args = f"tx sign tx_tmp.json --chain-id={chain_id} --from={account_addr} --offline --account-number {account_number} --sequence {sequence} --keyring-backend test --home {lead_node.home_dir}"
+        logging.info("Calling Cosmos SDK CLI: " + args)
+
+        time.sleep(7000)
 
         # call sign
         cmd = CosmosCmd(
             logfile,
             SIMD_BINARY,
-            f"tx sign tx_tmp.json --chain-id={chain_id} --from={account_addr} --offline --account-number {account_number} --sequence {sequence}".split(
+            args.split(
                 " "
             ),
             [mnemonic],
@@ -183,11 +199,14 @@ def broadcast_signed_tx(
         )
         cmd.call()
 
+        args = f"tx broadcast --node http://{TENDERMOCK_HOST}:{TENDERMOCK_PORT} --fees {fee_amount}{coin_denom} --gas {gas} --chain-id {chain_id} signed_tx_tmp.json"
+        logging.info("Calling Cosmos SDK CLI: " + args)
+
         # call broadcast
         cmd = CosmosCmd(
             logfile,
             SIMD_BINARY,
-            f"tx broadcast --node http://{TENDERMOCK_HOST}:{TENDERMOCK_PORT} --fees {fee_amount}{coin_denom} --gas {gas} --chain-id {chain_id} signed_tx_tmp.json".split(
+            args.split(
                 " "
             ),
             [mnemonic],

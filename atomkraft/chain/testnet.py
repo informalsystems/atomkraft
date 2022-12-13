@@ -435,18 +435,19 @@ class Testnet:
             node.init()
             validator_envs[v_id] = node
 
-        lead_node = validator_envs[self._lead_validator]
-        self.modify_genesis(lead_node)
+        self.lead_node = validator_envs[self._lead_validator]
+        self.modify_genesis(self.lead_node)
 
         for (v_id, validator) in self.validators.items():
-            lead_node.add_account(
+            self.lead_node.add_account(
                 validator, self.validator_balances[v_id]
             )
 
         for (a_id, account) in self.accounts.items():
-            lead_node.add_account(
+            self.lead_node.add_account(
                 account, self.account_balances[a_id]
             )
+            self.lead_node.add_key(account)
 
         def copy_genesis_from(node: Node, other: Node):
             args = f"docker exec simapp cp {other.home_dir}/config/genesis.json {node.home_dir}/config/genesis.json".split(
@@ -457,7 +458,7 @@ class Testnet:
         for node_id, node in self.validator_nodes.items():
             if node_id != self._lead_validator:
                 copy_genesis_from(validator_envs[node_id],
-                                  lead_node
+                                  self.lead_node
                                   )
 
         for node in validator_envs.values():
@@ -488,15 +489,15 @@ class Testnet:
             argstr = "collect-gentxs --gentx-dir ./gentxs/"
             return node._json_from_stdout_or_stderr(*node._execute(argstr.split()))
 
-        collect_gentx(lead_node)
+        collect_gentx(self.lead_node)
 
         # copy new genesis file out to be used by tendermock
-        args = f"docker cp simapp:{lead_node.home_dir}/config/genesis.json ./genesis.json".split(
+        args = f"docker cp simapp:{self.lead_node.home_dir}/config/genesis.json ./genesis.json".split(
         )
         logging.info(args)
         Popen(args).communicate()
 
-        args = f"docker exec simapp simd start --transport=grpc --with-tendermint=false --grpc-only --rpc.laddr=tcp://host.docker.internal:99999 --home {lead_node.home_dir}".split(
+        args = f"docker exec simapp simd start --transport=grpc --with-tendermint=false --grpc-only --rpc.laddr=tcp://host.docker.internal:99999 --home {self.lead_node.home_dir}".split(
         )
         logging.info(f"> Starting simd: {' '.join(args)}")
 
