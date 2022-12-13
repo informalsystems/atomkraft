@@ -71,12 +71,14 @@ def transfer(testnet: Testnet, action):
     logging.info(f"\tReceiver:  {receiver_id} ({receiver_addr})")
     logging.info(f"\tAmount:    {msg.amount}")
 
-    if result.code == 0:
-        logging.info("Status: Successful\n")
-    else:
-        logging.info("Status: Error")
-        logging.info(f"\tcode: {result.code}")
-        logging.info(f"\tlog:  {result.raw_log}\n")
+    logging.info(result)
+
+    # if not result or result.code != 0:
+    #     logging.info("Status: Error")
+    #     logging.info(f"\tcode: {result.code}")
+    #     logging.info(f"\tlog:  {result.raw_log}\n")
+    # else:
+    #     logging.info("Status: Successful\n")
 
     logging.debug(f"[MSG] {msg}")
     logging.debug(f"[RES] {result}")
@@ -110,7 +112,8 @@ def sign_and_broadcast(testnet: Testnet,
     coin_denom = testnet.denom
 
     body = TxBody(messages=[msg for msg in msgs])
-    auth = AuthInfo([], Fee(amount=f"{fee_amount}{testnet.denom}", gas_limit=gas, granter="", payer=""))
+    auth = AuthInfo([], Fee(
+        amount=f"{fee_amount}{testnet.denom}", gas_limit=gas, granter="", payer=""))
 
     tx = Tx(body=body, auth_info=auth, signatures=[])
 
@@ -118,8 +121,8 @@ def sign_and_broadcast(testnet: Testnet,
 
     signed_tx = sign_tx(account_addr, mnemonic,
                         testnet.chain_id, tx, testnet.lead_node)
-    broadcast_signed_tx(signed_tx, coin_denom, mnemonic, testnet.chain_id,
-                        gas, fee_amount, validator_id)
+    return broadcast_signed_tx(signed_tx, coin_denom, mnemonic, testnet.chain_id,
+                               gas, fee_amount, validator_id)
 
 
 def sign_tx(
