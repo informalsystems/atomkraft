@@ -421,30 +421,47 @@ class Testnet:
         # set up initial chain config
         # hacky way to reuse code from node
 
-        node = Node("node",
-                    self.chain_id,
-                    self.data_dir / f"net",
-                    overwrite=self.overwrite,
-                    keep=self.keep,
-                    binary="docker exec -i simapp simd",
-                    denom=self.denom,
-                    hrp_prefix=self.hrp_prefix)
+        validator_envs = {}
+        for (v_id, validator) in self.validators.items():
+            node = Node("node",
+                        self.chain_id,
+                        self.data_dir / f"{v_id}",
+                        overwrite=self.overwrite,
+                        keep=self.keep,
+                        binary="docker exec -i simapp simd",
+                        denom=self.denom,
+                        hrp_prefix=self.hrp_prefix)
 
-        node.init()
+            node.init()
+            validator_envs[v_id] = node
 
-        self.modify_genesis(node)
+        lead_node = validator_envs[self._lead_validator]
+        self.modify_genesis(lead_node)
 
         for (v_id, validator) in self.validators.items():
-            node.add_account(
+            lead_node.add_account(
                 validator, self.validator_balances[v_id]
             )
 
         for (a_id, account) in self.accounts.items():
-            node.add_account(
+            lead_node.add_account(
                 account, self.account_balances[a_id]
             )
 
-        self.modify_config(node)
+        def copy_genesis_from(node: Node, other: Node):
+            args = f"docker exec simapp cp {other.home_dir}/config/genesis.json {node.home_dir}/config/genesis.json".split(
+            )
+            logging.info(args)
+            Popen(args).communicate()
+
+        for node_id, node in self.validator_nodes.items():
+            if node_id != self._lead_validator:
+                copy_genesis_from(validator_envs[node_id],
+                                  lead_node
+                                  )
+
+        for node in validator_envs.values():
+            self.modify_config(node)
 
         # create folder for genesis transactions
         args = f"docker exec simapp mkdir ./gentxs".split(
@@ -452,9 +469,11 @@ class Testnet:
         logging.info(args)
         Popen(args).communicate()
 
+
         for (node_id, _) in self.validator_nodes.items():
             logging.info(self.validators[node_id].mnemonic)
-            node.add_key(self.validators[node_id])
+            curNode = validator_envs[node_id]
+            curNode.add_key(self.validators[node_id])
 
             # use alternative add_validator function to add output document location based on node_id
             def add_validator(node, account: Account, staking_amount: int):
@@ -462,22 +481,27 @@ class Testnet:
                 node._execute(argstr.split(), stderr=PIPE)
 
             add_validator(
-                node, self.validators[node_id], self.validator_balances[node_id][self.denom]
+                curNode, self.validators[node_id], self.validator_balances[node_id][self.denom]
             )
 
         def collect_gentx(node):
             argstr = "collect-gentxs --gentx-dir ./gentxs/"
             return node._json_from_stdout_or_stderr(*node._execute(argstr.split()))
 
-        genesis_file = collect_gentx(node)
+        collect_gentx(lead_node)
 
+        # copy new genesis file out to be used by tendermock
+        args = f"docker cp simapp:{lead_node.home_dir}/config/genesis.json ./genesis.json".split(
+        )
+        logging.info(args)
+        Popen(args).communicate()
 
-        args = f"docker exec simapp simd start --transport=grpc --with-tendermint=false --grpc-only --rpc.laddr=tcp://host.docker.internal:99999 --home {node.home_dir}".split()
+        args = f"docker exec simapp simd start --transport=grpc --with-tendermint=false --grpc-only --rpc.laddr=tcp://host.docker.internal:99999 --home {lead_node.home_dir}".split(
+        )
         logging.info(f"> Starting simd: {' '.join(args)}")
-        time.sleep(6000)
+
         Popen(args, stdout=abci_stdout, stderr=abci_stderr)
         time.sleep(1)
-
 
     def start_tendermock(self):
         tendermock_stdout = open(

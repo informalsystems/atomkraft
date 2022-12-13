@@ -124,7 +124,6 @@ def sign_tx(
         args = f"query account {account_addr} --node=http://{TENDERMOCK_HOST}:{TENDERMOCK_PORT} --chain-id={chain_id} --output=json"
 
         logging.info("Calling Cosmos SDK CLI: " + args)
-        time.sleep(6000)
 
         # get account number and sequence
         cmd = CosmosCmd(
