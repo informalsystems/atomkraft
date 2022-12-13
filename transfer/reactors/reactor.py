@@ -163,8 +163,6 @@ def sign_tx(
         args = f"tx sign tx_tmp.json --chain-id={chain_id} --from={account_addr} --offline --account-number {account_number} --sequence {sequence} --keyring-backend test --home {lead_node.home_dir}"
         logging.info("Calling Cosmos SDK CLI: " + args)
 
-        time.sleep(7000)
-
         # call sign
         cmd = CosmosCmd(
             logfile,
