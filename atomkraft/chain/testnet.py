@@ -18,14 +18,12 @@ from grpclib.client import Channel
 from terra_proto.cosmos.auth.v1beta1 import BaseAccount
 from terra_proto.cosmos.auth.v1beta1 import QueryStub as AuthQueryStub
 from terra_proto.cosmos.base.abci.v1beta1 import TxResponse
-from terra_proto.cosmos.tx.v1beta1 import BroadcastMode, ServiceStub
-from terra_sdk.client.lcd import LCDClient
-from terra_sdk.client.lcd.api.tx import CreateTxOptions
-from terra_sdk.core import Coins
 from terra_sdk.core.fee import Fee
 from terra_sdk.core.msg import Msg
-from terra_sdk.key.mnemonic import MnemonicKey
+from terra_sdk.core.tx import TxBody, Tx, AuthInfo
 
+
+from .connector import CosmosCmd
 from .node import Account, AccountId, ConfigPort, Node
 from .utils import TmEventSubscribe, get_free_ports, update_port
 
@@ -38,6 +36,13 @@ Bank = Dict[AccountId, Dict[str, int]]
 
 TENDERMOCK_BINARY = "/home/philip/tendermock/src/tendermock.py"
 GENESIS_PATH = "./genesis.json"
+
+DOCKER_PATH = "docker exec -i simapp".split(" ")
+
+SIMD_BINARY = DOCKER_PATH + ["simd"]
+
+TENDERMOCK_HOST = "host.docker.internal"
+TENDERMOCK_PORT = "26657"
 
 
 class Testnet:
@@ -94,6 +99,9 @@ class Testnet:
         elif isinstance(data_dir, str):
             data_dir = Path(data_dir)
         self.data_dir = data_dir / VALIDATOR_DIR
+
+        self.abci_process = None
+        self.tendermock_process = None
 
     def set_account_balances(self, balances: Bank):
         self.account_balances = balances
@@ -201,7 +209,7 @@ class Testnet:
         return Channel(host=grpc_ip, port=int(grpc_port))
 
     def prepare(self):
-        logging.info("Preparing")
+        logging.info("> Preparing accounts")
         self.finalize_accounts()
         self.data_dir.mkdir(parents=True, exist_ok=True)
         self.data_dir = Path(
@@ -221,6 +229,7 @@ class Testnet:
             )
             for validator_id in self.validators.keys()
         }
+        logging.info("> Finished preparing accounts")
 
     def spinup(self):
         self.start_abci_container()
@@ -249,9 +258,9 @@ class Testnet:
     def modify_config(self, node):
         for (config_file, configs) in self.config_node.items():
             # copy config file to host
-            args = f"docker cp simapp:{node.home_dir}/config/{config_file}.toml ./tmp.toml".split()
-            logging.info(args)
-            Popen(args).communicate()
+            args = f"docker cp simapp:{node.home_dir}/config/{config_file}.toml ./tmp.toml"
+            logging.debug(args)
+            Popen(args.split()).communicate()
 
             # modify config file
             for (k, v) in configs.items():
@@ -262,16 +271,16 @@ class Testnet:
                     self.set(Path("./tmp.toml"), v, k)
 
             # copy config file to container
-            args = f"docker cp ./tmp.toml simapp:{node.home_dir}/config/{config_file}.toml".split(
-            )
-            logging.info(args)
-            Popen(args).communicate()
+            args = f"docker cp ./tmp.toml simapp:{node.home_dir}/config/{config_file}.toml"
+            logging.debug(args)
+            Popen(args.split()).communicate()
 
     def modify_genesis(self, node):
+        logging.info("> Applying genesis parameters")
         # copy genesis file to host
-        args = f"docker cp simapp:{node.home_dir}/config/genesis.json ./genesis.json".split()
-        logging.info(args)
-        Popen(args).communicate()
+        args = f"docker cp simapp:{node.home_dir}/config/genesis.json ./genesis.json"
+        logging.debug(args)
+        Popen(args.split()).communicate()
 
         # modify genesis file
         for (k, v) in self.config_genesis.items():
@@ -280,33 +289,31 @@ class Testnet:
             )
 
         # copy genesis file to container
-        args = f"docker cp ./genesis.json simapp:{node.home_dir}/config/genesis.json".split(
-        )
-        logging.info(args)
-        Popen(args).communicate()
+        args = f"docker cp ./genesis.json simapp:{node.home_dir}/config/genesis.json"
+        logging.debug(args)
+        Popen(args.split()).communicate()
 
     def start_abci_container(self):
-        abci_stdout = open("abci_stdout.txt", "w", encoding="utf-8")
-        abci_stderr = open("abci_stderr.txt", "w", encoding="utf-8")
-
-        # ensure previous container is stopped and removed
         args = "docker stop simapp".split()
         Popen(args).communicate()
         args = "docker rm simapp".split()
         Popen(args).communicate()
 
+        abci_stdout = open("abci_stdout.txt", "w", encoding="utf-8")
+        abci_stderr = open("abci_stderr.txt", "w", encoding="utf-8")
+
         abci_args = f"docker run --add-host=host.docker.internal:host-gateway --name simapp -p 26658:26658 -p 26656:26656 -p 9091:9091 -p 1317:1317 -p 9090:9090 -i simapp sleep infinity"
 
-        logging.info(f"> Starting ABCI Container: {abci_args}")
+        logging.info(f"> Starting ABCI Container")
+        logging.debug(abci_args)
 
         self.abci_process = Popen(abci_args.split())
 
-        # wait until container was started. TODO better way to do this
+        # wait until container is started
         time.sleep(1)
 
         # set up initial chain config
         # hacky way to reuse code from node
-
         validator_envs = {}
         for (v_id, validator) in self.validators.items():
             node = Node("node",
@@ -324,6 +331,8 @@ class Testnet:
         self.lead_node = validator_envs[self._lead_validator]
         self.modify_genesis(self.lead_node)
 
+        logging.info("> Adding genesis accounts")
+
         for (v_id, validator) in self.validators.items():
             self.lead_node.add_account(
                 validator, self.validator_balances[v_id]
@@ -336,10 +345,9 @@ class Testnet:
             self.lead_node.add_key(account)
 
         def copy_genesis_from(node: Node, other: Node):
-            args = f"docker exec simapp cp {other.home_dir}/config/genesis.json {node.home_dir}/config/genesis.json".split(
-            )
-            logging.info(args)
-            Popen(args).communicate()
+            args = f"docker exec simapp cp {other.home_dir}/config/genesis.json {node.home_dir}/config/genesis.json"
+            logging.debug(args)
+            Popen(args.split()).communicate()
 
         for node_id, node in self.validator_nodes.items():
             if node_id != self._lead_validator:
@@ -347,18 +355,18 @@ class Testnet:
                                   self.lead_node
                                   )
 
+        logging.info("> Applying config")
         for node in validator_envs.values():
             self.modify_config(node)
 
         # create folder for genesis transactions
-        args = f"docker exec simapp mkdir ./gentxs".split(
-        )
-        logging.info(args)
-        Popen(args).communicate()
+        args = f"docker exec simapp mkdir ./gentxs"
+        logging.debug(args)
+        Popen(args.split()).communicate()
 
-
+        logging.info("> Adding genesis validators")
         for (node_id, _) in self.validator_nodes.items():
-            logging.info(self.validators[node_id].mnemonic)
+            logging.debug(f"Mnemonic: {self.validators[node_id].mnemonic}")
             curNode = validator_envs[node_id]
             curNode.add_key(self.validators[node_id])
 
@@ -375,20 +383,22 @@ class Testnet:
             argstr = "collect-gentxs --gentx-dir ./gentxs/"
             return node._json_from_stdout_or_stderr(*node._execute(argstr.split()))
 
+        logging.info("> Collecting gentx")
         collect_gentx(self.lead_node)
 
         # copy new genesis file out to be used by tendermock
         args = f"docker cp simapp:{self.lead_node.home_dir}/config/genesis.json ./genesis.json".split(
         )
-        logging.info(args)
         Popen(args).communicate()
 
         args = f"docker exec simapp simd start --transport=grpc --with-tendermint=false --grpc-only --rpc.laddr=tcp://host.docker.internal:99999 --home {self.lead_node.home_dir}".split(
         )
-        logging.info(f"> Starting simd: {' '.join(args)}")
+        logging.debug(f"> Starting simd: {' '.join(args)}")
 
         Popen(args, stdout=abci_stdout, stderr=abci_stderr)
         time.sleep(1)
+
+        logging.info("> Finished starting ABCI app")
 
     def start_tendermock(self):
         tendermock_stdout = open(
@@ -396,23 +406,163 @@ class Testnet:
         tendermock_stderr = open(
             "tendermock_stderr.txt", "w", encoding="utf-8")
 
-        args = f"python {TENDERMOCK_BINARY} {GENESIS_PATH} --tendermock-host localhost --tendermock-port 26657 --app-host localhost --app-port 26658".split()
+        args = f"python {TENDERMOCK_BINARY} {GENESIS_PATH} --tendermock-host localhost --tendermock-port 26657 --app-host localhost --app-port 26658"
 
-        logging.info(f"> Starting Tendermock: {' '.join(args)}")
+        logging.info(f"> Starting Tendermock")
+        logging.debug(args)
 
-        self.tendermock_process = Popen(args, stdout=tendermock_stdout, stderr=tendermock_stderr)
+        self.tendermock_process = Popen(
+            args.split(), stdout=tendermock_stdout, stderr=tendermock_stderr)
 
-        # wait until tendermock is started. TODO: more reliable way to check whether call is done
+        # wait until tendermock is started.
         time.sleep(1)
+        logging.info(f"> Finished starting Tendermock")
 
     def oneshot(self):
         self.prepare()
         self.spinup()
 
     def teardown(self):
-        logging.info("Terminating Tendermock")
-        self.tendermock_process.terminate()
-        logging.info("Terminating app")
+        if self.tendermock_process is not None:
+            logging.info("Terminating Tendermock")
+            self.tendermock_process.terminate()
+        if self.abci_process is not None:
+            logging.info("Terminating app")
+            self.abci_process.terminate()
+            # ensure previous container is stopped and removed
+            args = "docker stop simapp".split()
+            Popen(args).communicate()
+            args = "docker rm simapp".split()
+            Popen(args).communicate()
+        logging.info("Finished teardown")
 
-        self.abci_process.terminate()
-        pass
+    def __del__(self):
+        self.teardown()
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.teardown()
+
+    def sign_and_broadcast(self,
+                           account_id: AccountId,
+                           msgs: Union[Msg, List[Msg]],
+                           gas: int = 200_000,
+                           fee_amount: int = 0,
+                           validator_id: Optional[AccountId] = None):
+
+        if not isinstance(msgs, list):
+            msgs = [msgs]
+
+        account = self.accounts[account_id]
+        account_addr = account.address(self.hrp_prefix)
+        mnemonic = account.mnemonic
+
+        coin_denom = self.denom
+
+        body = TxBody(messages=[msg for msg in msgs])
+        auth = AuthInfo([], Fee(
+            amount=f"{fee_amount}{self.denom}", gas_limit=gas, granter="", payer=""))
+
+        tx = Tx(body=body, auth_info=auth, signatures=[])
+
+        signed_tx = self.sign_tx(account_addr, mnemonic,
+                                 self.chain_id, tx, self.lead_node)
+        return self.broadcast_signed_tx(signed_tx, coin_denom, mnemonic, self.chain_id,
+                                        gas, fee_amount)
+
+    def sign_tx(
+            self,
+            account_addr,
+            mnemonic,
+            chain_id,
+            tx: TxBody,
+            lead_node: Node):
+
+        with open("tendermint_client.log", "a") as logfile:
+
+            args = f"query account {account_addr} --node=http://{TENDERMOCK_HOST}:{TENDERMOCK_PORT} --chain-id={chain_id} --output=json"
+
+            logging.debug("Calling Cosmos SDK CLI: " + args)
+
+            # get account number and sequence
+            cmd = CosmosCmd(
+                logfile,
+                SIMD_BINARY,
+                args.split(
+                    " "
+                ),
+                [],
+            )
+            str_result = cmd.call()
+            logging.debug("Result: " + str(str_result))
+            result = json.loads(str_result)
+
+            account_number = result["account_number"]
+            sequence = result["sequence"]
+
+            logging.debug("Store tx in file tx_tmp.json")
+            # store transaction in file
+            cmd = CosmosCmd(
+                logfile,
+                DOCKER_PATH,
+                ["tee", "tx_tmp.json"],
+                [tx.to_json()],
+            )
+            cmd.call()
+
+            start_time = time.time()
+
+            args = f"tx sign tx_tmp.json --chain-id={chain_id} --from={account_addr} --offline --account-number {account_number} --sequence {sequence} --keyring-backend test --home {lead_node.home_dir}"
+            logging.debug("Calling Cosmos SDK CLI: " + args)
+
+
+            # call sign
+            cmd = CosmosCmd(
+                logfile,
+                SIMD_BINARY,
+                args.split(
+                    " "
+                ),
+                [mnemonic],
+            )
+
+            signed_tx = cmd.call()
+            end_time = time.time()
+            logging.info(
+                f"Time taken to sign: {end_time - start_time}s")
+            logging.debug("Done signing")
+
+            return signed_tx
+
+    def broadcast_signed_tx(
+            self,
+            signed_tx,
+            coin_denom,
+            mnemonic,
+            chain_id,
+            gas: int,
+            fee_amount: int):
+
+        with open("tendermint_client.log", "a") as logfile:
+            # store tx string in file
+            cmd = CosmosCmd(
+                logfile,
+                DOCKER_PATH,
+                ["tee", "signed_tx_tmp.json"],
+                [signed_tx],
+            )
+            cmd.call()
+
+            args = f"tx broadcast --node http://{TENDERMOCK_HOST}:{TENDERMOCK_PORT} --fees {fee_amount}{coin_denom} --gas {gas} --chain-id {chain_id} signed_tx_tmp.json --output json"
+            logging.debug("Calling Cosmos SDK CLI: " + args)
+
+            # call broadcast
+            cmd = CosmosCmd(
+                logfile,
+                SIMD_BINARY,
+                args.split(
+                    " "
+                ),
+                [mnemonic],
+            )
+            result = cmd.call()
+            return result
