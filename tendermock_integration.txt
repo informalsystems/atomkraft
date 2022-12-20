@@ -1,0 +1,17 @@
+Atomkraft with Tendermock is quite a bit slower right now, compared to using Atomkraft with Tendermint.
+Atomkraft+Tendermock takes about 3s per tx, while Atomkraft+Tendermint takes about 1s.
+This seems to be mostly due to the CLI - signing transactions via the CLI takes 1s, while signing them via the terra_sdk library takes 0.02s.
+I suspect this is similar for broadcasting - I cannot identify any particular way to speed this up except for by not using the CLI, which
+is currently impossible, see https://github.com/cosmos/cosmos-sdk/discussions/13968
+
+Docker seems to be not a huge issue in terms of overhead. It seems to take about 0.1s per call extra, compared to running commands locally.
+
+Signing could be changed to work via the Terra SDK python library, but I had trouble getting the signed txs into a format that could then be broadcasted via the CLI.
+There are some changes between the formats used by the two, e.g. TerraSDK seems to dump the messages as protobuf serialized and encoded bytes,
+while Cosmos SDK CLI wants them as plaintext-json.
+
+For guidance on how to integrate Tendermock with Atomkraft, see the following:
+* A sample reactor: https://github.com/informalsystems/atomkraft/blob/philip/tendermock/transfer/reactors/reactor.py
+* The adjusted testnet: https://github.com/informalsystems/atomkraft/tree/philip/tendermock/atomkraft/chain/testnet.py
+* A minimal prototype for utilizing Tendermock to communicate with ABCI: https://github.com/informalsystems/tendermock/tree/main/pipeline_poc
+* More generally the Tendermock repo: https://github.com/informalsystems/tendermock
