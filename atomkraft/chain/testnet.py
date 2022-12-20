@@ -222,120 +222,6 @@ class Testnet:
             for validator_id in self.validators.keys()
         }
 
-        # for node in self.validator_nodes.values():
-        #     node.init()
-
-        # for (k, v) in self.config_genesis.items():
-        #     self.validator_nodes[self._lead_validator].set(
-        #         Path("config/genesis.json"), v, k
-        #     )
-
-        # for (v_id, validator) in self.validators.items():
-        #     self.validator_nodes[self._lead_validator].add_account(
-        #         validator, self.validator_balances[v_id]
-        #     )
-
-        # for (a_id, account) in self.accounts.items():
-        #     self.validator_nodes[self._lead_validator].add_account(
-        #         account, self.account_balances[a_id]
-        #     )
-
-        # for node_id, node in self.validator_nodes.items():
-        #     if node_id != self._lead_validator:
-        #         self.validator_nodes[node_id].copy_genesis_from(
-        #             self.validator_nodes[self._lead_validator]
-        #         )
-
-        # very hacky
-        # all_ports = (
-        #     np.array(get_free_ports(len(self.ports())
-        #              * (len(self.validators) - 1)))
-        #     .reshape((-1, len(self.ports())))
-        #     .tolist()
-        # )
-
-        # all_port_data = []
-
-        # for (node_id, node) in self.validator_nodes.items():
-        #     for (config_file, configs) in self.config_node.items():
-        #         for (k, v) in configs.items():
-        #             if isinstance(v, str):
-        #                 # TODO: avoid tomlkit.items.str being a list
-        #                 node.set(Path(f"config/{config_file}.toml"), str(v), k)
-        #             else:
-        #                 node.set(Path(f"config/{config_file}.toml"), v, k)
-
-        #     if node_id != self._lead_validator:
-        #         ports = all_ports.pop()
-        #         for (j, e_port) in enumerate(self.ports().values()):
-        #             node.update(
-        #                 e_port.config_file,
-        #                 lambda x: update_port(x, ports[j]),
-        #                 e_port.property_path,
-        #             )
-
-        #     port_data = [node.moniker]
-        #     for e_port in self.ports().values():
-        #         port_data.append(
-        #             node.get(e_port.config_file, e_port.property_path))
-        #     all_port_data.append(port_data)
-
-        # if self.verbose:
-        #     print(
-        #         tabulate.tabulate(
-        #             all_port_data,
-        #             headers=["Moniker"] +
-        #             [e.title for e in self.ports().values()],
-        #         )
-        #     )
-
-        #     print(
-        #         tabulate.tabulate(
-        #             [
-        #                 [validator.address(self.hrp_prefix)]
-        #                 for validator in self.validators.values()
-        #             ],
-        #             headers=["Validators"],
-        #         )
-        #     )
-
-        #     print(
-        #         tabulate.tabulate(
-        #             [
-        #                 [account.address(self.hrp_prefix)]
-        #                 for account in self.accounts.values()
-        #             ],
-        #             headers=["Accounts"],
-        #         )
-        #     )
-
-        # for (node_id, node) in self.validator_nodes.items():
-        #     node.add_key(self.validators[node_id])
-        #     p2p = self.ports()["p2p"]
-        #     node.add_validator(
-        #         self.validators[node_id], self.validator_balances[node_id][self.denom]
-        #     )
-
-        #     if node_id != self._lead_validator:
-        #         # because this
-        #         # https://github.com/cosmos/cosmos-sdk/blob/88ee7fb2e9303f43c52bd32410901841cad491fb/x/staking/client/cli/tx.go#L599
-        #         gentx_file = next(node.home_dir.glob("config/gentx/*json"))
-        #         gentx_file = gentx_file.relative_to(node.home_dir)
-        #         node_p2p = node.get(p2p.config_file, p2p.property_path).rsplit(
-        #             ":", maxsplit=1
-        #         )[-1]
-        #         node.update(gentx_file, lambda x: update_port(
-        #             x, node_p2p), "body.memo")
-        #         node.sign(self.validators[node_id], node.home_dir / gentx_file)
-
-        # for (id_a, node_a) in self.validator_nodes.items():
-        #     for (id_b, node_b) in self.validator_nodes.items():
-        #         if id_a != id_b:
-        #             node_a.copy_gentx_from(node_b)
-
-        # for node in self.validator_nodes.values():
-        #     node.collect_gentx()
-
     def spinup(self):
         self.start_abci_container()
         self.start_tendermock()
@@ -409,11 +295,11 @@ class Testnet:
         args = "docker rm simapp".split()
         Popen(args).communicate()
 
-        abci_args = f"docker run --add-host=host.docker.internal:host-gateway --name simapp -p 26658:26658 -p 26656:26656 -p 9091:9091 -p 1317:1317 -p 9090:9090 -i simapp sleep infinity".split()
+        abci_args = f"docker run --add-host=host.docker.internal:host-gateway --name simapp -p 26658:26658 -p 26656:26656 -p 9091:9091 -p 1317:1317 -p 9090:9090 -i simapp sleep infinity"
 
-        logging.info(f"> Starting ABCI Container: {' '.join(abci_args)}")
+        logging.info(f"> Starting ABCI Container: {abci_args}")
 
-        Popen(abci_args)
+        self.abci_process = Popen(abci_args.split())
 
         # wait until container was started. TODO better way to do this
         time.sleep(1)
@@ -514,7 +400,7 @@ class Testnet:
 
         logging.info(f"> Starting Tendermock: {' '.join(args)}")
 
-        Popen(args, stdout=tendermock_stdout, stderr=tendermock_stderr)
+        self.tendermock_process = Popen(args, stdout=tendermock_stdout, stderr=tendermock_stderr)
 
         # wait until tendermock is started. TODO: more reliable way to check whether call is done
         time.sleep(1)
@@ -524,6 +410,9 @@ class Testnet:
         self.spinup()
 
     def teardown(self):
-        # for node in self.validator_nodes.values():
-        #     node.close()
+        logging.info("Terminating Tendermock")
+        self.tendermock_process.terminate()
+        logging.info("Terminating app")
+
+        self.abci_process.terminate()
         pass
