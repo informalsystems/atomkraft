@@ -2,16 +2,25 @@ Atomkraft with Tendermock is quite a bit slower right now, compared to using Ato
 Atomkraft+Tendermock takes about 3s per tx, while Atomkraft+Tendermint takes about 1s.
 This seems to be mostly due to the CLI - signing transactions via the CLI takes 1s, while signing them via the terra_sdk library takes 0.02s.
 I suspect this is similar for broadcasting - I cannot identify any particular way to speed this up except for by not using the CLI, which
-is currently impossible, see https://github.com/cosmos/cosmos-sdk/discussions/13968
+is currently hard, see https://github.com/cosmos/cosmos-sdk/discussions/13968
 
-Docker seems to be not a huge issue in terms of overhead. It seems to take about 0.1s per call extra, compared to running commands locally.
+Some areas for improvement:
 
-Signing could be changed to work via the Terra SDK python library, but I had trouble getting the signed txs into a format that could then be broadcasted via the CLI.
+* Docker seems to be not a huge issue in terms of overhead. It seems to take about 0.1s per call extra, compared to running commands locally.
+This seems only significant during startup, where many calls are needed to set up the Genesis.
+The calls there could potentially be consensed into fewer calls, however the benefit seems small, for now.
+
+* Signing could be changed to work via the Terra SDK python library, but I had trouble getting the signed txs into a format that could then be broadcasted via the CLI.
 There are some changes between the formats used by the two, e.g. TerraSDK seems to dump the messages as protobuf serialized and encoded bytes,
 while Cosmos SDK CLI wants them as plaintext-json.
 
-For guidance on how to integrate Tendermock with Atomkraft, see the following:
+* The CLI slowdown could be avoided by having deeper integration of Atomkraft with Tendermock, i.e. Atomkraft could call Tendermock methods directly.
+Tackling this would also make the next point easier.
+
+* Tendermock lacks an endpoint for choosing the proposer and timestamp of blocks, but it is fairly straightforward by adapting https://github.com/informalsystems/tendermock/blob/main/src/abci_client.py, in paricular _beginBlock. To call such an endpoint, Atomkraft would also need deeper integration with Tendermock directly, which would also address the CLI slowdown issue
+
+For guidance on how to better integrate Tendermock with Atomkraft, see the following:
 * A sample reactor: https://github.com/informalsystems/atomkraft/blob/philip/tendermock/transfer/reactors/reactor.py
 * The adjusted testnet: https://github.com/informalsystems/atomkraft/tree/philip/tendermock/atomkraft/chain/testnet.py
-* A minimal prototype for utilizing Tendermock to communicate with ABCI: https://github.com/informalsystems/tendermock/tree/main/pipeline_poc
+* A minimal prototype for utilizing Tendermock as a blackbox to communicate with ABCI: https://github.com/informalsystems/tendermock/tree/main/pipeline_poc
 * More generally the Tendermock repo: https://github.com/informalsystems/tendermock
