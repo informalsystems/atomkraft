@@ -84,6 +84,7 @@ def version():
 )
 def init(
     name: str = typer.Argument(..., help="Name of new directory", show_default=False),
+    template: str = typer.Option("transfer", help="Name of project template to use"),
 ):
     """
     Initialize new Atomkraft project in the given directory
@@ -96,10 +97,10 @@ def init(
         )
         raise typer.Exit(1)
 
-    init_project(name, Path.cwd() / name)
+    init_project(name, dir_path, template)
 
     print(
-        f"[green bold]{'Created'.rjust(12)}[/green bold]  Atomkraft project `{name}`."
+        f"[green bold]{'Created'.rjust(12)}[/green bold]  Atomkraft project `{name}` using template {template}."
     )
 
 

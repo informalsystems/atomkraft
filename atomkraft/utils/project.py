@@ -41,8 +41,13 @@ def get_relative_project_path(path: Path) -> Path:
         return path.absolute().relative_to(project_root())
 
 
-def init_project(name: str, dir_path: Path):
-    loader = jinja2.PackageLoader("atomkraft", "templates/project")
+def init_project(name: str, dir_path: Path, template: str):
+    try:
+        loader = jinja2.PackageLoader("atomkraft", f"templates/{template}")
+    except ValueError:
+        raise RuntimeError(
+            f"Template {template} does not exist in atomkraft"
+        )
     env = jinja2.Environment(loader=loader)
     env.globals["project_name"] = name
     for tmpl_path in env.list_templates():
