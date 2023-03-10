@@ -1,4 +1,7 @@
 import os
+import imp
+import shutil
+import logging
 from pathlib import Path
 from typing import Union
 
@@ -14,16 +17,34 @@ class NoProjectError(RuntimeError):
         super().__init__("Outside of Atomkraft project")
 
 
+def copy_file_from_template(file_path: Path, project_path: Path):
+    package_path = imp.find_module("atomkraft")[1]
+    file_path_abs = os.path.join(package_path, "templates/project", file_path)
+    dest_path = os.path.join(project_path, file_path)
+
+    os.makedirs(os.path.dirname(dest_path), exist_ok=True)
+    shutil.copyfile(file_path_abs, dest_path)
+
+
 def project_root() -> Path:
     cwd = Path(os.getcwd())
     while cwd != cwd.parent:
-        if (
-            (cwd / "pyproject.toml").exists()
-            and (cwd / "atomkraft.toml").exists()
-            and (cwd / ATOMKRAFT_INTERNAL_DIR / "config.toml").exists()
-        ):
+        if (cwd / "atomkraft.toml").exists():
+            if not (cwd / "pyproject.toml").exists():
+                logging.warn(
+                    f"Configuration file pyproject.toml not found, populating in root {cwd}"
+                )
+                copy_file_from_template("pyproject.toml", cwd)
+                # copy pyproject.toml file from template
+            if not (cwd / ATOMKRAFT_INTERNAL_DIR / "config.toml").exists():
+                logging.warn(
+                    f"Configuration file config.toml not found, populating in {cwd/ATOMKRAFT_INTERNAL_DIR}"
+                )
+                copy_file_from_template(os.path.join(ATOMKRAFT_INTERNAL_DIR, "config.toml"), cwd)
+                # copy config.toml file from template
             return cwd
         cwd = cwd.parent
+
     raise NoProjectError
 
 
