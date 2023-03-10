@@ -34,14 +34,14 @@ def project_root() -> Path:
                 logging.warn(
                     f"Configuration file pyproject.toml not found, populating in root {cwd}"
                 )
-                copy_file_from_template("pyproject.toml", cwd)
                 # copy pyproject.toml file from template
+                copy_file_from_template("pyproject.toml", cwd)
             if not (cwd / ATOMKRAFT_INTERNAL_DIR / "config.toml").exists():
                 logging.warn(
                     f"Configuration file config.toml not found, populating in {cwd/ATOMKRAFT_INTERNAL_DIR}"
                 )
-                copy_file_from_template(os.path.join(ATOMKRAFT_INTERNAL_DIR, "config.toml"), cwd)
                 # copy config.toml file from template
+                copy_file_from_template(os.path.join(ATOMKRAFT_INTERNAL_DIR, "config.toml"), cwd)
             return cwd
         cwd = cwd.parent
 
