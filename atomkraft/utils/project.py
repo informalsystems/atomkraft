@@ -1,4 +1,7 @@
 import os
+import imp
+import shutil
+import logging
 from pathlib import Path
 from typing import Union
 
@@ -17,13 +20,18 @@ class NoProjectError(RuntimeError):
 def project_root() -> Path:
     cwd = Path(os.getcwd())
     while cwd != cwd.parent:
-        if (
-            (cwd / "pyproject.toml").exists()
-            and (cwd / "atomkraft.toml").exists()
-            and (cwd / ATOMKRAFT_INTERNAL_DIR / "config.toml").exists()
-        ):
+        if (cwd / "atomkraft.toml").exists():
+            if not (cwd / "pyproject.toml").exists():
+                logging.warn(
+                    f"Configuration file pyproject.toml not found in root {cwd}"
+                )
+            if not (cwd / ATOMKRAFT_INTERNAL_DIR / "config.toml").exists():
+                logging.warn(
+                    f"Configuration file config.toml not found in {cwd/ATOMKRAFT_INTERNAL_DIR}"
+                )
             return cwd
         cwd = cwd.parent
+
     raise NoProjectError
 
 
@@ -41,8 +49,13 @@ def get_relative_project_path(path: Path) -> Path:
         return path.absolute().relative_to(project_root())
 
 
-def init_project(name: str, dir_path: Path):
-    loader = jinja2.PackageLoader("atomkraft", "templates/project")
+def init_project(name: str, dir_path: Path, template: str):
+    try:
+        loader = jinja2.PackageLoader("atomkraft", f"templates/{template}")
+    except ValueError:
+        raise RuntimeError(
+            f"Template {template} does not exist in atomkraft"
+        )
     env = jinja2.Environment(loader=loader)
     env.globals["project_name"] = name
     for tmpl_path in env.list_templates():
