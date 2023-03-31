@@ -13,9 +13,15 @@ import hdwallet
 import numpy as np
 import tenacity
 import tomlkit
-from hdwallet.cryptocurrencies import CoinType, Cryptocurrency
+from hdwallet.cryptocurrencies import Cryptocurrency, AtomMainnet, EthereumMainnet
 
 from .. import utils
+
+# Dictionary of supported coins by coin_type index
+supported_coins: dict[int, Cryptocurrency] = {
+    60: EthereumMainnet,
+    118: AtomMainnet
+}
 
 
 @dataclass
@@ -72,11 +78,13 @@ class Account:
             np.random.default_rng(list(bytes(final_seed))).bytes(strength // 8).hex()
         )
         self.coin_type = coin_type
+        coin = supported_coins.setdefault(self.coin_type)
+        if coin == None:
+            raise ValueError(
+                f"Provided coin type {self.coin_type} not supported."
+            )
 
-        class LocalCC(Cryptocurrency):
-            COIN_TYPE = CoinType({"INDEX": self.coin_type, "HARDENED": True})
-
-        self.wallet = hdwallet.BIP44HDWallet(cryptocurrency=LocalCC).from_entropy(
+        self.wallet = hdwallet.BIP44HDWallet(cryptocurrency=coin).from_entropy(
             entropy=self.entropy, language="english", passphrase=""
         )
 
@@ -91,7 +99,11 @@ class Account:
         return self.bech32_address(f"{prefix}valoper")
 
     def bech32_address(self, prefix) -> str:
-        return bip_utils.Bech32Encoder.Encode(prefix, bytes.fromhex(self.wallet.hash()))
+        match self.coin_type:
+            case EthereumMainnet.COIN_TYPE.INDEX:
+                return bip_utils.Bech32Encoder.Encode(prefix, bytes.fromhex(self.wallet.address()[2:]))
+            case _:
+                return bip_utils.Bech32Encoder.Encode(prefix, bytes.fromhex(self.wallet.hash()))
 
     def __repr__(self) -> str:
         return json.dumps(self.wallet.dumps(), indent=2)
