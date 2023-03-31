@@ -79,7 +79,7 @@ class Account:
         )
         self.coin_type = coin_type
         coin = supported_coins.setdefault(self.coin_type)
-        if coin == None:
+        if coin is None:
             raise ValueError(
                 f"Provided coin type {self.coin_type} not supported."
             )
