@@ -13,16 +13,9 @@ import hdwallet
 import numpy as np
 import tenacity
 import tomlkit
-from hdwallet.cryptocurrencies import Cryptocurrency, AtomMainnet, EthereumMainnet
+from hdwallet.cryptocurrencies import Cryptocurrency, CoinType, EthereumMainnet
 
 from .. import utils
-
-# Dictionary of supported coins by coin_type index
-supported_coins: dict[int, Cryptocurrency] = {
-    60: EthereumMainnet,
-    118: AtomMainnet
-}
-
 
 @dataclass
 class ConfigPort:
@@ -78,11 +71,14 @@ class Account:
             np.random.default_rng(list(bytes(final_seed))).bytes(strength // 8).hex()
         )
         self.coin_type = coin_type
-        coin = supported_coins.setdefault(self.coin_type)
-        if coin is None:
-            raise ValueError(
-                f"Provided coin type {self.coin_type} not supported."
-            )
+        
+        class LocalCC(Cryptocurrency):
+            COIN_TYPE = CoinType({"INDEX": self.coin_type, "HARDENED": True})
+        coin = LocalCC
+
+        # Needed for bech32 encoding on Ethermint chains
+        if coin_type == EthereumMainnet.COIN_TYPE.INDEX:
+            coin = EthereumMainnet
 
         self.wallet = hdwallet.BIP44HDWallet(cryptocurrency=coin).from_entropy(
             entropy=self.entropy, language="english", passphrase=""
