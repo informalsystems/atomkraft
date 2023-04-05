@@ -136,7 +136,7 @@ All three elements for running a test are now in place: a testnet, a test scenar
 Thus, we are ready to run some tests (though, trivial ones since the reactor is still only a stub).
 
 ```
-atomkraft test trace --path traces/TestALiceZero/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag
+atomkraft test trace --path traces/TestAliceZero/violation1.itf.json --reactor reactors/reactor.py --keypath action.tag
 ```
 
 The output of the command contains

@@ -1,9 +1,10 @@
 import json
+import os
 import shutil
 from datetime import datetime
 from io import TextIOWrapper
 from pathlib import Path
-from typing import List, Tuple
+from typing import List
 
 import pytest
 from atomkraft.chain.testnet import VALIDATOR_DIR
@@ -40,9 +41,20 @@ class Test:
         Initialize a test for a given trace, which can be a directory or a file.
         """
         self.root = root
-        self.name = Test.make_name(trace)
-        self.dir = Test.make_dir(root, trace.is_dir(), self.name)
-        self.file_path = self.dir / f"test_{self.name}.py"
+        self.trace = trace
+        self.timestamp = snakecase(datetime.now().isoformat(timespec="milliseconds"))
+
+        if trace.is_dir():
+            self.name = Test._path_to_id(trace)
+            self.tests_dir = root / "tests" / f"{self.name}_{self.timestamp}"
+        else:
+            self.name = Test._path_to_id(trace) + "_" + self.timestamp
+            self.tests_dir = root / "tests"
+        self.tests_dir.mkdir(parents=True, exist_ok=True)
+        self.file_path = self.tests_dir / f"test_{self.name}.py"
+
+        self.report_dir = root / "reports" / Test._path_to_id(trace) / self.timestamp
+        self.report_dir.mkdir(parents=True, exist_ok=True)
 
     def create_file(self, traces: List[Path], reactor: Path, keypath: str):
         """
@@ -60,35 +72,13 @@ class Test:
 
         print(f"Executing test {self.name} ...")
         val_root_dir = self.prepare_validators()
-        pytest_args, report_dir = self.make_pytest_args(verbose)
+        pytest_args = self.make_pytest_args(verbose)
         exit_code = pytest.main(pytest_args + [self.file_path])
 
-        self.save_validator_files(val_root_dir, report_dir)
-        print(f"Test data for {self.name} saved at {report_dir}")
+        self.save_validator_files(val_root_dir)
+        print(f"Test data for {self.name} saved at {self.report_dir}")
 
         return int(exit_code)
-
-    @staticmethod
-    def make_name(trace_path: Path):
-        """
-        Make a test name from a file path or directory.
-        """
-        name = Test._path_to_id(trace_path)
-        if not trace_path.is_dir:
-            name = Test._append_timestamp(name)
-        return name
-
-    @staticmethod
-    def make_dir(root: Path, trace_path_is_dir: bool, name: str):
-        """
-        Make a directory for the test file.
-        """
-        if trace_path_is_dir:
-            dir = root / "tests" / Test._append_timestamp(name)
-        else:
-            dir = root / "tests"
-        dir.mkdir(parents=True, exist_ok=True)
-        return dir
 
     @staticmethod
     def _path_to_id(path: Path) -> str:
@@ -132,14 +122,9 @@ class Test:
             )
         )
 
-    def make_pytest_args(self, verbose: bool) -> Tuple[List[str], Path]:
-        report_dir = Path(
-            str(get_relative_project_path(self.dir)).replace("tests/", "reports/")
-        )
-        report_dir.mkdir(parents=True, exist_ok=True)
-
-        logging_file = report_dir / "log.txt"
-        pytest_report_file = report_dir / "report.jsonl"
+    def make_pytest_args(self, verbose: bool) -> List[str]:
+        logging_file = self.report_dir / "log.txt"
+        pytest_report_file = self.report_dir / "report.jsonl"
         pytest_args = [
             "--log-file-level=INFO",
             "--log-cli-level=INFO",
@@ -149,7 +134,7 @@ class Test:
         if verbose:
             pytest_args.append("-rP")
 
-        return pytest_args, report_dir
+        return pytest_args
 
     def prepare_validators(self):
         val_root_dir = self.root / ATOMKRAFT_INTERNAL_DIR / VALIDATOR_DIR
@@ -157,14 +142,15 @@ class Test:
             shutil.rmtree(val_root_dir)
         return val_root_dir
 
-    def save_validator_files(self, val_root_dir: Path, report_dir: Path):
+    def save_validator_files(self, val_root_dir: Path):
         vals_dirs = list(val_root_dir.glob(f"{ATOMKRAFT_VAL_DIR_PREFIX}*"))
         vals_dirs.sort(key=lambda k: k.stat().st_mtime)
 
+        # Be careful: zip assumes that trace_paths and the validator directories
+        # are sorted in the same order. We should improve this code.
         for (trace_path, validator_dir) in zip(self.trace_paths, vals_dirs):
-            copy_if_exists(
-                [trace_path, validator_dir], report_dir / Test._path_to_id(trace_path)
-            )
+            subdir = Path(Test._path_to_id(Path(os.path.basename(trace_path))))
+            copy_if_exists([trace_path, validator_dir], self.report_dir / subdir)
 
 
 def all_traces_from(trace_dir: Path):
