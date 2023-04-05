@@ -13,9 +13,10 @@ import hdwallet
 import numpy as np
 import tenacity
 import tomlkit
-from hdwallet.cryptocurrencies import Cryptocurrency, CoinType, EthereumMainnet
+from hdwallet.cryptocurrencies import CoinType, Cryptocurrency, EthereumMainnet
 
 from .. import utils
+
 
 @dataclass
 class ConfigPort:
@@ -71,7 +72,7 @@ class Account:
             np.random.default_rng(list(bytes(final_seed))).bytes(strength // 8).hex()
         )
         self.coin_type = coin_type
-        
+
         class LocalCC(Cryptocurrency):
             COIN_TYPE = CoinType({"INDEX": self.coin_type, "HARDENED": True})
         coin = LocalCC
