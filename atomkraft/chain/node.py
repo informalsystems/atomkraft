@@ -13,7 +13,7 @@ import hdwallet
 import numpy as np
 import tenacity
 import tomlkit
-from hdwallet.cryptocurrencies import CoinType, Cryptocurrency
+from hdwallet.cryptocurrencies import CoinType, Cryptocurrency, EthereumMainnet
 
 from .. import utils
 
@@ -75,8 +75,13 @@ class Account:
 
         class LocalCC(Cryptocurrency):
             COIN_TYPE = CoinType({"INDEX": self.coin_type, "HARDENED": True})
+        coin = LocalCC
 
-        self.wallet = hdwallet.BIP44HDWallet(cryptocurrency=LocalCC).from_entropy(
+        # Needed for bech32 encoding on Ethermint chains
+        if coin_type == EthereumMainnet.COIN_TYPE.INDEX:
+            coin = EthereumMainnet
+
+        self.wallet = hdwallet.BIP44HDWallet(cryptocurrency=coin).from_entropy(
             entropy=self.entropy, language="english", passphrase=""
         )
 
@@ -91,7 +96,11 @@ class Account:
         return self.bech32_address(f"{prefix}valoper")
 
     def bech32_address(self, prefix) -> str:
-        return bip_utils.Bech32Encoder.Encode(prefix, bytes.fromhex(self.wallet.hash()))
+        match self.coin_type:
+            case EthereumMainnet.COIN_TYPE.INDEX:
+                return bip_utils.Bech32Encoder.Encode(prefix, bytes.fromhex(self.wallet.address()[2:]))
+            case _:
+                return bip_utils.Bech32Encoder.Encode(prefix, bytes.fromhex(self.wallet.hash()))
 
     def __repr__(self) -> str:
         return json.dumps(self.wallet.dumps(), indent=2)
